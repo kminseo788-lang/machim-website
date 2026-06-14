@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pure UV — 포트폴리오</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="sunscreen.css">
+</head>
+<body>
+<div class="port-nav-label">
+    <div class="port-nav-dot"></div>
+    Portfolio · Pure UV Sun Essence
+  </div>
+  <div class="port-toggle">
+    <button class="toggle-btn active" id="btn-desktop" onclick="switchView('desktop')">
+      🖥 Desktop
+    </button>
+    <button class="toggle-btn inactive" id="btn-mobile" onclick="switchView('mobile')">
+      📱 Mobile
+    </button>
+  </div>
+  <span class="port-size" id="size-label">1440px</span>
+</div>
+
+<div class="content">
+
+<!-- ════ DESKTOP VIEW ════ -->
+<div id="desktop-view">
+
+  <!-- SITE NAV -->
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <div style="display:flex;align-items:center;gap:28px">
+        <span class="site-logo">Pure UV</span>
+        <div style="width:1px;height:14px;background:rgba(0,0,0,0.12)"></div>
+        <span style="font-size:11px;color:#aaa;letter-spacing:0.04em">Sun Essence Collection</span>
+      </div>
+      <div class="site-nav-links">
+        <a href="#">제품 소개</a>
+        <a href="#">성분</a>
+        <a href="#">사용 방법</a>
+        <a href="#">리뷰</a>
+      </div>
+      <div class="site-nav-btns">
+        <button class="btn-outline-sm">🤍 찜하기</button>
+        <button class="btn-solid-sm">🛍 구매하기</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section style="background:var(--bg);overflow:hidden">
+    <div class="hero-grid" style="max-width:1440px;margin:0 auto">
+      <div class="hero-left">
+        <p class="section-label">Daily Sun Essence · SPF 50+ PA++++</p>
+        <h1 class="hero-h1">매일 바르는<br>선크림은<br>가벼워야 합니다</h1>
+        <p class="hero-desc">백탁 없이 수분처럼 스며드는<br>데일리 선 에센스</p>
+        <div class="benefit-pills">
+          <span class="pill">SPF 50+ PA++++</span>
+          <span class="pill">0% 백탁</span>
+          <span class="pill">24H 보습</span>
+          <span class="pill">피부과 테스트 완료</span>
+        </div>
+        <div class="hero-cta">
+          <button class="btn-primary">제품 자세히 보기 →</button>
+          <span class="hero-price">38,000원</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <img src="https://images.unsplash.com/photo-1616750819456-5cdee9b85d22?w=1200&h=1600&fit=crop&auto=format" alt="Pure UV Sun Essence">
+        <div class="hero-fade"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem-section">
+    <div class="inner">
+      <div class="problem-header">
+        <div>
+          <p class="section-label">Problem</p>
+          <h2 class="problem-h2">선크림이<br>불편했던 이유</h2>
+        </div>
+        <p class="problem-sub">많은 사람들이 선크림을 꺼려하는 이유는 동일합니다. 우리는 그 이유들을 해결했습니다.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card"><span class="problem-num">01</span><p class="problem-label">끈적임</p><p class="problem-desc">바르고 나면 손에 달라붙는 불쾌한 점성</p></div>
+        <div class="problem-card"><span class="problem-num">02</span><p class="problem-label">백탁</p><p class="problem-desc">피부톤을 하얗게 뒤덮는 파우더 막</p></div>
+        <div class="problem-card"><span class="problem-num">03</span><p class="problem-label">밀림</p><p class="problem-desc">화장이 뭉치고 지워지는 문제</p></div>
+        <div class="problem-card"><span class="problem-num">04</span><p class="problem-label">답답함</p><p class="problem-desc">막히는 느낌의 두꺼운 도막감</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section class="solution-section">
+    <div class="solution-grid">
+      <div class="solution-img">
+        <img src="https://images.unsplash.com/photo-1638609927040-8a7e97cd9d6a?w=1200&h=1600&fit=crop&auto=format" alt="에센스 텍스처">
+        <div class="solution-img-fade"></div>
+      </div>
+      <div class="solution-text">
+        <p class="section-label section-label-light">Solution</p>
+        <h2 class="solution-h2">우리가 바꾼 것은<br>SPF 수치가 아니라<br><span>사용감입니다</span></h2>
+        <div class="solution-divider"></div>
+        <p class="solution-desc">피부과학에 기반한 처방으로 자외선 차단 성능은 그대로 유지하되, 에센스처럼 가볍고 수분감 있는 사용감을 실현했습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- KEY NUMBERS -->
+  <section class="numbers-section">
+    <div class="inner">
+      <div class="numbers-center">
+        <p class="section-label" style="text-align:center">Specification</p>
+        <h2 class="numbers-h2">숫자로 증명하는 확실한 성능</h2>
+      </div>
+      <div class="numbers-grid">
+        <div class="number-item"><span class="number-val sm">SPF 50+</span><p class="number-label">자외선 B 차단</p><p class="number-sub">최고 등급</p></div>
+        <div class="number-item"><span class="number-val sm">PA++++</span><p class="number-label">자외선 A 차단</p><p class="number-sub">최고 등급</p></div>
+        <div class="number-item"><span class="number-val">0%</span><p class="number-label">백탁 제로</p><p class="number-sub">투명 처방</p></div>
+        <div class="number-item"><span class="number-val sm">24H</span><p class="number-label">지속 보습</p><p class="number-sub">장시간 유지</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEXTURE -->
+  <section class="texture-section">
+    <div class="texture-banner">
+      <img src="https://images.unsplash.com/photo-1748543668687-624e058c367c?w=1200&h=900&fit=crop&auto=format" alt="에센스 텍스처">
+    </div>
+    <div class="inner">
+      <div class="texture-grid">
+        <div>
+          <p class="section-label">Texture</p>
+          <h2 class="texture-h2">선크림보다<br>수분 에센스에<br>가깝게</h2>
+          <p class="texture-desc">손에 닿는 순간 녹아들어 피부에 흡수됩니다. 끈적임 없이 매트하게 마무리되는 가벼운 에센스 타입.</p>
+          <div class="texture-points">
+            <div class="texture-point"><div class="texture-dot"></div><span>가벼운 에센스 텍스처</span></div>
+            <div class="texture-point"><div class="texture-dot"></div><span>무잔여감 빠른 흡수</span></div>
+            <div class="texture-point"><div class="texture-dot"></div><span>끈적임 없는 마무리</span></div>
+          </div>
+        </div>
+        <div class="texture-imgs">
+          <div class="texture-img-item"><img src="https://images.unsplash.com/photo-1585945037805-5fd82c2e60b1?w=900&h=900&fit=crop&auto=format" alt="크림 텍스처"></div>
+          <div class="texture-img-item"><img src="https://images.unsplash.com/photo-1608068811588-3a67006b7489?w=900&h=900&fit=crop&auto=format" alt="수분 텍스처"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIFESTYLE -->
+  <section class="lifestyle-section">
+    <div class="lifestyle-header">
+      <div>
+        <p class="section-label">Lifestyle</p>
+        <h2 class="lifestyle-h2">아침마다 생각 없이<br>집어드는 선크림</h2>
+      </div>
+      <p class="lifestyle-sub">스킨케어 마지막 단계에 가볍게 한 번. 귀찮음 없이 매일 이어가는 루틴이 됩니다.</p>
+    </div>
+    <div class="lifestyle-imgs">
+      <div class="lifestyle-main"><img src="https://images.unsplash.com/photo-1631832293782-2eda7804489b?w=1200&h=1600&fit=crop&auto=format" alt="아침 루틴"></div>
+      <div class="lifestyle-side">
+        <div><img src="https://images.unsplash.com/photo-1529047033375-f402d3da24ca?w=900&h=700&fit=crop&auto=format" alt="햇빛" style="width:100%;height:100%;object-fit:cover"></div>
+        <div><img src="https://images.unsplash.com/photo-1601276174812-63280a55656e?w=900&h=700&fit=crop&auto=format" alt="아침 침실" style="width:100%;height:100%;object-fit:cover"></div>
+      </div>
+    </div>
+    <div class="lifestyle-footer"></div>
+  </section>
+
+  <!-- INGREDIENTS -->
+  <section class="ingredients-section">
+    <div class="inner">
+      <div class="ingredients-center">
+        <p class="section-label" style="text-align:center">Key Ingredients</p>
+        <h2 class="ingredients-h2">피부과학이 선택한 4가지 핵심 성분</h2>
+      </div>
+      <div class="ingredients-grid">
+        <div class="ingredient-card"><div class="ingredient-icon">💧</div><p class="ingredient-name">히알루론산</p><p class="ingredient-en">Hyaluronic Acid</p><p class="ingredient-desc">피부 깊숙이 수분을 채워 24시간 촉촉함을 유지합니다.</p></div>
+        <div class="ingredient-card"><div class="ingredient-icon">🌿</div><p class="ingredient-name">판테놀</p><p class="ingredient-en">Panthenol</p><p class="ingredient-desc">손상된 피부 장벽을 회복하고 자극을 진정시킵니다.</p></div>
+        <div class="ingredient-card"><div class="ingredient-icon">🍃</div><p class="ingredient-name">병풀추출물</p><p class="ingredient-en">Centella Asiatica</p><p class="ingredient-desc">민감성 피부를 안정화하고 트러블을 케어합니다.</p></div>
+        <div class="ingredient-card"><div class="ingredient-icon">✨</div><p class="ingredient-name">세라마이드</p><p class="ingredient-en">Ceramide</p><p class="ingredient-desc">피부 장벽을 강화하고 수분 증발을 차단합니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section class="comparison-section">
+    <div class="inner">
+      <div class="comparison-grid">
+        <div>
+          <p class="section-label">Comparison</p>
+          <h2 class="comparison-h2">일반 선크림 VS<br>Pure UV<br>Sun Essence</h2>
+          <p class="comparison-sub">자외선 차단 성능을 타협하지 않으면서 사용감을 근본적으로 바꿨습니다.</p>
+        </div>
+        <div class="comparison-table">
+          <div class="comp-header">
+            <div class="comp-header-cell left"></div>
+            <div class="comp-header-cell dim">일반 선크림</div>
+            <div class="comp-header-cell bright">Pure UV</div>
+          </div>
+          <div class="comp-row even"><div class="comp-cell"><p class="comp-label">백탁 없음</p><p class="comp-detail">투명 처방</p></div><div class="comp-cell center">✕</div><div class="comp-cell center" style="color:var(--navy);font-weight:700">✓</div></div>
+          <div class="comp-row odd"><div class="comp-cell"><p class="comp-label">끈적임 없음</p><p class="comp-detail">에센스 텍스처</p></div><div class="comp-cell center">✕</div><div class="comp-cell center" style="color:var(--navy);font-weight:700">✓</div></div>
+          <div class="comp-row even"><div class="comp-cell"><p class="comp-label">빠른 흡수력</p><p class="comp-detail">즉각 흡수</p></div><div class="comp-cell center">✕</div><div class="comp-cell center" style="color:var(--navy);font-weight:700">✓</div></div>
+          <div class="comp-row odd"><div class="comp-cell"><p class="comp-label">메이크업 밀림 없음</p><p class="comp-detail">밀착 포뮬라</p></div><div class="comp-cell center">✕</div><div class="comp-cell center" style="color:var(--navy);font-weight:700">✓</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reviews-section">
+    <div class="inner">
+      <div class="reviews-header">
+        <div class="reviews-meta">
+          <span class="reviews-score">5.0</span>
+          <div>
+            <div class="stars">⭐⭐⭐⭐⭐</div>
+            <p class="reviews-meta-text">2,847개의 리뷰</p>
+          </div>
+        </div>
+        <button class="btn-outline-sm2">전체 리뷰 보기 →</button>
+      </div>
+      <div class="reviews-grid">
+        <div class="review-card"><div class="review-top"><div class="stars">⭐⭐⭐⭐⭐</div><span class="review-tag">건성 피부</span></div><p class="review-title">화장 전에 발라도 안 밀려요</p><p class="review-body">처음에 반신반의했는데 진짜 밀리지 않아요. 수분크림 바르는 느낌이에요. 촉촉하고 가벼워서 매일 아침 쓰고 있어요.</p><div class="review-footer"><span class="review-name">김지연</span><span class="review-date">2025.05.12</span></div></div>
+        <div class="review-card"><div class="review-top"><div class="stars">⭐⭐⭐⭐⭐</div><span class="review-tag">지성 피부</span></div><p class="review-title">백탁 없이 투명하게 흡수돼요</p><p class="review-body">다른 선크림은 얼굴이 하얗게 떠서 못 쓰는데, 이건 정말 투명하게 흡수돼요. 여름에 색조 없이 이것만 발라도 될 것 같아요.</p><div class="review-footer"><span class="review-name">박소연</span><span class="review-date">2025.04.28</span></div></div>
+        <div class="review-card"><div class="review-top"><div class="stars">⭐⭐⭐⭐⭐</div><span class="review-tag">민감성 피부</span></div><p class="review-title">드디어 선크림이 편해졌어요</p><p class="review-body">민감성 피부라 선크림 고르기가 너무 힘들었는데 이건 자극도 없고 끈적임도 없어요. 진짜 에센스처럼 스며들어요.</p><div class="review-footer"><span class="review-name">이민아</span><span class="review-date">2025.06.01</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW TO USE -->
+  <section class="howto-section">
+    <div class="inner">
+      <div class="howto-center">
+        <p class="section-label" style="text-align:center">How to Use</p>
+        <h2 class="howto-h2">올바른 사용 방법</h2>
+      </div>
+      <div class="howto-grid">
+        <div class="howto-card"><span class="howto-step-label">Step 01</span><div class="howto-num">1</div><p class="howto-title">스킨케어 마지막 단계</p><p class="howto-desc">스킨, 에센스, 크림 순서로 기초 케어를 완료한 후 마지막 단계에 사용하세요.</p></div>
+        <div class="howto-arrow">→</div>
+        <div class="howto-card"><span class="howto-step-label">Step 02</span><div class="howto-num">2</div><p class="howto-title">적당량 도포</p><p class="howto-desc">검지 한 마디 정도의 양을 이마, 양볼, 코, 턱에 나누어 올린 후 가볍게 펴 발라 주세요.</p></div>
+        <div class="howto-arrow">→</div>
+        <div class="howto-card"><span class="howto-step-label">Step 03</span><div class="howto-num">3</div><p class="howto-title">외출 20분 전 사용</p><p class="howto-desc">자외선 차단 효과를 최대화하려면 외출 20분 전에 바르는 것을 권장합니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="inner">
+      <div class="faq-grid">
+        <div class="faq-sticky">
+          <p class="section-label">FAQ</p>
+          <h2 class="faq-h2">자주<br>묻는 질문</h2>
+          <p class="faq-sub">더 궁금한 사항은 고객센터로<br>문의해 주세요.</p>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">민감성 피부도 사용 가능한가요?</span><span class="faq-chevron">∨</span></div><div class="faq-a">네, 병풀추출물과 판테놀을 함유해 민감한 피부에도 자극 없이 사용할 수 있습니다. 피부과 테스트가 완료된 저자극 포뮬라입니다.</div></div>
+          <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">메이크업 전에 발라도 되나요?</span><span class="faq-chevron">∨</span></div><div class="faq-a">스킨케어 마지막 단계에 사용하고 5~10분 후 메이크업을 진행하시면 밀림 없이 완벽하게 밀착됩니다.</div></div>
+          <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">백탁이 있나요?</span><span class="faq-chevron">∨</span></div><div class="faq-a">0% 백탁 처방으로 설계되었습니다. 무기 자외선 차단제 특유의 하얀 막 현상 없이 어떤 피부톤에서도 투명하게 흡수됩니다.</div></div>
+          <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span class="faq-q-text">남성도 사용할 수 있나요?</span><span class="faq-chevron">∨</span></div><div class="faq-a">물론입니다. 성별 구분 없이 누구나 사용 가능한 젠더 뉴트럴 포뮬라입니다.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta-section">
+    <div class="cta-dec1"></div><div class="cta-dec2"></div>
+    <div class="cta-grid">
+      <div class="cta-img">
+        <img src="https://images.unsplash.com/photo-1616750819456-5cdee9b85d22?w=1200&h=1600&fit=crop&auto=format" alt="Pure UV">
+        <div class="cta-img-fade"></div>
+      </div>
+      <div class="cta-text">
+        <p class="cta-eyebrow">Pure UV Sun Essence · 50ml</p>
+        <h2 class="cta-h2">매일 바르는<br>선크림, 이제<br>가볍게 바꾸세요</h2>
+        <div class="cta-price"><span class="cta-price-num">38,000</span><span class="cta-price-won">원</span></div>
+        <div class="cta-btns">
+          <button class="cta-btn-white">구매하기</button>
+          <button class="cta-btn-ghost">장바구니 담기</button>
+        </div>
+        <div class="trust-badges">
+          <div class="trust-badge"><p class="trust-label">무료 배송</p><p class="trust-sub">3만원 이상</p></div>
+          <div class="trust-badge"><p class="trust-label">피부과 테스트</p><p class="trust-sub">완료</p></div>
+          <div class="trust-badge"><p class="trust-label">30일 교환</p><p class="trust-sub">보장</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="inner">
+      <div class="footer-inner">
+        <div><p class="footer-logo">Pure UV</p><p class="footer-info">고객센터: 1588-0000 | 평일 10:00–18:00</p></div>
+        <div class="footer-links"><a href="#">개인정보처리방침</a><a href="#">이용약관</a><a href="#">브랜드 스토리</a></div>
+        <p class="footer-copy">© 2025 Pure UV. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /desktop-view -->
+
+<!-- ════ MOBILE VIEW ════ -->
+<div id="mobile-view">
+  <div class="mobile-frame">
+    <div class="mob">
+
+      <!-- MOB NAV -->
+      <nav class="mob-nav">
+        <span class="mob-logo">Pure UV</span>
+        <button class="mob-buy">구매하기</button>
+      </nav>
+
+      <!-- MOB HERO -->
+      <section style="background:var(--bg)">
+        <div class="mob-hero-img">
+          <img src="https://images.unsplash.com/photo-1638609927040-8a7e97cd9d6a?w=780&h=960&fit=crop&auto=format" alt="Pure UV">
+          <div class="mob-hero-img-fade"></div>
+        </div>
+        <div class="mob-hero-text">
+          <p class="mob-label">Daily Sun Essence · SPF 50+ PA++++</p>
+          <h1 class="mob-h1">매일 바르는 선크림은<br>가벼워야 합니다</h1>
+          <p class="mob-desc">백탁 없이 수분처럼 스며드는<br>데일리 선 에센스</p>
+          <button class="mob-btn-primary">제품 자세히 보기 →</button>
+        </div>
+      </section>
+
+      <!-- MOB PROBLEM -->
+      <section class="mob-section" style="background:var(--bg)">
+        <p class="mob-label">Problem</p>
+        <h2 class="mob-h2">선크림이<br>불편했던 이유</h2>
+        <div class="mob-problem-list">
+          <div class="mob-problem-item"><span class="mob-problem-num">01</span><div><p class="mob-problem-label">끈적임</p><p class="mob-problem-desc">바르고 나면 손에 달라붙는 불편함</p></div></div>
+          <div class="mob-problem-item"><span class="mob-problem-num">02</span><div><p class="mob-problem-label">백탁</p><p class="mob-problem-desc">하얗게 뜨는 파우더 막</p></div></div>
+          <div class="mob-problem-item"><span class="mob-problem-num">03</span><div><p class="mob-problem-label">밀림</p><p class="mob-problem-desc">화장이 뭉치고 지워지는 문제</p></div></div>
+          <div class="mob-problem-item"><span class="mob-problem-num">04</span><div><p class="mob-problem-label">답답함</p><p class="mob-problem-desc">막히는 느낌의 두꺼운 도막감</p></div></div>
+        </div>
+      </section>
+
+      <!-- MOB SOLUTION -->
+      <section class="mob-solution">
+        <div class="mob-sol-dec"></div>
+        <p class="mob-sol-label">Solution</p>
+        <h2 class="mob-sol-h2">우리가 바꾼 것은<br>SPF 수치가 아니라<br><span>사용감입니다</span></h2>
+        <div class="mob-sol-divider">
+          <p class="mob-sol-desc">피부과학에 기반한 처방으로 자외선 차단 성능은 그대로, 에센스처럼 가볍고 수분감 있는 사용감을 실현했습니다.</p>
+        </div>
+      </section>
+
+      <!-- MOB NUMBERS -->
+      <section class="mob-section" style="background:var(--bg)">
+        <p class="mob-label">Specification</p>
+        <h2 style="font-size:22px;font-weight:700;letter-spacing:-0.03em;margin-bottom:48px;line-height:1.4">숫자로 증명하는<br>확실한 성능</h2>
+        <div class="mob-numbers-grid">
+          <div class="mob-number-item"><span class="mob-number-val sm">SPF 50+</span><span class="mob-number-label">자외선 B 차단</span></div>
+          <div class="mob-number-item"><span class="mob-number-val sm">PA++++</span><span class="mob-number-label">자외선 A 최고 등급</span></div>
+          <div class="mob-number-item"><span class="mob-number-val">0%</span><span class="mob-number-label">백탁 없는 투명 처방</span></div>
+          <div class="mob-number-item"><span class="mob-number-val">24H</span><span class="mob-number-label">지속 보습</span></div>
+        </div>
+      </section>
+
+      <!-- MOB TEXTURE -->
+      <section style="padding:64px 0 72px;background:var(--bg)">
+        <div style="padding:0 28px;margin-bottom:36px">
+          <p class="mob-label">Texture</p>
+          <h2 style="font-size:27px;font-weight:700;line-height:1.35;letter-spacing:-0.03em">선크림보다<br>수분 에센스에 가깝게</h2>
+        </div>
+        <div class="mob-img-full" style="height:310px"><img src="https://images.unsplash.com/photo-1748543668687-624e058c367c?w=600&h=600&fit=crop&auto=format" alt="텍스처" style="width:100%;height:100%;object-fit:cover"></div>
+        <div class="mob-img-duo">
+          <div style="height:185px"><img src="https://images.unsplash.com/photo-1585945037805-5fd82c2e60b1?w=600&h=600&fit=crop&auto=format" alt="크림" style="width:100%;height:100%;object-fit:cover"></div>
+          <div style="height:185px"><img src="https://images.unsplash.com/photo-1608068811588-3a67006b7489?w=600&h=600&fit=crop&auto=format" alt="수분" style="width:100%;height:100%;object-fit:cover"></div>
+        </div>
+        <div style="padding:32px 28px 0"><p style="font-size:14px;color:#666;line-height:1.8">손에 닿는 순간 녹아들어 피부에 흡수됩니다. 끈적임 없이 가볍게 마무리되는 에센스 타입.</p></div>
+      </section>
+
+      <!-- MOB LIFESTYLE -->
+      <section style="padding:64px 0 72px;background:var(--bg2)">
+        <div style="padding:0 28px;margin-bottom:36px">
+          <p class="mob-label">Lifestyle</p>
+          <h2 style="font-size:27px;font-weight:700;line-height:1.35;letter-spacing:-0.03em">아침마다 생각 없이<br>집어드는 선크림</h2>
+        </div>
+        <div class="mob-img-full" style="height:440px"><img src="https://images.unsplash.com/photo-1631832293782-2eda7804489b?w=600&h=800&fit=crop&auto=format" alt="아침 루틴" style="width:100%;height:100%;object-fit:cover"></div>
+        <div class="mob-img-duo">
+          <div style="height:200px"><img src="https://images.unsplash.com/photo-1529047033375-f402d3da24ca?w=600&h=600&fit=crop&auto=format" alt="햇빛" style="width:100%;height:100%;object-fit:cover"></div>
+          <div style="height:200px"><img src="https://images.unsplash.com/photo-1601276174812-63280a55656e?w=600&h=600&fit=crop&auto=format" alt="아침" style="width:100%;height:100%;object-fit:cover"></div>
+        </div>
+      </section>
+
+      <!-- MOB INGREDIENTS -->
+      <section class="mob-section" style="background:var(--bg)">
+        <p class="mob-label">Key Ingredients</p>
+        <h2 style="font-size:26px;font-weight:700;line-height:1.35;letter-spacing:-0.03em;margin-bottom:40px">피부과학이 선택한<br>4가지 핵심 성분</h2>
+        <div class="mob-ingredient-list">
+          <div class="mob-ingredient"><div class="mob-ingredient-icon">💧</div><div><p class="mob-ingredient-name">히알루론산</p><p class="mob-ingredient-en">Hyaluronic Acid</p><p class="mob-ingredient-desc">피부 깊숙이 수분을 채워 24시간 촉촉함 유지</p></div></div>
+          <div class="mob-ingredient"><div class="mob-ingredient-icon">🌿</div><div><p class="mob-ingredient-name">판테놀</p><p class="mob-ingredient-en">Panthenol</p><p class="mob-ingredient-desc">손상된 피부 장벽 회복, 진정 효과</p></div></div>
+          <div class="mob-ingredient"><div class="mob-ingredient-icon">🍃</div><div><p class="mob-ingredient-name">병풀추출물</p><p class="mob-ingredient-en">Centella Asiatica</p><p class="mob-ingredient-desc">민감성 피부 안정화, 트러블 케어</p></div></div>
+          <div class="mob-ingredient"><div class="mob-ingredient-icon">✨</div><div><p class="mob-ingredient-name">세라마이드</p><p class="mob-ingredient-en">Ceramide</p><p class="mob-ingredient-desc">피부 장벽 강화, 수분 증발 차단</p></div></div>
+        </div>
+      </section>
+
+      <!-- MOB COMPARISON -->
+      <section class="mob-section" style="background:var(--bg)">
+        <p class="mob-label">Comparison</p>
+        <h2 style="font-size:26px;font-weight:700;line-height:1.35;letter-spacing:-0.03em;margin-bottom:40px">일반 선크림 VS<br>Pure UV Sun Essence</h2>
+        <div class="mob-comparison-table">
+          <div class="mob-comp-header">
+            <div class="mob-comp-h" style="padding:16px 14px"></div>
+            <div class="mob-comp-h dim">일반 선크림</div>
+            <div class="mob-comp-h bright">Pure UV</div>
+          </div>
+          <div class="mob-comp-row"><div class="mob-comp-cell">백탁 없음</div><div class="mob-comp-cell center" style="color:#ddd">✕</div><div class="mob-comp-cell center" style="color:var(--navy);font-weight:700">✓</div></div>
+          <div class="mob-comp-row" style="background:#fafaf8"><div class="mob-comp-cell">끈적임 없음</div><div class="mob-comp-cell center" style="color:#ddd">✕</div><div class="mob-comp-cell center" style="color:var(--navy);font-weight:700">✓</div></div>
+          <div class="mob-comp-row"><div class="mob-comp-cell">빠른 흡수력</div><div class="mob-comp-cell center" style="color:#ddd">✕</div><div class="mob-comp-cell center" style="color:var(--navy);font-weight:700">✓</div></div>
+          <div class="mob-comp-row" style="background:#fafaf8"><div class="mob-comp-cell">메이크업 밀림 없음</div><div class="mob-comp-cell center" style="color:#ddd">✕</div><div class="mob-comp-cell center" style="color:var(--navy);font-weight:700">✓</div></div>
+        </div>
+      </section>
+
+      <!-- MOB REVIEWS -->
+      <section style="padding:72px 0;background:var(--bg2)">
+        <div class="mob-reviews-header">
+          <p class="mob-label">Reviews</p>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">
+            <span class="mob-score">5.0</span>
+            <div><div>⭐⭐⭐⭐⭐</div><p style="font-size:11px;color:#aaa;margin-top:5px">2,847개의 리뷰</p></div>
+          </div>
+        </div>
+        <div class="mob-reviews-scroll">
+          <div class="mob-review-card"><div class="mob-review-top"><div>⭐⭐⭐⭐⭐</div><span class="mob-review-tag">건성 피부</span></div><p class="mob-review-title">화장 전에 발라도 안 밀려요</p><p class="mob-review-body">처음에 반신반의했는데 진짜 밀리지 않아요. 수분크림 바르는 느낌이에요.</p><div class="mob-review-footer"><span class="mob-review-name">김지연</span><span class="mob-review-date">2025.05.12</span></div></div>
+          <div class="mob-review-card"><div class="mob-review-top"><div>⭐⭐⭐⭐⭐</div><span class="mob-review-tag">지성 피부</span></div><p class="mob-review-title">백탁 없이 투명하게</p><p class="mob-review-body">다른 선크림은 얼굴이 하얗게 떠서 못 쓰는데, 이건 정말 투명하게 흡수돼요.</p><div class="mob-review-footer"><span class="mob-review-name">박소연</span><span class="mob-review-date">2025.04.28</span></div></div>
+          <div class="mob-review-card"><div class="mob-review-top"><div>⭐⭐⭐⭐⭐</div><span class="mob-review-tag">민감성 피부</span></div><p class="mob-review-title">드디어 선크림이 편해졌어요</p><p class="mob-review-body">에센스처럼 스며들어요. 자극도 없고 끈적임도 없어요.</p><div class="mob-review-footer"><span class="mob-review-name">이민아</span><span class="mob-review-date">2025.06.01</span></div></div>
+        </div>
+      </section>
+
+      <!-- MOB HOW TO USE -->
+      <section class="mob-section" style="background:var(--bg)">
+        <p class="mob-label">How to Use</p>
+        <h2 style="font-size:26px;font-weight:700;line-height:1.35;letter-spacing:-0.03em;margin-bottom:44px">올바른<br>사용 방법</h2>
+        <div class="mob-howto-list">
+          <div class="mob-howto-item"><div class="mob-howto-num">1</div><div><p class="mob-howto-step">Step 1</p><p class="mob-howto-title">스킨케어 마지막 단계</p><p class="mob-howto-desc">스킨, 에센스, 크림 순서로 기초 케어를 완료한 후 마지막 단계에 사용하세요.</p></div></div>
+          <div class="mob-howto-item"><div class="mob-howto-num">2</div><div><p class="mob-howto-step">Step 2</p><p class="mob-howto-title">적당량 도포</p><p class="mob-howto-desc">검지 한 마디 정도의 양을 이마, 양볼, 코, 턱에 나누어 올린 후 가볍게 펴 발라 주세요.</p></div></div>
+          <div class="mob-howto-item"><div class="mob-howto-num">3</div><div><p class="mob-howto-step">Step 3</p><p class="mob-howto-title">외출 20분 전 사용</p><p class="mob-howto-desc">자외선 차단 효과를 최대화하려면 외출 20분 전에 바르는 것을 권장합니다.</p></div></div>
+        </div>
+      </section>
+
+      <!-- MOB FAQ -->
+      <section class="mob-section" style="background:var(--bg)">
+        <p class="mob-label">FAQ</p>
+        <h2 style="font-size:26px;font-weight:700;line-height:1.35;letter-spacing:-0.03em;margin-bottom:36px">자주 묻는 질문</h2>
+        <div class="mob-faq-list">
+          <div class="mob-faq-item"><div class="mob-faq-q" onclick="toggleMobFaq(this)"><span class="mob-faq-q-text">민감성 피부도 사용 가능한가요?</span><span class="mob-faq-chevron">∨</span></div><div class="mob-faq-a">네, 병풀추출물과 판테놀을 함유해 민감한 피부에도 자극 없이 사용할 수 있습니다.</div></div>
+          <div class="mob-faq-item"><div class="mob-faq-q" onclick="toggleMobFaq(this)"><span class="mob-faq-q-text">메이크업 전에 발라도 되나요?</span><span class="mob-faq-chevron">∨</span></div><div class="mob-faq-a">스킨케어 마지막 단계에 사용하고 5~10분 후 메이크업을 진행하시면 밀림 없이 밀착됩니다.</div></div>
+          <div class="mob-faq-item"><div class="mob-faq-q" onclick="toggleMobFaq(this)"><span class="mob-faq-q-text">백탁이 있나요?</span><span class="mob-faq-chevron">∨</span></div><div class="mob-faq-a">0% 백탁 처방으로 설계되었습니다. 어떤 피부톤에서도 투명하게 흡수됩니다.</div></div>
+          <div class="mob-faq-item"><div class="mob-faq-q" onclick="toggleMobFaq(this)"><span class="mob-faq-q-text">남성도 사용할 수 있나요?</span><span class="mob-faq-chevron">∨</span></div><div class="mob-faq-a">물론입니다. 성별 구분 없이 누구나 사용 가능한 젠더 뉴트럴 포뮬라입니다.</div></div>
+        </div>
+      </section>
+
+      <!-- MOB CTA -->
+      <section class="mob-cta">
+        <div class="mob-cta-dec"></div>
+        <div class="mob-cta-img">
+          <img src="https://images.unsplash.com/photo-1616750819456-5cdee9b85d22?w=780&h=960&fit=crop&auto=format" alt="Pure UV">
+          <div class="mob-cta-img-fade"></div>
+        </div>
+        <div class="mob-cta-text">
+          <p class="mob-cta-eyebrow">Pure UV Sun Essence · 50ml</p>
+          <h2 class="mob-cta-h2">매일 바르는 선크림,<br>이제 가볍게 바꾸세요</h2>
+          <div class="mob-cta-price"><span class="mob-cta-price-num">38,000</span><span class="mob-cta-price-won">원</span></div>
+          <div class="mob-cta-btns">
+            <button class="mob-cta-btn-white">구매하기</button>
+            <button class="mob-cta-btn-ghost">장바구니 담기</button>
+          </div>
+          <div class="mob-trust">
+            <div class="mob-trust-item"><p class="mob-trust-label">무료 배송</p><p class="mob-trust-sub">3만원 이상</p></div>
+            <div class="mob-trust-item"><p class="mob-trust-label">피부과 테스트</p><p class="mob-trust-sub">완료</p></div>
+            <div class="mob-trust-item"><p class="mob-trust-label">30일 교환</p><p class="mob-trust-sub">보장</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MOB FOOTER -->
+      <footer class="mob-footer">
+        <p class="mob-footer-logo">Pure UV</p>
+        <p class="mob-footer-copy">© 2025 Pure UV. All rights reserved.<br>고객센터: 1588-0000 | 평일 10:00–18:00</p>
+      </footer>
+
+    </div><!-- /mob -->
+  </div><!-- /mobile-frame -->
+</div><!-- /mobile-view -->
+
+</div><!-- /content -->
+
+<script>
+function switchView(v) {
+  const dv = document.getElementById('desktop-view');
+  const mv = document.getElementById('mobile-view');
+  const bd = document.getElementById('btn-desktop');
+  const bm = document.getElementById('btn-mobile');
+  const sl = document.getElementById('size-label');
+  if (v === 'desktop') {
+    dv.style.display = 'block';
+    mv.style.display = 'none';
+    bd.className = 'toggle-btn active';
+    bm.className = 'toggle-btn inactive';
+    sl.textContent = '1440px';
+  } else {
+    dv.style.display = 'none';
+    mv.style.display = 'flex';
+    bd.className = 'toggle-btn inactive';
+    bm.className = 'toggle-btn active';
+    sl.textContent = '390px';
+  }
+}
+function toggleFaq(el) {
+  const a = el.nextElementSibling;
+  const c = el.querySelector('.faq-chevron');
+  a.classList.toggle('open');
+  c.classList.toggle('open');
+}
+function toggleMobFaq(el) {
+  const a = el.nextElementSibling;
+  const c = el.querySelector('.mob-faq-chevron');
+  a.classList.toggle('open');
+  c.classList.toggle('open');
+}
+</script></div>
+<div id="page-food"><!-- NAV -->
+</body>
+</html>

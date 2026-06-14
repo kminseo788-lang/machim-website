@@ -1,0 +1,211 @@
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1B4332;--g2:#2D6A4F;--g3:#52B788;
+  --g-pale:#D8F3DC;--gray:#F4F4F2;--border:#E8E8E4;
+  --text:#1A1A1A;--muted:#888;--white:#fff;
+  --font:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);color:var(--text);background:var(--white);-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center}
+.nav-i{max-width:1100px;margin:0 auto;padding:0 40px;width:100%;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-size:15px;font-weight:800;color:var(--g);letter-spacing:.04em}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{font-size:13px;color:var(--muted);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--text)}
+.nav-btn{font-size:13px;font-weight:600;padding:8px 18px;border-radius:6px;background:var(--g);color:#fff;text-decoration:none}
+
+/* 공통 */
+.inner{max-width:1100px;margin:0 auto;padding:0 40px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--g);margin-bottom:14px}
+.eyebrow-light{color:rgba(255,255,255,.5)}
+.sec-h2{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;letter-spacing:-.03em;line-height:1.25;color:var(--text)}
+.sec-h2-light{color:#fff}
+.divider{width:32px;height:2px;background:var(--g);margin:16px 0}
+.divider-light{background:rgba(255,255,255,.3)}
+
+/* 01 HERO — 흰색 */
+.hero{background:var(--white);padding:80px 0 0;border-bottom:1px solid var(--border)}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--g-pale);color:var(--g);font-size:11px;font-weight:700;padding:6px 14px;border-radius:999px;letter-spacing:.06em;margin-bottom:20px}
+.hero-tag-dot{width:5px;height:5px;border-radius:50%;background:var(--g)}
+.hero-h1{font-size:clamp(2rem,4.5vw,3.4rem);font-weight:800;letter-spacing:-.04em;line-height:1.2;color:var(--text);margin-bottom:18px}
+.hero-h1 em{font-style:normal;color:var(--g)}
+.hero-sub{font-size:15px;color:var(--muted);line-height:1.85;margin-bottom:32px;max-width:400px}
+.hero-btns{display:flex;gap:12px;align-items:center;margin-bottom:40px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--g);color:#fff;border:none;border-radius:8px;padding:14px 26px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);text-decoration:none;transition:background .15s}
+.btn-primary:hover{background:var(--g2)}
+.btn-ghost{font-size:13px;color:var(--muted);text-decoration:none}
+.hero-trust{display:flex;gap:20px;padding-top:20px;border-top:1px solid var(--border)}
+.trust-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.trust-dot{width:4px;height:4px;border-radius:50%;background:var(--g3)}
+.hero-visual{position:relative;display:flex;justify-content:center;align-items:flex-end}
+.hero-product-bg{width:100%;aspect-ratio:1;background:linear-gradient(145deg,#e8f5e9,#c8e6c9);border-radius:24px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.hero-product-mock{width:200px;height:280px;background:linear-gradient(160deg,var(--g),var(--g2));border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;box-shadow:0 24px 60px rgba(27,67,50,.3)}
+.hero-badge{position:absolute;background:#fff;border-radius:10px;padding:10px 14px;box-shadow:0 4px 16px rgba(0,0,0,.1);border:1px solid var(--border)}
+.badge-1{top:20px;right:20px}
+.badge-2{bottom:60px;left:16px}
+.badge-num{font-size:18px;font-weight:800;color:var(--g)}
+.badge-label{font-size:10px;color:var(--muted)}
+
+/* 02 PROBLEM — 흰색 */
+.problem{background:var(--white);padding:100px 0;border-bottom:1px solid var(--border)}
+.problem-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px}
+.problem-sub{font-size:14px;color:var(--muted);line-height:1.8;max-width:320px;text-align:right}
+.problem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.problem-card{background:var(--white);padding:40px 28px}
+.problem-num{font-size:10px;font-weight:700;color:#ccc;letter-spacing:.1em;display:block;margin-bottom:20px}
+.problem-emoji{font-size:28px;margin-bottom:14px;display:block}
+.problem-label{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.02em;margin-bottom:8px}
+.problem-desc{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* 03 SOLUTION — 딥그린 ★ */
+.solution{background:var(--g);padding:100px 0}
+.solution-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.solution-h2{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;letter-spacing:-.03em;line-height:1.3;color:#fff;margin-bottom:20px}
+.solution-h2 span{color:rgba(255,255,255,.35)}
+.solution-desc{font-size:15px;color:rgba(255,255,255,.65);line-height:1.9;margin-bottom:36px}
+.solution-points{display:flex;flex-direction:column;gap:14px}
+.solution-point{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1)}
+.solution-point-text{font-size:13px;color:rgba(255,255,255,.8);font-weight:500}
+.solution-visual{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.solution-card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:24px 20px;text-align:center}
+.solution-card.accent{background:rgba(255,255,255,.18)}
+.solution-card-num{font-size:2.4rem;font-weight:900;color:#fff;letter-spacing:-.04em;display:block;margin-bottom:6px}
+.solution-card-label{font-size:11px;color:rgba(255,255,255,.55);letter-spacing:.04em}
+
+/* 04 BENEFITS — 흰색 */
+.benefits{background:var(--white);padding:100px 0;border-bottom:1px solid var(--border)}
+.benefits-header{text-align:center;margin-bottom:70px}
+.benefits-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-left:1px solid var(--border)}
+.benefit-item{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:48px 32px}
+.benefit-num{font-size:clamp(2.8rem,5vw,4rem);font-weight:900;color:var(--g);letter-spacing:-.05em;line-height:1;display:block;margin-bottom:16px}
+.benefit-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.benefit-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* 05 HOW IT WORKS — 연회색 */
+.howto{background:var(--gray);padding:100px 0;border-bottom:1px solid var(--border)}
+.howto-header{text-align:center;margin-bottom:64px}
+.howto-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.howto-card{padding:36px 28px;position:relative}
+.howto-card::after{content:'→';position:absolute;right:-12px;top:50px;font-size:18px;color:rgba(27,67,50,.2);z-index:1}
+.howto-card:last-child::after{display:none}
+.howto-step{font-size:10px;font-weight:700;color:var(--g);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;display:block}
+.howto-icon-wrap{width:52px;height:52px;border-radius:12px;background:var(--white);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px}
+.howto-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+.howto-desc{font-size:13px;color:var(--muted);line-height:1.7}
+
+/* 06 LIFESTYLE — 딥그린 ★ */
+.lifestyle{background:var(--g);overflow:hidden}
+.lifestyle-inner{display:grid;grid-template-columns:1fr 1fr;min-height:560px}
+.lifestyle-text{display:flex;flex-direction:column;justify-content:center;padding:80px 72px}
+.lifestyle-h2{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;color:#fff;letter-spacing:-.03em;line-height:1.3;margin-bottom:16px}
+.lifestyle-desc{font-size:15px;color:rgba(255,255,255,.65);line-height:1.9;margin-bottom:36px}
+.lifestyle-tags{display:flex;flex-wrap:wrap;gap:8px}
+.lifestyle-tag{font-size:12px;font-weight:600;color:rgba(255,255,255,.8);padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08)}
+.lifestyle-img{position:relative;overflow:hidden;background:#2D6A4F}
+.lifestyle-img img{width:100%;height:100%;object-fit:cover;opacity:.65;mix-blend-mode:luminosity}
+.lifestyle-img-fade{position:absolute;inset:0;background:linear-gradient(to right,var(--g) 0%,transparent 40%)}
+
+/* 07 FEATURE DETAIL — 흰색 */
+.features{background:var(--white);padding:100px 0;border-bottom:1px solid var(--border)}
+.features-header{margin-bottom:60px}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feature-card{border:1px solid var(--border);border-radius:16px;padding:32px 28px;transition:border-color .2s,transform .2s}
+.feature-card:hover{border-color:var(--g);transform:translateY(-2px)}
+.feature-icon{width:48px;height:48px;border-radius:12px;background:var(--g-pale);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px}
+.feature-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px}
+.feature-desc{font-size:13px;color:var(--muted);line-height:1.75}
+
+/* 08 COMPARISON — 연회색 */
+.comparison{background:var(--gray);padding:100px 0;border-bottom:1px solid var(--border)}
+.comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:flex-start}
+.comparison-h2{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:700;letter-spacing:-.03em;line-height:1.3;margin-bottom:16px}
+.comparison-sub{font-size:14px;color:var(--muted);line-height:1.8}
+.comp-table{background:var(--white);border-radius:20px;overflow:hidden;border:1px solid var(--border)}
+.comp-header{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--g)}
+.comp-h{padding:16px 20px;text-align:center;font-size:12px;font-weight:600;letter-spacing:.04em}
+.comp-h.dim{color:rgba(255,255,255,.4);border-left:1px solid rgba(255,255,255,.1)}
+.comp-h.bright{color:#fff;font-weight:700;border-left:1px solid rgba(255,255,255,.15)}
+.comp-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--border)}
+.comp-row.even{background:var(--white)}
+.comp-row.odd{background:#fafaf8}
+.comp-cell{padding:18px 20px;font-size:13px;font-weight:500;color:#333}
+.comp-cell.center{display:flex;justify-content:center;align-items:center;border-left:1px solid var(--border);font-size:16px}
+.x{color:#ddd}.o{color:var(--g);font-weight:700}
+
+/* 09 REVIEWS — 흰색 */
+.reviews{background:var(--white);padding:100px 0;border-bottom:1px solid var(--border)}
+.reviews-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px}
+.reviews-score{font-size:4.5rem;font-weight:900;color:var(--g);letter-spacing:-.05em;line-height:1}
+.reviews-meta{display:flex;align-items:center;gap:16px}
+.stars{font-size:16px;letter-spacing:2px;color:var(--g)}
+.reviews-count{font-size:12px;color:var(--muted);margin-top:4px}
+.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.review-card{background:var(--gray);border-radius:16px;padding:28px 24px}
+.review-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.review-tag{font-size:10px;font-weight:700;background:var(--g-pale);color:var(--g);padding:4px 10px;border-radius:999px}
+.review-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.4}
+.review-body{font-size:13px;color:#666;line-height:1.8}
+.review-footer{margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between}
+.review-name{font-size:12px;font-weight:600}
+.review-date{font-size:11px;color:#ccc}
+
+/* 10 SPEC — 연회색 */
+.spec{background:var(--gray);padding:100px 0;border-bottom:1px solid var(--border)}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.spec-product{display:flex;justify-content:center}
+.spec-product-mock{width:200px;height:280px;background:linear-gradient(160deg,var(--g),var(--g2));border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;box-shadow:0 20px 50px rgba(27,67,50,.25)}
+.spec-row{display:flex;padding:16px 0;border-bottom:1px solid var(--border)}
+.spec-key{font-size:12px;color:var(--muted);font-weight:500;width:120px;flex-shrink:0}
+.spec-val{font-size:13px;color:var(--text);font-weight:600}
+
+/* 11 FAQ — 흰색 */
+.faq{background:var(--white);padding:100px 0;border-bottom:1px solid var(--border)}
+.faq-grid{display:grid;grid-template-columns:1fr 2fr;gap:80px}
+.faq-sticky{position:sticky;top:80px}
+.faq-list{border-top:1px solid var(--border)}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:22px 0;cursor:pointer;gap:20px}
+.faq-q-text{font-size:15px;font-weight:500;color:var(--text);line-height:1.5}
+.faq-chevron{font-size:16px;color:var(--g);flex-shrink:0;transition:transform .3s}
+.faq-chevron.open{transform:rotate(180deg)}
+.faq-a{padding-bottom:20px;font-size:14px;color:#666;line-height:1.8;display:none}
+.faq-a.open{display:block}
+
+/* 12 FINAL CTA — 딥그린 ★ */
+.final-cta{background:var(--g);padding:100px 0}
+.final-cta-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.final-cta-h2{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;color:#fff;letter-spacing:-.03em;line-height:1.3;margin-bottom:16px}
+.final-cta-desc{font-size:15px;color:rgba(255,255,255,.65);line-height:1.9;margin-bottom:36px}
+.final-price{display:flex;align-items:baseline;gap:8px;margin-bottom:32px}
+.price-num{font-size:2.8rem;font-weight:900;color:#fff;letter-spacing:-.04em}
+.price-won{font-size:18px;color:rgba(255,255,255,.5)}
+.final-btns{display:flex;gap:12px}
+.btn-white{flex:1;background:#fff;color:var(--g);border:none;border-radius:8px;padding:16px 24px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.btn-outline-white{flex:1;background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:16px 24px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--font)}
+.trust-badges{display:flex;border-top:1px solid rgba(255,255,255,.1);padding-top:32px;margin-top:36px}
+.trust-b{flex:1;border-right:1px solid rgba(255,255,255,.1);padding:0 20px}
+.trust-b:first-child{padding-left:0}
+.trust-b:last-child{border-right:none}
+.trust-b-label{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
+.trust-b-sub{font-size:11px;color:rgba(255,255,255,.35)}
+.cta-product-mock{width:220px;height:300px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;margin:0 auto}
+
+/* FOOTER */
+footer{background:#112a1f;padding:36px 0}
+.footer-inner{max-width:1100px;margin:0 auto;padding:0 40px;display:flex;justify-content:space-between;align-items:center}
+.footer-logo{font-size:14px;font-weight:800;color:rgba(255,255,255,.7);letter-spacing:.08em}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:12px;color:rgba(255,255,255,.3);text-decoration:none}
+.footer-copy{font-size:11px;color:rgba(255,255,255,.2)}
+
+@media(max-width:768px){
+  .hero-grid,.solution-grid,.comparison-grid,.spec-grid,.faq-grid,.final-cta-inner,.lifestyle-inner{grid-template-columns:1fr}
+  .problem-grid,.benefits-grid,.howto-grid,.features-grid,.reviews-grid{grid-template-columns:1fr 1fr}
+  .inner{padding:0 20px}
+  .lifestyle-text{padding:52px 28px}
+  .footer-inner{flex-direction:column;gap:16px;text-align:center}
+}

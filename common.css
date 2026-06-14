@@ -1,0 +1,76 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --green: #1A4731;
+  --green-hover: #2d6b4f;
+  --green-pale: #e0ece5;
+  --gray: #EDE9E1;   /* 회색빛 베이지 */
+  --white: #FFFFFF;
+  --border: #DDD8CE;
+  --text: #1C1C1A;
+  --muted: #888;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  background: var(--gray);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--white); border-bottom: 1px solid var(--border);
+  height: 56px; display: flex; align-items: center;
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 32px;
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+}
+.logo { font-size: 20px; font-weight: 700; color: var(--green); letter-spacing: -0.04em; text-decoration: none; }
+.nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+.nav-links a { font-size: 14px; color: var(--muted); text-decoration: none; transition: color .15s; }
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  font-size: 13px; font-weight: 600; padding: 8px 18px;
+  border-radius: 6px; background: var(--green); color: var(--white) !important;
+  transition: background .15s !important;
+}
+.nav-cta:hover { background: var(--green-hover) !important; }
+
+/* === 공통 섹션 타이틀 === */
+/* 공통 섹션 */
+.section-eyebrow {
+  font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--green); font-weight: 600; margin-bottom: 10px;
+}
+.section-title {
+  font-size: clamp(1.6rem, 2.8vw, 2.2rem); font-weight: 700;
+  letter-spacing: -0.03em; color: var(--text); margin-bottom: 8px;
+}
+.section-desc { font-size: 14px; color: var(--muted); margin-bottom: 48px; }
+
+/* ===== FOOTER — 녹색 ===== */
+footer { background: var(--green); padding: 32px 0; }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; }
+.footer-logo { font-size: 16px; font-weight: 700; color: rgba(255,255,255,.9); letter-spacing: -0.03em; }
+.footer-tagline { font-size: 12px; color: rgba(255,255,255,.45); margin-top: 3px; }
+.footer-links { display: flex; gap: 24px; list-style: none; }
+.footer-links a { font-size: 12px; color: rgba(255,255,255,.45); text-decoration: none; transition: color .15s; }
+.footer-links a:hover { color: rgba(255,255,255,.8); }
+.footer-contact { text-align: right; }
+.footer-contact p { font-size: 12px; color: rgba(255,255,255,.45); line-height: 1.7; }
+
+@media (max-width: 768px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .services-grid { grid-template-columns: 1fr 1fr; }
+  .portfolio-grid { grid-template-columns: 1fr; }
+  .stats-inner { grid-template-columns: 1fr 1fr; }
+  .process-grid { grid-template-columns: 1fr 1fr; }
+  .cta-inner { grid-template-columns: 1fr; text-align: center; padding: 36px 28px; }
+  .footer-inner { flex-direction: column; gap: 20px; text-align: center; }
+  .footer-contact { text-align: center; }
+}
+#page-chipbook, #page-sunscreen, #page-food, #page-realestate { display: none; }
