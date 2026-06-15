@@ -74,14 +74,14 @@ footer { background: var(--page-bg); padding: 40px 0; }
   .nav-links li:has(a:not(.nav-cta)) { display: none; }
   .nav-cta { font-size: 12px; padding: 7px 14px; }
 
-  .hero-inner { grid-template-columns: 1fr; }
+  .hero-inner { grid-template-columns: 1fr !important; }
   .hero-right { display: none; }
   .hero-left {
     padding-right: 0;
     display: flex; flex-direction: column; align-items: flex-start;
     text-align: left;
   }
-  .hero-eyebrow { display: none; }
+  .hero-eyebrow { display: none !important; }
   .hero-problem, .hero-solution { max-width: 100%; }
 
   .services-grid { grid-template-columns: 1fr 1fr !important; gap: 14px; }
@@ -109,7 +109,7 @@ footer { background: var(--page-bg); padding: 40px 0; }
   .logo { font-size: 18px; }
 
   .hero-inner { padding: 40px 16px 36px; }
-  .hero-title { font-size: clamp(1.7rem, 8vw, 2.2rem); }
+  .hero-title { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; }
   .hero-problem { font-size: 13px; margin-bottom: 16px; }
   .hero-solution { font-size: 14px; margin-bottom: 28px; }
   .hero-btns { flex-wrap: wrap; }
