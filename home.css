@@ -8,9 +8,9 @@
   display: flex; align-items: center;
 }
 .hero-inner {
-  max-width: 1200px; margin: 0 auto; padding: 72px 32px 64px;
+  max-width: 1280px; margin: 0 auto; padding: 72px 32px 64px;
   width: 100%;
-  display: grid; grid-template-columns: 4fr 8fr;
+  display: grid; grid-template-columns: 5fr 7fr;
   gap: 0; align-items: center;
   position: relative; z-index: 2;
 }
@@ -116,9 +116,12 @@
 @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 @keyframes float3 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
 
-/* ===== STATS — 회색빛 (히어로랑 이어지게) ===== */
-.stats { background: var(--gray); border-bottom: 1px solid var(--border); }
-.stats-inner { display: grid; grid-template-columns: repeat(4, 1fr); }
+/* ===== STATS — 박스형 회색 카드 ===== */
+.stats { background: var(--page-bg); padding: 40px 0; }
+.stats-inner {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--gray); border-radius: 20px; overflow: hidden;
+}
 .stat-item { padding: 28px 24px; border-right: 1px solid var(--border); text-align: center; }
 .stat-item:last-child { border-right: none; }
 .stat-val { font-size: 1.3rem; font-weight: 700; color: var(--green); display: block; margin-bottom: 5px; letter-spacing: -.02em; }
@@ -140,21 +143,20 @@
 .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .service-card {
   background: var(--gray); border: 1px solid var(--border);
-  border-radius: 14px; padding: 28px 22px;
+  border-radius: 14px; padding: 22px;
+  display: flex; align-items: center; gap: 14px;
   transition: border-color .2s, transform .2s;
 }
 .service-card:hover { border-color: var(--green); transform: translateY(-3px); }
 .service-icon {
-  width: 44px; height: 44px; border-radius: 10px;
+  width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
   background: var(--green-pale); display: flex; align-items: center;
-  justify-content: center; margin-bottom: 16px; color: var(--green);
+  justify-content: center; color: var(--green);
 }
-.service-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-.service-desc-text { font-size: 13px; color: var(--muted); line-height: 1.75; margin-bottom: 18px; }
-.service-cta { font-size: 12px; font-weight: 600; color: var(--green); }
+.service-name { font-size: 15px; font-weight: 600; color: var(--text); }
 
-/* ===== PORTFOLIO — 회색빛 ===== */
-.portfolio { padding: 80px 0; border-bottom: 1px solid var(--border); background: var(--gray); }
+/* ===== PORTFOLIO — 페이지 배경 위 카드 ===== */
+.portfolio { padding: 60px 0 80px; background: var(--page-bg); }
 .portfolio-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 36px; }
 .portfolio-more { font-size: 13px; color: var(--green); text-decoration: none; font-weight: 500; }
 .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -199,7 +201,7 @@
 .process-desc { font-size: 12px; color: var(--muted); line-height: 1.75; }
 
 /* ===== CTA — 회색빛 ===== */
-.cta-section { background: var(--gray); padding: 80px 0; border-bottom: 1px solid var(--border); }
+.cta-section { background: var(--page-bg); padding: 60px 0 80px; }
 .cta-inner {
   display: grid; grid-template-columns: 1fr auto; gap: 64px; align-items: center;
   background: var(--white); border: 1px solid var(--border);
