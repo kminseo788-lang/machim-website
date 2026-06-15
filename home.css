@@ -1,12 +1,5 @@
 /* ===== HERO — 회색빛 ===== */
-.hero {
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-  position: relative;
-  min-height: 620px;
-  display: flex; align-items: center;
-}
+
 .hero-inner {
   max-width: 1280px; margin: 0 auto; padding: 72px 32px 64px;
   width: 100%;
@@ -36,8 +29,7 @@
   font-weight: 500; margin-bottom: 36px; max-width: 400px;
 }
 .hero-accent {
-  display: block; color: var(--green); font-size: 1.35em;
-  font-weight: 700; margin-bottom: 6px; letter-spacing: -0.02em;
+  color: var(--green); font-weight: 700;
 }
 .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
 .btn-primary {
@@ -147,7 +139,7 @@
 .section-desc { font-size: 14px; color: var(--muted); margin-bottom: 48px; }
 
 /* ===== SERVICES — 흰색 ===== */
-.services { padding: 80px 0; border-bottom: 1px solid var(--border); background: var(--white); }
+.services { padding: 80px 0;  background: var(--white); }
 .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .service-card {
   background: var(--gray); border: 1px solid var(--border);
@@ -202,7 +194,7 @@
 }
 
 /* ===== PROCESS — 흰색 ===== */
-.process { padding: 80px 0; border-bottom: 1px solid var(--border); background: var(--white); }
+
 .process-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-top: 48px; }
 .process-step { padding: 24px 20px; border-right: 1px solid var(--border); }
 .process-step:last-child { border-right: none; }

@@ -85,7 +85,7 @@ footer { background: var(--page-bg); padding: 40px 0; }
   .hero-problem, .hero-solution { max-width: 100%; }
 
   .services-grid { grid-template-columns: 1fr 1fr !important; gap: 14px; }
-  .portfolio-grid { grid-template-columns: 1fr 1fr !important; gap: 14px; }
+  .portfolio-grid { grid-template-columns: 1fr !important; gap: 14px; }
   .portfolio-thumb { aspect-ratio: 4/3; }
 
   .stats-inner { grid-template-columns: 1fr 1fr !important; }
