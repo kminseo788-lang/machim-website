@@ -103,6 +103,16 @@ footer { background: var(--page-bg); padding: 40px 0; }
   .footer-contact { text-align: center; }
 }
 
+/* ===== LEGAL PAGES — 약관/방침 ===== */
+.legal-page { padding: 60px 0 80px; background: var(--white); }
+.legal-page .container { max-width: 760px; }
+.legal-page h1 { font-size: clamp(1.7rem, 4vw, 2.2rem); margin-bottom: 8px; letter-spacing: -0.02em; }
+.legal-page .legal-date { font-size: 13px; color: var(--muted); margin-bottom: 40px; }
+.legal-page h2 { font-size: 17px; font-weight: 700; color: var(--green); margin: 36px 0 10px; }
+.legal-page p { font-size: 14px; color: var(--text); line-height: 1.9; margin-bottom: 4px; }
+.legal-page ul { margin: 8px 0 8px 20px; }
+.legal-page li { font-size: 14px; color: var(--text); line-height: 1.9; }
+
 @media (max-width: 480px) {
   .container { padding: 0 16px; }
   .nav-inner { padding: 0 16px; }
