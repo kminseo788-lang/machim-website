@@ -27,9 +27,17 @@
   line-height: 1.15; letter-spacing: -0.04em; color: var(--text); margin-bottom: 20px;
 }
 .hero-title em { font-style: normal; color: var(--green); }
-.hero-desc {
-  font-size: 15px; color: var(--muted); line-height: 1.85;
-  margin-bottom: 36px; max-width: 380px;
+.hero-problem {
+  font-size: 14px; color: var(--muted); line-height: 1.85;
+  margin-bottom: 20px; max-width: 380px;
+}
+.hero-solution {
+  font-size: 15px; color: var(--text); line-height: 1.85;
+  font-weight: 500; margin-bottom: 36px; max-width: 400px;
+}
+.hero-accent {
+  display: block; color: var(--green); font-size: 1.35em;
+  font-weight: 700; margin-bottom: 6px; letter-spacing: -0.02em;
 }
 .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
 .btn-primary {
@@ -143,8 +151,9 @@
 .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .service-card {
   background: var(--gray); border: 1px solid var(--border);
-  border-radius: 14px; padding: 22px;
-  display: flex; align-items: center; gap: 14px;
+  border-radius: 14px; padding: 24px 16px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 12px;
   transition: border-color .2s, transform .2s;
 }
 .service-card:hover { border-color: var(--green); transform: translateY(-3px); }
@@ -152,8 +161,9 @@
   width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
   background: var(--green-pale); display: flex; align-items: center;
   justify-content: center; color: var(--green);
+  order: 2;
 }
-.service-name { font-size: 15px; font-weight: 600; color: var(--text); }
+.service-name { font-size: 15px; font-weight: 600; color: var(--text); order: 1; }
 
 /* ===== PORTFOLIO — 페이지 배경 위 카드 ===== */
 .portfolio { padding: 60px 0 80px; background: var(--page-bg); }
