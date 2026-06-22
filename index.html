@@ -19,7 +19,7 @@
       <li><a href="#portfolio">포트폴리오</a></li>
       <li><a href="#process">작업 과정</a></li>
       <li><a href="#contact">문의하기</a></li>
-      <li><a href="#contact" class="nav-cta">상담 신청</a></li>
+      <li><a href="http://pf.kakao.com/_HxgDXX/chat" class="nav-cta" target="_blank">카카오 상담</a></li>
     </ul>
   </div>
 </nav>
@@ -47,7 +47,7 @@
       </p>
       <div class="hero-btns">
         <a href="#portfolio" class="btn-outline">포트폴리오 보기</a>
-        <a href="#contact" class="btn-primary">상담 신청</a>
+       <a href="http://pf.kakao.com/_HxgDXX/chat" class="btn-primary" target="_blank">카카오톡 상담</a>
       </div>
     </div>
 
@@ -317,7 +317,7 @@
         </p>
       </div>
       <div class="cta-right">
-        <a href="mailto:hello@machim.kr" class="btn-green">상담 신청하기 →</a>
+        <a href="http://pf.kakao.com/_HxgDXX/chat" class="btn-green" target="_blank">카카오톡으로 상담하기 →</a>
         <p class="cta-contact">24시간 내 답변<br>hello@machim.kr<br>010-1234-5678</p>
       </div>
     </div>
@@ -346,5 +346,37 @@
     </div>
   </div>
 </footer>
+<!-- 플로팅 카카오 버튼 -->
+<a href="http://pf.kakao.com/_HxgDXX/chat" class="kakao-float" target="_blank" aria-label="카카오톡 상담">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="#3A1D1D">
+    <path d="M12 3C6.477 3 2 6.582 2 11c0 2.72 1.563 5.123 3.964 6.619L4.9 20.7a.5.5 0 0 0 .693.588l3.89-2.038C10.137 19.408 11.054 19.5 12 19.5c5.523 0 10-3.582 10-8s-4.477-8.5-10-8.5z"/>
+  </svg>
+  <span>카카오 상담</span>
+</a>
+
+<style>
+.kakao-float {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 999;
+  background: #FEE500;
+  color: #3A1D1D;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,.18);
+  transition: transform .2s, box-shadow .2s;
+}
+.kakao-float:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,.22);
+}
+</style>
 </body>
 </html>
