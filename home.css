@@ -22,7 +22,7 @@
 }
 .hero-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
 .hero-title {
-  font-size: clamp(2.4rem, 4.5vw, 3.8rem); font-weight: 700;
+  font-size: clamp(1.8rem, 3.2vw, 2.8rem); font-weight: 700;
   line-height: 1.15; letter-spacing: -0.04em; color: var(--text); margin-bottom: 20px;
 }
 .hero-title em { font-style: normal; color: var(--green); }
