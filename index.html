@@ -148,125 +148,333 @@
   </div>
 </section>
 
-<!-- PORTFOLIO — 회색빛 -->
+<!-- PORTFOLIO → 서비스 쇼케이스 — 회색빛 -->
 <section class="portfolio" id="portfolio">
   <div class="container">
     <div class="portfolio-header">
       <div>
-        <p class="section-eyebrow">Portfolio</p>
-        <h2 class="section-title" style="margin-bottom:0">포트폴리오</h2>
+        <p class="section-eyebrow">Service Showcase</p>
+        <h2 class="section-title" style="margin-bottom:0">마침에게 맡기면</h2>
       </div>
-      <a href="#" class="portfolio-more">전체 보기 →</a>
+      <p style="font-size:14px;color:#888;align-self:flex-end;margin-bottom:4px">카드를 클릭해 보세요</p>
     </div>
     <div class="portfolio-grid">
-      <a href="noire-skincare.html" target="_blank" class="portfolio-card">
-        <div class="portfolio-thumb" style="background:linear-gradient(135deg,#18160F,#2C2920)">
-          <div class="portfolio-badge">홈페이지 (정적)</div>
-          <div style="position:absolute;bottom:20px;left:20px;font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:0.2em;color:#B8A48A;font-weight:400;">NOIRE</div>
-        </div>
-        <div class="portfolio-info">
-          <p class="portfolio-category">홈페이지 (정적) · 뷰티</p>
-          <p class="portfolio-name">NOIRE SKINCARE</p>
-          <p class="portfolio-sub">화장품 브랜드 · 다크 럭셔리 · 풀페이지 디자인</p>
-        </div>
-      </a>
 
-      <a href="chipbook.html" target="_blank" class="portfolio-card">
-        <div class="portfolio-thumb" style="background:#1A4731">
-          <div class="portfolio-badge">홈페이지 (동적)</div>
-          <div style="text-align:center;padding:24px">
-            <p style="font-size:2.2rem;font-weight:700;color:#fff;letter-spacing:-.04em;line-height:1.05">CHIP<br>BOOK</p>
-            <p style="font-size:10px;color:rgba(255,255,255,.55);margin-top:10px">실용 전자책 유통 플랫폼</p>
-            <div style="display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap">
-              <span style="font-size:9px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8)">Supabase</span>
-              <span style="font-size:9px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8)">Vanilla JS</span>
-              <span style="font-size:9px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.8)">Vercel</span>
-            </div>
-          </div>
-        </div>
-        <div class="portfolio-info">
-          <p class="portfolio-category">홈페이지 (동적) · 풀스택 개발</p>
-          <p class="portfolio-name">CHIPBOOK</p>
-          <p class="portfolio-sub">전자책 유통 플랫폼 · CMS · 뷰어 · 회원 인증 · 실 서비스 운영 중</p>
-        </div>
-      </a>
-
-      <a href="realestate.html" target="_blank" class="portfolio-card">
-        <div class="portfolio-thumb" style="background:linear-gradient(135deg,#1a2a3a,#2c3e50)">
+      <!-- 랜딩페이지 -->
+      <div class="portfolio-card pf-modal-trigger" data-modal="modal-landing" style="cursor:pointer">
+        <div class="portfolio-thumb" style="background:linear-gradient(135deg,#1A4731,#2D6A4F)">
           <div class="portfolio-badge">랜딩페이지</div>
           <div style="text-align:center;padding:20px">
-            <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.15);margin:0 auto 12px;display:flex;align-items:center;justify-content:center">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a0c4d8" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            <p style="font-size:14px;font-weight:700;color:#fff">마림 부동산파트너스</p>
-            <p style="font-size:10px;color:rgba(255,255,255,.5);margin-top:6px">부동산 중개 랜딩페이지</p>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.2" style="margin:0 auto 10px;display:block"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            <p style="font-size:13px;font-weight:600;color:#fff">광고·홍보·이벤트</p>
+            <p style="font-size:10px;color:rgba(255,255,255,.55);margin-top:6px">전환율에 집중한 단일 페이지</p>
           </div>
         </div>
         <div class="portfolio-info">
-          <p class="portfolio-category">랜딩페이지 · 부동산</p>
-          <p class="portfolio-name">마림 부동산파트너스</p>
-          <p class="portfolio-sub">부동산 중개 · 랜딩페이지 · 리드 수집</p>
+          <p class="portfolio-category">광고 · 홍보 · 이벤트</p>
+          <p class="portfolio-name">랜딩페이지 제작</p>
+          <p class="portfolio-sub">목적에 맞는 단일 페이지 — 클릭해서 상세 보기</p>
         </div>
-      </a>
+      </div>
 
-      <a href="detail-pages.html" target="_blank" class="portfolio-card">
+      <!-- 홈페이지 (정적) -->
+      <div class="portfolio-card pf-modal-trigger" data-modal="modal-static" style="cursor:pointer">
+        <div class="portfolio-thumb" style="background:linear-gradient(135deg,#18160F,#2C2920)">
+          <div class="portfolio-badge">홈페이지 (정적)</div>
+          <div style="text-align:center;padding:20px">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(212,176,106,.8)" stroke-width="1.2" style="margin:0 auto 10px;display:block"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <p style="font-size:13px;font-weight:600;color:#B8A48A">브랜드 · 소개 사이트</p>
+            <p style="font-size:10px;color:rgba(184,164,138,.5);margin-top:6px">빠른 속도 · 깔끔한 디자인</p>
+          </div>
+        </div>
+        <div class="portfolio-info">
+          <p class="portfolio-category">브랜드 · 소개 · 포트폴리오</p>
+          <p class="portfolio-name">홈페이지 (정적) 제작</p>
+          <p class="portfolio-sub">HTML/CSS/JS 기반 빠르고 안정적인 사이트 — 클릭해서 상세 보기</p>
+        </div>
+      </div>
+
+      <!-- 홈페이지 (동적) -->
+      <div class="portfolio-card pf-modal-trigger" data-modal="modal-dynamic" style="cursor:pointer">
+        <div class="portfolio-thumb" style="background:linear-gradient(135deg,#1a2a4a,#2c3e70)">
+          <div class="portfolio-badge">홈페이지 (동적)</div>
+          <div style="text-align:center;padding:20px">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(160,196,232,.8)" stroke-width="1.2" style="margin:0 auto 10px;display:block"><ellipse cx="12" cy="12" rx="10" ry="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <p style="font-size:13px;font-weight:600;color:#a0c4e8">로그인 · DB · 관리자</p>
+            <p style="font-size:10px;color:rgba(160,196,232,.5);margin-top:6px">Supabase 풀스택 개발</p>
+          </div>
+        </div>
+        <div class="portfolio-info">
+          <p class="portfolio-category">쇼핑몰 · 플랫폼 · 회원제</p>
+          <p class="portfolio-name">홈페이지 (동적) 제작</p>
+          <p class="portfolio-sub">DB 연동 · 로그인 · CMS 포함 — 클릭해서 상세 보기</p>
+        </div>
+      </div>
+
+      <!-- 상세페이지 -->
+      <div class="portfolio-card pf-modal-trigger" data-modal="modal-detail" style="cursor:pointer">
         <div class="portfolio-thumb" style="background:linear-gradient(135deg,#f5e6d0,#e8d5b0)">
           <div class="portfolio-badge">상세페이지</div>
           <div style="text-align:center;padding:20px">
-            <div style="display:flex;gap:10px;justify-content:center;margin-bottom:12px">
-              <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A4731" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-              </div>
-              <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A4731" stroke-width="1.5"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
-              </div>
-            </div>
-            <p style="font-size:14px;font-weight:700;color:#5a3a1a">선크림 · 음식물처리기</p>
-            <p style="font-size:10px;color:#a08060;margin-top:6px">뷰티 · 가전 상세페이지</p>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(90,58,26,.7)" stroke-width="1.2" style="margin:0 auto 10px;display:block"><path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+            <p style="font-size:13px;font-weight:600;color:#5a3a1a">스마트스토어 · 쿠팡</p>
+            <p style="font-size:10px;color:#a08060;margin-top:6px">전환율 높이는 상품 상세페이지</p>
           </div>
         </div>
         <div class="portfolio-info">
-          <p class="portfolio-category">상세페이지 · 뷰티 / 가전</p>
-          <p class="portfolio-name">상세페이지 2종</p>
-          <p class="portfolio-sub">선크림 · 음식물처리기 · 스마트스토어/쿠팡 상세페이지 · 피그마 디자인</p>
+          <p class="portfolio-category">스마트스토어 · 쿠팡 · 자사몰</p>
+          <p class="portfolio-name">상세페이지 디자인</p>
+          <p class="portfolio-sub">구매를 유도하는 섹션 구성 · 피그마 시안 포함 — 클릭해서 상세 보기</p>
         </div>
-      </a>
+      </div>
 
-      <a href="shop.html" target="_blank" class="portfolio-card">
+      <!-- 쇼핑몰 -->
+      <div class="portfolio-card pf-modal-trigger" data-modal="modal-shop" style="cursor:pointer">
         <div class="portfolio-thumb" style="background:linear-gradient(135deg,#F3EFEA,#E8E2DE)">
           <div class="portfolio-badge">쇼핑몰</div>
           <div style="text-align:center;padding:20px">
-            <p style="font-family:Georgia,'Times New Roman',serif;font-size:1.8rem;letter-spacing:.12em;font-weight:700;color:#1A1A1A">LUMIE</p>
-            <p style="font-size:10px;color:#8C8C8C;margin-top:8px">패션 쇼핑몰 · 상품 그리드</p>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(26,71,49,.7)" stroke-width="1.2" style="margin:0 auto 10px;display:block"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            <p style="font-size:13px;font-weight:600;color:#1A1A1A">상품 등록 · 결제 · 관리</p>
+            <p style="font-size:10px;color:#8C8C8C;margin-top:6px">직접 운영 가능한 자사몰</p>
           </div>
         </div>
         <div class="portfolio-info">
-          <p class="portfolio-category">쇼핑몰 · 패션</p>
-          <p class="portfolio-name">LUMIE</p>
-          <p class="portfolio-sub">카테고리 필터 · 상품 상세 · 위시리스트 구현</p>
+          <p class="portfolio-category">자사몰 · 브랜드 쇼핑몰</p>
+          <p class="portfolio-name">쇼핑몰 구축</p>
+          <p class="portfolio-sub">상품 등록 · 결제 연동 · 관리자 기능 포함 — 클릭해서 상세 보기</p>
         </div>
-      </a>
+      </div>
 
-      <a href="reset-demo.html" target="_blank" class="portfolio-card">
+      <!-- 유지보수 -->
+      <div class="portfolio-card pf-modal-trigger" data-modal="modal-maintain" style="cursor:pointer">
         <div class="portfolio-thumb" style="background:linear-gradient(135deg,#EDE9E1,#DDD8CE)">
-          <div class="portfolio-badge">리셋 · 마무리</div>
+          <div class="portfolio-badge">유지보수 · 개선</div>
           <div style="text-align:center;padding:20px">
-            <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.8);margin:0 auto 12px;display:flex;align-items:center;justify-content:center">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A4731" stroke-width="1.5"><path d="M3 12a9 9 0 1 0 2.6-6.3L3 8"/><path d="M3 3v5h5"/></svg>
-            </div>
-            <p style="font-size:14px;font-weight:700;color:#1C1C1A">Before → After</p>
-            <p style="font-size:10px;color:#888;margin-top:6px">마무리 전/후 비교 데모</p>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(26,71,49,.7)" stroke-width="1.2" style="margin:0 auto 10px;display:block"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            <p style="font-size:13px;font-weight:600;color:#1C1C1A">기존 사이트 수정 · 개선</p>
+            <p style="font-size:10px;color:#888;margin-top:6px">멈춰있던 작업, 마침이 마무리</p>
           </div>
         </div>
         <div class="portfolio-info">
-          <p class="portfolio-category">리셋 · 마무리 패키지</p>
-          <p class="portfolio-name">리셋 패키지 데모</p>
-          <p class="portfolio-sub">진행 중단된 작업, 마침이 마무리한다면 — 예시 비교</p>
+          <p class="portfolio-category">수정 · 개선 · 인수인계</p>
+          <p class="portfolio-name">유지보수 · 리뉴얼</p>
+          <p class="portfolio-sub">기존 사이트 버그 수정 · 기능 추가 · 디자인 개선 — 클릭해서 상세 보기</p>
         </div>
-      </a>
+      </div>
+
     </div>
   </div>
 </section>
+
+<!-- ===== 서비스 모달들 ===== -->
+
+<!-- 랜딩페이지 모달 -->
+<div id="modal-landing" class="pf-modal" style="display:none">
+  <div class="pf-modal-overlay"></div>
+  <div class="pf-modal-box">
+    <button class="pf-modal-close">✕</button>
+    <div class="pf-modal-header" style="background:linear-gradient(135deg,#1A4731,#2D6A4F)">
+      <span class="pf-modal-badge">랜딩페이지</span>
+      <h3 class="pf-modal-title">랜딩페이지를 맡기면<br>이렇게 받아가세요</h3>
+    </div>
+    <div class="pf-modal-body">
+      <p class="pf-modal-desc">광고 클릭 후 도달하는 단일 페이지. 방문자가 행동하도록 설계합니다.</p>
+      <ul class="pf-modal-list">
+        <li>✦ 반응형 랜딩페이지 1페이지 (PC·모바일)</li>
+        <li>✦ 피그마 시안 → 최종 HTML/CSS/JS 코드</li>
+        <li>✦ 문의 폼 또는 카카오 연동</li>
+        <li>✦ Vercel 배포 또는 도메인 연결 지원</li>
+        <li>✦ 소스 파일 전체 납품</li>
+      </ul>
+      <div class="pf-modal-tags">
+        <span>광고 랜딩</span><span>이벤트 페이지</span><span>제품 홍보</span><span>신청 접수</span>
+      </div>
+      <a href="http://pf.kakao.com/_HxgDXX/chat" target="_blank" class="pf-modal-cta">카카오톡으로 견적 문의 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- 홈페이지 (정적) 모달 -->
+<div id="modal-static" class="pf-modal" style="display:none">
+  <div class="pf-modal-overlay"></div>
+  <div class="pf-modal-box">
+    <button class="pf-modal-close">✕</button>
+    <div class="pf-modal-header" style="background:linear-gradient(135deg,#18160F,#2C2920)">
+      <span class="pf-modal-badge">홈페이지 (정적)</span>
+      <h3 class="pf-modal-title">정적 홈페이지를 맡기면<br>이렇게 받아가세요</h3>
+    </div>
+    <div class="pf-modal-body">
+      <p class="pf-modal-desc">로그인·DB 없이 빠르고 깔끔하게. 브랜드 소개, 포트폴리오, 회사 소개에 최적입니다.</p>
+      <ul class="pf-modal-list">
+        <li>✦ 반응형 다페이지 홈페이지 (PC·모바일)</li>
+        <li>✦ 피그마 시안 → HTML/CSS/JS 코드</li>
+        <li>✦ 메인 + 서브 페이지 구성</li>
+        <li>✦ 문의 폼 (Google Sheets 또는 이메일 연동)</li>
+        <li>✦ Vercel 배포 / 도메인 연결 지원</li>
+        <li>✦ 소스 파일 전체 납품</li>
+      </ul>
+      <div class="pf-modal-tags">
+        <span>브랜드 사이트</span><span>회사 소개</span><span>포트폴리오</span><span>서비스 소개</span>
+      </div>
+      <a href="http://pf.kakao.com/_HxgDXX/chat" target="_blank" class="pf-modal-cta">카카오톡으로 견적 문의 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- 홈페이지 (동적) 모달 -->
+<div id="modal-dynamic" class="pf-modal" style="display:none">
+  <div class="pf-modal-overlay"></div>
+  <div class="pf-modal-box">
+    <button class="pf-modal-close">✕</button>
+    <div class="pf-modal-header" style="background:linear-gradient(135deg,#1a2a4a,#2c3e70)">
+      <span class="pf-modal-badge">홈페이지 (동적)</span>
+      <h3 class="pf-modal-title">동적 홈페이지를 맡기면<br>이렇게 받아가세요</h3>
+    </div>
+    <div class="pf-modal-body">
+      <p class="pf-modal-desc">회원가입, 로그인, 콘텐츠 관리, 결제까지. DB 연동이 필요한 서비스에 적합합니다.</p>
+      <ul class="pf-modal-list">
+        <li>✦ Supabase 기반 풀스택 웹 서비스</li>
+        <li>✦ 회원 인증 (이메일·소셜 로그인)</li>
+        <li>✦ 관리자 CMS 또는 대시보드</li>
+        <li>✦ 결제 연동 (Toss Payments 등) 협의 가능</li>
+        <li>✦ Vercel 배포 + GitHub 저장소 납품</li>
+      </ul>
+      <div class="pf-modal-tags">
+        <span>플랫폼</span><span>회원제 서비스</span><span>예약 시스템</span><span>콘텐츠 관리</span>
+      </div>
+      <a href="http://pf.kakao.com/_HxgDXX/chat" target="_blank" class="pf-modal-cta">카카오톡으로 견적 문의 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- 상세페이지 모달 -->
+<div id="modal-detail" class="pf-modal" style="display:none">
+  <div class="pf-modal-overlay"></div>
+  <div class="pf-modal-box">
+    <button class="pf-modal-close">✕</button>
+    <div class="pf-modal-header" style="background:linear-gradient(135deg,#5a3a1a,#8a5a2a)">
+      <span class="pf-modal-badge">상세페이지</span>
+      <h3 class="pf-modal-title">상세페이지를 맡기면<br>이렇게 받아가세요</h3>
+    </div>
+    <div class="pf-modal-body">
+      <p class="pf-modal-desc">스마트스토어·쿠팡·자사몰에 바로 올릴 수 있는 상세페이지. 구매를 유도하는 구조로 설계합니다.</p>
+      <ul class="pf-modal-list">
+        <li>✦ 피그마 시안 디자인 (860px 기준)</li>
+        <li>✦ 섹션 구성 : 히어로 → 문제 → 해결 → 성분 → CTA</li>
+        <li>✦ 이미지 최적화 + 섹션별 PNG 납품</li>
+        <li>✦ HTML 버전 추가 납품 (자사몰용) 협의 가능</li>
+        <li>✦ 피그마 소스 파일 포함</li>
+      </ul>
+      <div class="pf-modal-tags">
+        <span>스마트스토어</span><span>쿠팡</span><span>자사몰</span><span>뷰티·식품·가전</span>
+      </div>
+      <a href="http://pf.kakao.com/_HxgDXX/chat" target="_blank" class="pf-modal-cta">카카오톡으로 견적 문의 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- 쇼핑몰 모달 -->
+<div id="modal-shop" class="pf-modal" style="display:none">
+  <div class="pf-modal-overlay"></div>
+  <div class="pf-modal-box">
+    <button class="pf-modal-close">✕</button>
+    <div class="pf-modal-header" style="background:linear-gradient(135deg,#2a2a2a,#1A4731)">
+      <span class="pf-modal-badge">쇼핑몰</span>
+      <h3 class="pf-modal-title">쇼핑몰을 맡기면<br>이렇게 받아가세요</h3>
+    </div>
+    <div class="pf-modal-body">
+      <p class="pf-modal-desc">직접 운영 가능한 자사몰. 상품 등록부터 주문 관리까지 사장님이 직접 할 수 있도록 구성합니다.</p>
+      <ul class="pf-modal-list">
+        <li>✦ 반응형 쇼핑몰 (PC·모바일)</li>
+        <li>✦ 상품 목록 · 상세 · 장바구니 · 주문</li>
+        <li>✦ 결제 연동 (Toss Payments 등)</li>
+        <li>✦ 관리자 상품 등록 · 주문 확인 기능</li>
+        <li>✦ Vercel 배포 + 소스 파일 납품</li>
+      </ul>
+      <div class="pf-modal-tags">
+        <span>패션</span><span>뷰티</span><span>식품</span><span>소규모 자사몰</span>
+      </div>
+      <a href="http://pf.kakao.com/_HxgDXX/chat" target="_blank" class="pf-modal-cta">카카오톡으로 견적 문의 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- 유지보수 모달 -->
+<div id="modal-maintain" class="pf-modal" style="display:none">
+  <div class="pf-modal-overlay"></div>
+  <div class="pf-modal-box">
+    <button class="pf-modal-close">✕</button>
+    <div class="pf-modal-header" style="background:linear-gradient(135deg,#3a3a3a,#555)">
+      <span class="pf-modal-badge">유지보수 · 개선</span>
+      <h3 class="pf-modal-title">유지보수를 맡기면<br>이렇게 받아가세요</h3>
+    </div>
+    <div class="pf-modal-body">
+      <p class="pf-modal-desc">이미 만들어진 사이트, 마침이 이어받습니다. 버그 수정부터 디자인 개선까지 가능합니다.</p>
+      <ul class="pf-modal-list">
+        <li>✦ 기존 코드 분석 및 버그 수정</li>
+        <li>✦ 기능 추가 (폼, 섹션, 페이지 등)</li>
+        <li>✦ 디자인 리뉴얼 · 반응형 개선</li>
+        <li>✦ 도메인·배포 환경 이전 지원</li>
+        <li>✦ 범위에 따라 별도 견적 협의</li>
+      </ul>
+      <div class="pf-modal-tags">
+        <span>버그 수정</span><span>기능 추가</span><span>디자인 리뉴얼</span><span>인수인계</span>
+      </div>
+      <a href="http://pf.kakao.com/_HxgDXX/chat" target="_blank" class="pf-modal-cta">카카오톡으로 견적 문의 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- 모달 스타일 + JS -->
+<style>
+.pf-modal { position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px; }
+.pf-modal-overlay { position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px); }
+.pf-modal-box { position:relative;z-index:1;background:#fff;border-radius:16px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3); }
+.pf-modal-close { position:absolute;top:14px;right:16px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:16px;width:30px;height:30px;border-radius:50%;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;transition:.2s; }
+.pf-modal-close:hover { background:rgba(255,255,255,.35); }
+.pf-modal-header { padding:36px 28px 28px;border-radius:16px 16px 0 0;position:relative; }
+.pf-modal-badge { font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.7);background:rgba(255,255,255,.15);padding:4px 10px;border-radius:999px;display:inline-block;margin-bottom:12px; }
+.pf-modal-title { font-size:1.45rem;font-weight:700;color:#fff;line-height:1.35;margin:0; }
+.pf-modal-body { padding:24px 28px 28px; }
+.pf-modal-desc { font-size:14px;color:#555;line-height:1.7;margin-bottom:20px; }
+.pf-modal-list { list-style:none;padding:0;margin:0 0 20px; }
+.pf-modal-list li { font-size:14px;color:#333;padding:8px 0;border-bottom:1px solid #f0f0f0;line-height:1.5; }
+.pf-modal-list li:last-child { border-bottom:none; }
+.pf-modal-tags { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px; }
+.pf-modal-tags span { font-size:11px;padding:4px 10px;border-radius:999px;background:#f0f0f0;color:#555; }
+.pf-modal-cta { display:block;background:#1A4731;color:#fff;text-align:center;padding:14px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:.2s; }
+.pf-modal-cta:hover { background:#2D6A4F;transform:translateY(-1px); }
+</style>
+<script>
+(function(){
+  function openModal(id){
+    var m = document.getElementById(id);
+    if(!m) return;
+    m.style.display='flex';
+    document.body.style.overflow='hidden';
+  }
+  function closeModal(m){
+    m.style.display='none';
+    document.body.style.overflow='';
+  }
+  document.querySelectorAll('.pf-modal-trigger').forEach(function(el){
+    el.addEventListener('click', function(){
+      openModal(el.dataset.modal);
+    });
+  });
+  document.querySelectorAll('.pf-modal').forEach(function(m){
+    m.querySelector('.pf-modal-overlay').addEventListener('click', function(){ closeModal(m); });
+    m.querySelector('.pf-modal-close').addEventListener('click', function(){ closeModal(m); });
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape'){
+      document.querySelectorAll('.pf-modal').forEach(function(m){
+        if(m.style.display!=='none') closeModal(m);
+      });
+    }
+  });
+})();
+</script>
 
 <!-- PROCESS — 흰색 -->
 <section class="process" id="process">
