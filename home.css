@@ -2,7 +2,7 @@
 .hero {
   position: relative;
   overflow: hidden;
-  min-height: 560px; /* 기존 100vh 느낌 줄임 */
+  min-height: 520px; /* 기존 100vh 느낌 줄임 */
   display: flex;
   align-items: center;
 
@@ -15,7 +15,7 @@
       rgba(255,255,255,0.15) 78%,
       rgba(255,255,255,0) 100%
     ),
-    url('./img/imageshero-machim.png');
+    url('./img/images-hero.png');
 
   background-size: cover;
   background-position: center right;
@@ -24,7 +24,7 @@
 .hero-inner {
   max-width: 1500px;
   margin: 0 auto;
-  padding: 80px 32px;
+  padding: 60px 32px;
   width: 100%;
 
   display: block;
