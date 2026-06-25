@@ -1,44 +1,38 @@
 /* ===== HERO ===== */
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height: 680px;
   overflow: hidden;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 
   background-image:
     linear-gradient(
       to right,
       #fff 0%,
-      #fff 45%,
-      rgba(255,255,255,.85) 55%,
-      rgba(255,255,255,.20) 68%,
-      transparent 80%
-    ),
-    linear-gradient(
-      to top,
-      #fff 0%,
-      rgba(255,255,255,.2) 6%,
-      transparent 16%
+      #fff 40%,
+      rgba(255,255,255,.7) 52%,
+      rgba(255,255,255,.1) 66%,
+      transparent 76%
     ),
     url('./img/img-hero.png');
 
   background-size: cover;
-  background-position: right center;
+  background-position: right top;
   background-repeat: no-repeat;
 }
 
 .hero-inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 72px 32px 64px;
+  padding: 100px 32px 80px;
   width: 100%;
   position: relative;
   z-index: 2;
 }
 
 .hero-left {
-  max-width: 620px;
+  max-width: 520px;
   position: relative;
   z-index: 3;
 }
@@ -66,17 +60,6 @@
   display: block; margin-bottom: 5px; letter-spacing: -.02em;
 }
 .stat-label { font-size: 12px; color: rgba(255,255,255,.6); }
-
-/* 공통 섹션 */
-.section-eyebrow {
-  font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--green); font-weight: 600; margin-bottom: 10px;
-}
-.section-title {
-  font-size: clamp(1.6rem, 2.8vw, 2.2rem); font-weight: 700;
-  letter-spacing: -0.03em; color: var(--text); margin-bottom: 8px;
-}
-.section-desc { font-size: 14px; color: var(--muted); margin-bottom: 48px; }
 
 /* ===== SERVICES — 흰색 ===== */
 .services { padding: 80px 0; background: var(--white); }
