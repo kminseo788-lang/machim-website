@@ -1,89 +1,45 @@
 /* ===== HERO ===== */
 .hero {
-  min-height: 670px;
-
-  background:
-    linear-gradient(
-      to right,
-      rgba(255,255,255,0.97) 0%,
-      rgba(255,255,255,0.9) 28%,
-      rgba(255,255,255,0.55) 52%,
-      rgba(255,255,255,0.15) 78%,
-      rgba(255,255,255,0) 100%
-    ),
-    url('./img/imageshero-machim.png');
-
-  background-size: auto 105%;
-  background-position: center right;
-  background-repeat: no-repeat;
+  background: #fff;
+  overflow: hidden;
+  position: relative;
+  min-height: 620px;
+  display: flex;
+  align-items: center;
 }
+
 .hero-inner {
-  max-width: 1500px;
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 60px 32px;
+  padding: 72px 32px 64px;
   width: 100%;
-
-  display: block;
-
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 0;
+  align-items: center;
   position: relative;
   z-index: 2;
 }
-.hero-left {
-  max-width: 620px;
-  padding-right: 32px;
-}
-.hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 12px; letter-spacing: .08em; color: var(--green);
-  font-weight: 600; margin-bottom: 24px;
-  background: var(--green-pale); padding: 6px 14px; border-radius: 999px;
-}
-.hero-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
-.hero-title {
-  font-size: clamp(1.8rem, 3.2vw, 2.8rem); font-weight: 700;
-  line-height: 1.15; letter-spacing: -0.04em; color: var(--text); margin-bottom: 20px;
-}
-.hero-title em { font-style: normal; color: var(--green); }
-.hero-problem {
-  font-size: 14px; color: var(--muted); line-height: 1.85;
-  margin-bottom: 20px; max-width: 380px;
-}
-.hero-solution {
-  font-size: 15px; color: var(--text); line-height: 1.85;
-  font-weight: 500; margin-bottom: 36px; max-width: 400px;
-}
-.hero-accent { color: var(--green); font-weight: 700; }
-.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
-.btn-primary {
-  font-size: 14px; font-weight: 600; padding: 13px 26px; border-radius: 8px;
-  background: var(--green); color: var(--white); text-decoration: none;
-  border: none; cursor: pointer; transition: background .15s; display: inline-block;
-}
-.btn-primary:hover { background: var(--green-hover); }
-.btn-outline {
-  font-size: 14px; font-weight: 500; padding: 13px 26px; border-radius: 8px;
-  background: transparent; color: var(--green); text-decoration: none;
-  border: 1.5px solid var(--green); cursor: pointer; transition: all .15s; display: inline-block;
-}
-.btn-outline:hover { background: var(--green-pale); }
 
-/* 히어로 우측 */
 .hero-right {
-  display: none;
+  position: relative;
+  height: 580px;
+  margin-right: -160px;
+  margin-left: -80px;
 }
 
 .hero-img-wrap {
   position: absolute;
   inset: 0;
   border-radius: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .hero-img-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center right;
+  object-position: center;
   display: block;
 }
 
@@ -91,20 +47,29 @@
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 1;
-  pointer-events: none;
-
   background: linear-gradient(
     to right,
-    var(--white) 0%,
-    rgba(255,255,255,0.95) 10%,
-    rgba(255,255,255,0.45) 28%,
-    rgba(255,255,255,0) 48%
+    #fff 0%,
+    #fff 18%,
+    rgba(255,255,255,0.96) 35%,
+    rgba(255,255,255,0.72) 55%,
+    rgba(255,255,255,0.25) 75%,
+    transparent 100%
   );
+  z-index: 1;
 }
 
 .hero-img-wrap::after {
-  display: none;
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    #fff 0%,
+    rgba(255,255,255,0.65) 12%,
+    transparent 32%
+  );
+  z-index: 1;
 }
 .hero-img-placeholder {
   position: absolute; inset: 0; background: #d8d4cc; border-radius: 16px;
