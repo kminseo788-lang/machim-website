@@ -2,7 +2,7 @@
 .hero {
   position: relative;
   overflow: hidden;
-  min-height: 520px; /* 기존 100vh 느낌 줄임 */
+  min-height: 560px; /* 기존 100vh 느낌 줄임 */
   display: flex;
   align-items: center;
 
