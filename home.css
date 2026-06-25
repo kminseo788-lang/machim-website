@@ -10,22 +10,21 @@
     linear-gradient(
       to right,
       #fff 0%,
-      rgba(255,255,255,.98) 28%,
-      rgba(255,255,255,.80) 42%,
-      rgba(255,255,255,.30) 56%,
-      rgba(255,255,255,.05) 68%,
-      transparent 76%
+      #fff 45%,
+      rgba(255,255,255,.85) 55%,
+      rgba(255,255,255,.20) 68%,
+      transparent 80%
     ),
     linear-gradient(
       to top,
       #fff 0%,
-      rgba(255,255,255,.3) 8%,
-      transparent 20%
+      rgba(255,255,255,.2) 6%,
+      transparent 16%
     ),
     url('./img/img-hero.png');
 
   background-size: cover;
-  background-position: center right;
+  background-position: right center;
   background-repeat: no-repeat;
 }
 
