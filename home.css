@@ -38,28 +38,18 @@
   z-index: 3;
 }
 
-/* 기존 이미지 박스는 숨김 */
-.hero-right,
-.hero-img-wrap,
-.hero-cards {
-  display: none;
-}
+.hero-right, .hero-img-wrap, .hero-cards { display: none; }
 
-/* ===== STATS — 딥그린 배경 ===== */
+/* ===== STATS — 딥그린 ===== */
 .stats { background: var(--green); padding: 48px 0; }
-.stats-inner {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-}
+.stats-inner { display: grid; grid-template-columns: repeat(4, 1fr); }
 .stat-item {
   padding: 28px 24px;
   border-right: 1px solid rgba(255,255,255,.15);
   text-align: center;
 }
 .stat-item:last-child { border-right: none; }
-.stat-val {
-  font-size: 1.3rem; font-weight: 700; color: #fff;
-  display: block; margin-bottom: 5px; letter-spacing: -.02em;
-}
+.stat-val { font-size: 1.3rem; font-weight: 700; color: #fff; display: block; margin-bottom: 5px; letter-spacing: -.02em; }
 .stat-label { font-size: 12px; color: rgba(255,255,255,.6); }
 
 /* ===== SERVICES — 흰색 ===== */
@@ -79,21 +69,17 @@
 }
 .service-name { font-size: 15px; font-weight: 600; color: var(--text); order: 1; }
 
-/* ===== PORTFOLIO — 딥그린 배경 ===== */
-.portfolio { padding: 60px 0 0; background: var(--green); }
+/* ===== PORTFOLIO — 연회색 ===== */
+.portfolio { padding: 60px 0 0; background: var(--page-bg); }
 .portfolio-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 36px; }
-.portfolio-header .section-eyebrow { color: rgba(255,255,255,.6); }
-.portfolio-header .section-title { color: #fff; }
-.portfolio-header .section-desc { color: rgba(255,255,255,.6); }
-.portfolio-more { font-size: 13px; color: rgba(255,255,255,.7); text-decoration: none; font-weight: 500; }
-.portfolio-more:hover { color: #fff; }
+.portfolio-more { font-size: 13px; color: var(--green); text-decoration: none; font-weight: 500; }
 .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .portfolio-card {
-  background: var(--white); border: 1px solid transparent;
+  background: var(--white); border: 1px solid var(--border);
   border-radius: 14px; overflow: hidden; text-decoration: none; color: var(--text);
   transition: border-color .2s, transform .2s; display: block;
 }
-.portfolio-card:hover { border-color: rgba(255,255,255,.4); transform: translateY(-3px); }
+.portfolio-card:hover { border-color: var(--green); transform: translateY(-3px); }
 .portfolio-thumb {
   aspect-ratio: 16/10; display: flex; align-items: center;
   justify-content: center; position: relative; overflow: hidden;
@@ -109,39 +95,23 @@
 .portfolio-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
 .portfolio-sub { font-size: 12px; color: var(--muted); line-height: 1.6; }
 
-/* ===== 포트폴리오 하단 인포 배너 — 흰색 배경 ===== */
-.portfolio-info-banner {
-  margin-top: 60px;
-  background: var(--white);
-  padding: 56px 0;
-}
-.portfolio-info-banner .section-eyebrow { color: var(--green); }
-.portfolio-info-banner .section-title { color: var(--text); margin-bottom: 40px; }
-.info-banner-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
-}
+/* ===== WHY 섹션 — 흰색 ===== */
+.why-section { background: var(--white); padding: 56px 0; }
+.why-section .section-eyebrow { color: var(--green); }
+.why-section .section-title { color: var(--text); margin-bottom: 40px; }
+
+.info-banner-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
 .info-banner-item {
-  background: var(--gray);
-  padding: 32px 28px;
-  border-radius: 4px;
-  transition: background .2s;
+  background: var(--gray); padding: 32px 28px; border-radius: 4px; transition: background .2s;
 }
 .info-banner-item:first-child { border-radius: 14px 4px 4px 14px; }
 .info-banner-item:last-child { border-radius: 4px 14px 14px 4px; }
 .info-banner-item:hover { background: var(--green-pale); }
-.info-banner-num {
-  font-size: 11px; font-weight: 700; letter-spacing: .12em;
-  color: var(--green); opacity: .5; margin-bottom: 16px; display: block;
-}
-.info-banner-title {
-  font-size: 17px; font-weight: 700; color: var(--text);
-  margin-bottom: 10px; line-height: 1.3;
-}
-.info-banner-desc {
-  font-size: 13px; color: var(--muted); line-height: 1.75;
-}
+.info-banner-num { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--green); opacity: .5; margin-bottom: 16px; display: block; }
+.info-banner-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 10px; line-height: 1.3; }
+.info-banner-desc { font-size: 13px; color: var(--muted); line-height: 1.75; }
 
-/* ===== PROCESS — 딥그린 배경 ===== */
+/* ===== PROCESS — 딥그린 ===== */
 .process { padding: 80px 0; background: var(--green); }
 .process .section-eyebrow { color: rgba(255,255,255,.6); }
 .process .section-title { color: #fff; }
@@ -152,7 +122,7 @@
 .process-name { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 8px; }
 .process-desc { font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.75; }
 
-/* ===== CTA — 흰색 배경 ===== */
+/* ===== CTA — 흰색 ===== */
 .cta-section { background: var(--white); padding: 60px 0 80px; }
 .cta-inner {
   display: grid; grid-template-columns: 1fr auto; gap: 64px; align-items: center;
