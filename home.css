@@ -2,29 +2,29 @@
 .hero {
   position: relative;
   overflow: hidden;
-  min-height: calc(100vh - 56px);
+  min-height: 560px; /* 기존 100vh 느낌 줄임 */
   display: flex;
   align-items: center;
 
   background:
     linear-gradient(
       to right,
-      rgba(255,255,255,0.97) 0%,
-      rgba(255,255,255,0.92) 28%,
-      rgba(255,255,255,0.75) 45%,
-      rgba(255,255,255,0.35) 65%,
-      rgba(255,255,255,0.05) 100%
+      rgba(255,255,255,0.96) 0%,
+      rgba(255,255,255,0.9) 32%,
+      rgba(255,255,255,0.55) 55%,
+      rgba(255,255,255,0.15) 78%,
+      rgba(255,255,255,0) 100%
     ),
     url('./img/imageshero-machim.png');
 
   background-size: cover;
-  background-position: center center;
+  background-position: center right;
   background-repeat: no-repeat;
 }
 .hero-inner {
   max-width: 1500px;
   margin: 0 auto;
-  padding: 56px 32px 48px;
+  padding: 80px 32px;
   width: 100%;
 
   display: block;
@@ -32,7 +32,10 @@
   position: relative;
   z-index: 2;
 }
-.hero-left { padding-right: 32px; }
+.hero-left {
+  max-width: 620px;
+  padding-right: 32px;
+}
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: 12px; letter-spacing: .08em; color: var(--green);
@@ -267,4 +270,8 @@
 
 .hero-left{
   max-width: 620px;
+}
+
+.hero-right {
+  display: none !important;
 }
