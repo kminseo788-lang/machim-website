@@ -1,44 +1,40 @@
 /* ===== HERO ===== */
 .hero {
-  position: relative;
-  min-height: 680px;
+  background: #fff;
   overflow: hidden;
-  display: flex;
-  align-items: flex-start;
-
-  background-image:
-    linear-gradient(
-      to right,
-      #fff 0%,
-      #fff 38%,
-      rgba(255,255,255,.6) 50%,
-      rgba(255,255,255,.05) 64%,
-      transparent 74%
-    ),
-    url('./img/img-hero.png');
-
-  background-size: cover;
-  background-position: right top;
-  background-repeat: no-repeat;
-  background-color: #fff;
 }
 
 .hero-inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 100px 32px 80px;
+  padding: 80px 32px 0;
   width: 100%;
-  position: relative;
-  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 40px;
 }
 
 .hero-left {
-  max-width: 500px;
-  position: relative;
-  z-index: 3;
+  padding-bottom: 80px;
 }
 
-.hero-right, .hero-img-wrap, .hero-cards { display: none; }
+.hero-right {
+  display: flex !important;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.hero-mockup-img {
+  width: 100%;
+  max-width: 680px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  object-position: bottom right;
+}
+
+.hero-img-wrap, .hero-cards { display: none; }
 
 /* ===== STATS — 딥그린 ===== */
 .stats { background: var(--green); padding: 48px 0; }
