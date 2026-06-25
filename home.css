@@ -1,12 +1,32 @@
 /* ===== HERO ===== */
-
 .hero {
-  background: #fff;
-  overflow: hidden;
   position: relative;
   min-height: 670px;
+  overflow: hidden;
   display: flex;
   align-items: center;
+
+  background-image:
+    linear-gradient(
+      to right,
+      #fff 0%,
+      rgba(255,255,255,.96) 24%,
+      rgba(255,255,255,.72) 40%,
+      rgba(255,255,255,.32) 53%,
+      rgba(255,255,255,.08) 65%,
+      transparent 78%
+    ),
+    linear-gradient(
+      to top,
+      #fff 0%,
+      rgba(255,255,255,.5) 10%,
+      transparent 28%
+    ),
+    url('./img/imageshero-machim.png');
+
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
 }
 
 .hero-inner {
@@ -14,98 +34,22 @@
   margin: 0 auto;
   padding: 72px 32px 64px;
   width: 100%;
-  display: grid;
-  grid-template-columns: 5fr 7fr;
-  gap: 0;
-  align-items: center;
   position: relative;
   z-index: 2;
 }
 
 .hero-left {
   max-width: 620px;
-  padding-right: 32px;
   position: relative;
   z-index: 3;
 }
 
-.hero-right {
-  position: relative;
-  height: 580px;
-  margin-left: -180px;
-  margin-right: -200px;
+/* 기존 이미지 박스는 숨김 */
+.hero-right,
+.hero-img-wrap,
+.hero-cards {
+  display: none;
 }
-
-.hero-img-wrap {
-  position: absolute;
-  inset: 0;
-  border-radius: 0;
-  overflow: hidden;
-}
-
-.hero-img-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center right;
-  display: block;
-}
-
-.hero-img-wrap::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to right,
-    #fff 0%,
-    #fff 30%,
-    rgba(255,255,255,.95) 45%,
-    rgba(255,255,255,.75) 60%,
-    rgba(255,255,255,.35) 75%,
-    transparent 100%
-  );
-  z-index: 1;
-}
-
-.hero-img-wrap::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    #fff 0%,
-    rgba(255,255,255,.6) 14%,
-    transparent 35%
-  );
-  z-index: 1;
-}
-
-
-.hero-img-placeholder {
-  position: absolute; inset: 0; background: #d8d4cc; border-radius: 16px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
-}
-.hero-img-placeholder svg { color: #aaa; }
-.hero-img-placeholder p { font-size: 12px; color: #aaa; text-align: center; line-height: 1.6; }
-
-/* 떠다니는 카드 */
-.hero-cards { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
-.project-card {
-  position: absolute; background: var(--white); border: 1px solid var(--border);
-  border-radius: 12px; padding: 10px 14px; box-shadow: 0 8px 24px rgba(0,0,0,.1);
-  min-width: 140px; pointer-events: auto; cursor: pointer; text-decoration: none;
-  color: var(--text); display: block; transition: box-shadow .2s;
-}
-.project-card:hover { box-shadow: 0 12px 32px rgba(0,0,0,.15); }
-.pc-thumb { width: 100%; height: 72px; border-radius: 7px; overflow: hidden; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
-.pc-category { font-size: 10px; color: var(--green); font-weight: 600; letter-spacing: .04em; margin-bottom: 2px; }
-.pc-name { font-size: 13px; font-weight: 600; color: var(--text); }
-.card-chipbook { top: 20px; right: 40px; width: 158px; animation: float1 4s ease-in-out infinite; }
-.card-sunscreen { top: 155px; right: 14px; width: 146px; animation: float2 4.8s ease-in-out infinite; }
-.card-food { bottom: 70px; right: 52px; width: 150px; animation: float3 3.8s ease-in-out infinite; }
-@keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-@keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-@keyframes float3 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
 
 /* ===== STATS — 딥그린 배경으로 변경 ===== */
 .stats { background: var(--green); padding: 48px 0; }
