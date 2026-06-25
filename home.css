@@ -1,11 +1,25 @@
 /* ===== HERO ===== */
 .hero {
-  background: var(--white);
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
   min-height: calc(100vh - 56px);
   display: flex;
   align-items: center;
+
+  background:
+    linear-gradient(
+      to right,
+      rgba(255,255,255,0.97) 0%,
+      rgba(255,255,255,0.92) 28%,
+      rgba(255,255,255,0.75) 45%,
+      rgba(255,255,255,0.35) 65%,
+      rgba(255,255,255,0.05) 100%
+    ),
+    url('./img/imageshero-machim.png');
+
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 .hero-inner {
   max-width: 1500px;
@@ -13,10 +27,7 @@
   padding: 56px 32px 48px;
   width: 100%;
 
-  display: grid;
-  grid-template-columns: 4fr 8fr;
-  gap: 0;
-  align-items: center;
+  display: block;
 
   position: relative;
   z-index: 2;
@@ -59,9 +70,7 @@
 
 /* 히어로 우측 */
 .hero-right {
-  position: relative;
-  height: 720px;
-  margin-right: -140px;
+  display: none;
 }
 
 .hero-img-wrap {
@@ -255,3 +264,7 @@
   transition: background .15s; white-space: nowrap;
 }
 .btn-green:hover { background: var(--green-hover); }
+
+.hero-left{
+  max-width: 620px;
+}
