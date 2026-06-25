@@ -1,23 +1,19 @@
 /* ===== HERO ===== */
 .hero {
-  position: relative;
-  overflow: hidden;
-  min-height: 620px; /* 기존 100vh 느낌 줄임 */
-  display: flex;
-  align-items: center;
+  min-height: 560px;
 
   background:
     linear-gradient(
       to right,
-      rgba(255,255,255,0.96) 0%,
-      rgba(255,255,255,0.9) 32%,
-      rgba(255,255,255,0.55) 55%,
+      rgba(255,255,255,0.97) 0%,
+      rgba(255,255,255,0.9) 28%,
+      rgba(255,255,255,0.55) 52%,
       rgba(255,255,255,0.15) 78%,
       rgba(255,255,255,0) 100%
     ),
-    url('./img/images-hero.png');
+    url('./img/imageshero-machim.png');
 
-  background-size: cover;
+  background-size: auto 105%;
   background-position: center right;
   background-repeat: no-repeat;
 }
