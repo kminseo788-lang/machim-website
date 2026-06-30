@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>블랑로즈 | 마침.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../common.css">
+<link rel="stylesheet" href="../cases.css">
+</head>
+<body>
+<nav><div class="nav-inner">
+  <a href="../index.html" class="logo">마침.</a>
+  <ul class="nav-links"><li><a href="../index.html#cases">← 제작 예시 목록</a></li></ul>
+</div></nav>
+
+<section class="case-hero">
+  <div class="container">
+    <a href="../index.html#cases" class="case-back">← 목록으로</a>
+    <span class="case-badge">뷰티 · 화장품 상세페이지</span>
+    <h1>블랑로즈</h1>
+    <p>스마트스토어 형식의 구매 전환형 상세페이지예요. 효능 카피, 성분 소개, 사용 전후 비교, 후기까지 구매 결정을 돕는 흐름으로 구성했어요.</p>
+  </div>
+</section>
+
+<div class="case-body">
+  <div class="case-section">
+    <p class="case-label">Design Rationale</p>
+    <p class="case-title">왜 이렇게 만들었나요</p>
+    <div class="rationale-list">
+      <div class="rationale-item">
+        <p class="rationale-head">핑크 + 화이트 컬러</p>
+        <p class="rationale-desc">여성 타깃 뷰티 제품 특성상 부드럽고 깨끗한 인상이 중요해요. 채도 높은 핑크 대신 연한 톤을 써서 자극적이지 않으면서도 고급스러운 느낌을 살렸어요.</p>
+      </div>
+      <div class="rationale-item">
+        <p class="rationale-head">가격·할인을 상단에 바로 노출</p>
+        <p class="rationale-desc">쇼핑몰 상세페이지는 스크롤을 끝까지 안 봐도 구매 결정이 가능해야 해요. 할인율과 가격을 제일 먼저 보여주고, 그 아래에서 설득 논리를 풀어가는 구조로 짰어요.</p>
+      </div>
+      <div class="rationale-item">
+        <p class="rationale-head">사용 전후 비교 이미지</p>
+        <p class="rationale-desc">화장품은 '진짜 효과가 있나'에 대한 의심이 가장 큰 구매 장벽이에요. 비포애프터를 시각적으로 비교해 보여줘서 그 의심을 줄이는 데 집중했어요.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="case-section">
+    <p class="case-label">Preview</p>
+    <p class="case-title">전체 화면 보기</p>
+    <div class="img-frame" onclick="document.getElementById('lb').classList.add('on')">
+      <img src="../portfolio_examples_img/pf_beauty.png" alt="블랑로즈">
+      <span class="img-hint">🔍 클릭하면 크게 보기</span>
+    </div>
+  </div>
+
+  <div class="case-section">
+    <div class="notice">※ 본 제작 예시는 제작 역량을 보여드리기 위한 디자인 시안입니다. 표기된 상호·연락처는 실존 업체와 무관한 예시입니다.</div>
+  </div>
+
+  <div class="case-cta">
+    <p>MACHIM STUDIO</p>
+    <h3>이런 홈페이지, 함께 만들어드릴 수 있어요</h3>
+    <div class="cc-btns">
+      <a href="http://pf.kakao.com/_HxgDXX/chat" target="_blank" class="btn-w">카카오톡 상담</a>
+      <a href="../index.html#cases" class="btn-o">← 제작 예시 목록</a>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lb" onclick="this.classList.remove('on')">
+  <button class="lb-close">✕</button>
+  <img src="../portfolio_examples_img/pf_beauty.png" alt="블랑로즈">
+</div>
+
+</body>
+</html>
