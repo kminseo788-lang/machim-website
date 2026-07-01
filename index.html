@@ -80,47 +80,7 @@
   </div>
 </section>
 
-<!-- BANNER — 1인1홈피시대 -->
-<section class="banner-section">
-  <div class="container">
-    <a href="landing.html" class="banner-card">
-      <div class="banner-left">
-        <span class="banner-dot"></span>
-        <span class="banner-title">지금은 1인 1홈피 시대</span>
-      </div>
-      <div class="banner-right">
-        <span class="banner-sub">나만의 홈페이지로 잠든 사이에도 수익을 만드세요</span>
-        <span class="banner-arrow">→</span>
-      </div>
-    </a>
-  </div>
-</section>
 
-<style>
-.banner-section { background: transparent; padding: 0 0 40px; }
-.banner-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #1B4332;
-  border-radius: 14px;
-  padding: 28px 40px;
-  text-decoration: none;
-  transition: transform .2s, box-shadow .2s;
-}
-.banner-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(27,67,50,.25); }
-.banner-left { display: flex; align-items: center; gap: 14px; }
-.banner-dot { width: 10px; height: 10px; border-radius: 50%; background: #F5F2ED; flex-shrink: 0; }
-.banner-title { font-size: 26px; font-weight: 800; color: #F5F2ED; letter-spacing: -0.5px; }
-.banner-right { display: flex; align-items: center; gap: 20px; }
-.banner-sub { font-size: 14px; color: rgba(245,242,237,.65); }
-.banner-arrow { font-size: 22px; color: #F5F2ED; }
-@media (max-width: 700px) {
-  .banner-card { flex-direction: column; align-items: flex-start; gap: 10px; padding: 24px; }
-  .banner-title { font-size: 20px; }
-  .banner-sub { display: none; }
-}
-</style>
 
 <!-- SERVICES — 흰색 -->
 <section class="services" id="services">
@@ -627,6 +587,43 @@
   });
 })();
 </script>
+
+<!-- BANNER — 1인1홈피시대 -->
+<section class="banner-section">
+  <div class="container">
+    <a href="landing.html" class="banner-card">
+      <span class="banner-dot"></span>
+      <p class="banner-title">지금은 1인 1홈피 시대</p>
+      <p class="banner-sub">나만의 홈페이지로 잠든 사이에도 수익을 만드세요</p>
+      <span class="banner-arrow">자세히 보기 →</span>
+    </a>
+  </div>
+</section>
+
+<style>
+.banner-section { background: transparent; padding: 0 0 60px; }
+.banner-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  background: #1B4332;
+  border-radius: 16px;
+  padding: 48px 52px;
+  text-decoration: none;
+  min-height: 200px;
+  transition: transform .2s, box-shadow .2s;
+}
+.banner-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(27,67,50,.3); }
+.banner-dot { width: 10px; height: 10px; border-radius: 50%; background: #F5F2ED; margin-bottom: 20px; flex-shrink: 0; }
+.banner-title { font-size: 32px; font-weight: 800; color: #F5F2ED; letter-spacing: -0.5px; margin-bottom: 10px; }
+.banner-sub { font-size: 15px; color: rgba(245,242,237,.65); margin-bottom: 24px; }
+.banner-arrow { font-size: 14px; font-weight: 600; color: #F5F2ED; border: 1px solid rgba(245,242,237,.4); padding: 8px 18px; border-radius: 999px; }
+@media (max-width: 600px) {
+  .banner-card { padding: 36px 28px; min-height: 160px; }
+  .banner-title { font-size: 24px; }
+}
+</style>
 
 <!-- PROCESS — 흰색 -->
 <section class="process" id="process">
