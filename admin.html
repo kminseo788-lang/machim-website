@@ -186,7 +186,7 @@
   // ⚠️ 결제 페이지 URL의 기준 도메인 (배포 후 실제 도메인으로 확인)
   const SITE_URL = "https://machim.net";
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const loginCard = document.getElementById('loginCard');
   const formCard = document.getElementById('formCard');
@@ -194,7 +194,7 @@
   const formError = document.getElementById('formError');
 
   async function checkSession() {
-    const { data } = await supabase.auth.getSession();
+    const { data } = await sb.auth.getSession();
     if (data.session) {
       loginCard.style.display = 'none';
       formCard.style.display = 'block';
@@ -209,7 +209,7 @@
     loginError.style.display = 'none';
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await sb.auth.signInWithPassword({ email, password });
     if (error) {
       loginError.style.display = 'block';
       return;
@@ -218,7 +218,7 @@
   });
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await supabase.auth.signOut();
+    await sb.auth.signOut();
     checkSession();
   });
 
@@ -242,7 +242,7 @@
 
     try {
       // 1) 프로젝트 생성
-      const { data: project, error: projectErr } = await supabase
+      const { data: project, error: projectErr } = await sb
         .from('projects')
         .insert({ client_name: clientName, project_name: projectName, total_amount: totalAmount })
         .select()
@@ -254,7 +254,7 @@
       const balanceAmount = totalAmount - depositAmount;
 
       // 2) 착수금/잔금 두 건 생성
-      const { data: paymentsData, error: paymentsErr } = await supabase
+      const { data: paymentsData, error: paymentsErr } = await sb
         .from('payments')
         .insert([
           { project_id: project.id, payment_type: '착수금', amount: depositAmount, status: '대기' },

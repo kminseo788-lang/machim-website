@@ -117,7 +117,7 @@
   // ⚠️ PortOne V1 채널키 - 계좌이체/가상계좌 등 사용할 채널의 키
   const PORTONE_CHANNEL_KEY = "channel-key-여기에-붙여넣기";
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const content = document.getElementById('content');
 
   function formatWon(n) {
@@ -133,7 +133,7 @@
       return;
     }
 
-    const { data, error } = await supabase.rpc('get_payment_info', { payment_uuid: id });
+    const { data, error } = await sb.rpc('get_payment_info', { payment_uuid: id });
 
     if (error || !data || data.length === 0) {
       content.innerHTML = '<div class="state fail">결제 정보를 찾을 수 없습니다.<br>링크를 다시 확인해주세요.</div>';
