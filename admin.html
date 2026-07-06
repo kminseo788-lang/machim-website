@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>마침 · 관리자</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --green: #1B4332;
+    --cream: #F5F2ED;
+    --text: #2B2B28;
+    --muted: #8A8578;
+    --border: #E3DED3;
+    --error: #B3261E;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Pretendard", "Apple SD Gothic Neo", sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 40px;
+    width: 100%;
+    max-width: 480px;
+  }
+  h1 {
+    font-size: 20px;
+    margin: 0 0 4px;
+    color: var(--green);
+  }
+  .sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 28px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 16px 0 6px;
+  }
+  input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+  }
+  input:focus { outline: 2px solid var(--green); outline-offset: 1px; }
+  button {
+    width: 100%;
+    margin-top: 24px;
+    padding: 13px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .error {
+    color: var(--error);
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+  .result {
+    margin-top: 28px;
+    padding: 18px;
+    background: var(--cream);
+    border-radius: 10px;
+    display: none;
+  }
+  .result h3 {
+    font-size: 14px;
+    margin: 0 0 12px;
+    color: var(--green);
+  }
+  .link-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .link-row input {
+    flex: 1;
+    background: #fff;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .link-row button {
+    width: auto;
+    margin: 0;
+    padding: 0 16px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .link-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  #logoutBtn {
+    background: none;
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 13px;
+    width: auto;
+    padding: 0;
+    margin: 0;
+    text-decoration: underline;
+    position: absolute;
+    top: 24px;
+    right: 24px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 로그인 화면 -->
+<div class="card" id="loginCard">
+  <h1>마침 관리자</h1>
+  <p class="sub">프로젝트를 등록하고 결제 링크를 생성합니다.</p>
+  <label for="email">이메일</label>
+  <input type="email" id="email" autocomplete="username">
+  <label for="password">비밀번호</label>
+  <input type="password" id="password" autocomplete="current-password">
+  <button id="loginBtn">로그인</button>
+  <p class="error" id="loginError">이메일 또는 비밀번호가 올바르지 않습니다.</p>
+</div>
+
+<!-- 입력 폼 화면 -->
+<div class="card" id="formCard" style="display:none; position:relative;">
+  <button id="logoutBtn">로그아웃</button>
+  <h1>새 프로젝트 등록</h1>
+  <p class="sub">계약 확정 후 정보를 입력하면 착수금·잔금 결제 링크가 생성됩니다.</p>
+
+  <label for="clientName">고객명</label>
+  <input type="text" id="clientName" placeholder="예: 홍길동">
+
+  <label for="projectName">프로젝트명</label>
+  <input type="text" id="projectName" placeholder="예: OO님 홈페이지 제작">
+
+  <label for="totalAmount">총 계약금액 (원)</label>
+  <input type="number" id="totalAmount" placeholder="예: 750000">
+
+  <button id="createBtn">등록하고 링크 생성</button>
+  <p class="error" id="formError"></p>
+
+  <div class="result" id="result">
+    <h3>결제 링크가 생성되었습니다</h3>
+    <div class="link-label">착수금 (50%)</div>
+    <div class="link-row">
+      <input type="text" id="depositLink" readonly>
+      <button data-copy="depositLink">복사</button>
+    </div>
+    <div class="link-label">잔금 (50%)</div>
+    <div class="link-row">
+      <input type="text" id="balanceLink" readonly>
+      <button data-copy="balanceLink">복사</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ⚠️ 아래 두 값을 Supabase 프로젝트(machim) 정보로 채워주세요.
+  // Settings → API 에서 확인 가능합니다.
+  const SUPABASE_URL = "https://jzxlmcvthicmruxxxmzg.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6eGxtY3Z0aGljbXJ1eHh4bXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMjM2MDgsImV4cCI6MjA5ODc5OTYwOH0.ld7qDDJgqK1cQzf1IoCiyglFFQeMRArmWPoavR4bPo8";
+
+  // ⚠️ 결제 페이지 URL의 기준 도메인 (배포 후 실제 도메인으로 확인)
+  const SITE_URL = "https://machim.net";
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const loginCard = document.getElementById('loginCard');
+  const formCard = document.getElementById('formCard');
+  const loginError = document.getElementById('loginError');
+  const formError = document.getElementById('formError');
+
+  async function checkSession() {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      loginCard.style.display = 'none';
+      formCard.style.display = 'block';
+    } else {
+      loginCard.style.display = 'block';
+      formCard.style.display = 'none';
+    }
+  }
+  checkSession();
+
+  document.getElementById('loginBtn').addEventListener('click', async () => {
+    loginError.style.display = 'none';
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      loginError.style.display = 'block';
+      return;
+    }
+    checkSession();
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    checkSession();
+  });
+
+  document.getElementById('createBtn').addEventListener('click', async () => {
+    formError.style.display = 'none';
+    document.getElementById('result').style.display = 'none';
+
+    const clientName = document.getElementById('clientName').value.trim();
+    const projectName = document.getElementById('projectName').value.trim();
+    const totalAmount = parseInt(document.getElementById('totalAmount').value, 10);
+
+    if (!clientName || !projectName || !totalAmount || totalAmount <= 0) {
+      formError.textContent = '모든 항목을 정확히 입력해주세요.';
+      formError.style.display = 'block';
+      return;
+    }
+
+    const createBtn = document.getElementById('createBtn');
+    createBtn.disabled = true;
+    createBtn.textContent = '생성 중...';
+
+    try {
+      // 1) 프로젝트 생성
+      const { data: project, error: projectErr } = await supabase
+        .from('projects')
+        .insert({ client_name: clientName, project_name: projectName, total_amount: totalAmount })
+        .select()
+        .single();
+
+      if (projectErr) throw projectErr;
+
+      const depositAmount = Math.round(totalAmount * 0.5);
+      const balanceAmount = totalAmount - depositAmount;
+
+      // 2) 착수금/잔금 두 건 생성
+      const { data: paymentsData, error: paymentsErr } = await supabase
+        .from('payments')
+        .insert([
+          { project_id: project.id, payment_type: '착수금', amount: depositAmount, status: '대기' },
+          { project_id: project.id, payment_type: '잔금', amount: balanceAmount, status: '대기' }
+        ])
+        .select();
+
+      if (paymentsErr) throw paymentsErr;
+
+      const deposit = paymentsData.find(p => p.payment_type === '착수금');
+      const balance = paymentsData.find(p => p.payment_type === '잔금');
+
+      document.getElementById('depositLink').value = `${SITE_URL}/pay.html?id=${deposit.id}`;
+      document.getElementById('balanceLink').value = `${SITE_URL}/pay.html?id=${balance.id}`;
+      document.getElementById('result').style.display = 'block';
+
+      document.getElementById('clientName').value = '';
+      document.getElementById('projectName').value = '';
+      document.getElementById('totalAmount').value = '';
+
+    } catch (err) {
+      formError.textContent = '오류가 발생했습니다: ' + err.message;
+      formError.style.display = 'block';
+    } finally {
+      createBtn.disabled = false;
+      createBtn.textContent = '등록하고 링크 생성';
+    }
+  });
+
+  document.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.copy);
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      const original = btn.textContent;
+      btn.textContent = '복사됨!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    });
+  });
+</script>
+</body>
+</html>

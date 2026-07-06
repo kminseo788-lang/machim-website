@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마침 · 결제</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<style>
+  :root {
+    --green: #1B4332;
+    --cream: #F5F2ED;
+    --text: #2B2B28;
+    --muted: #8A8578;
+    --border: #E3DED3;
+    --error: #B3261E;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Pretendard", "Apple SD Gothic Neo", sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 40px;
+    width: 100%;
+    max-width: 440px;
+    text-align: center;
+  }
+  .brand {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 0.05em;
+    margin-bottom: 24px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--cream);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 100px;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: 19px;
+    margin: 0 0 6px;
+  }
+  .client {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0 0 28px;
+  }
+  .amount {
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--green);
+    margin: 0 0 32px;
+  }
+  .amount span {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  button#payBtn {
+    width: 100%;
+    padding: 15px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button#payBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .state {
+    font-size: 14px;
+    color: var(--muted);
+    padding: 40px 0;
+  }
+  .done {
+    color: var(--green);
+    font-weight: 600;
+  }
+  .fail { color: var(--error); }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand">마침</div>
+  <div id="content">
+    <div class="state">불러오는 중...</div>
+  </div>
+</div>
+
+<script>
+  // ⚠️ machim 프로젝트 정보로 채워주세요 (admin.html과 동일한 값)
+  const SUPABASE_URL = "https://jzxlmcvthicmruxxxmzg.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6eGxtY3Z0aGljbXJ1eHh4bXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMjM2MDgsImV4cCI6MjA5ODc5OTYwOH0.ld7qDDJgqK1cQzf1IoCiyglFFQeMRArmWPoavR4bPo8";
+
+  // ⚠️ PortOne(포트원) V1 가맹점 식별코드 - machim.net용 PG 등록 완료 후 채워주세요
+  const PORTONE_MERCHANT_CODE = "imp00000000";
+  // ⚠️ PortOne V1 채널키 - 계좌이체/가상계좌 등 사용할 채널의 키
+  const PORTONE_CHANNEL_KEY = "channel-key-여기에-붙여넣기";
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const content = document.getElementById('content');
+
+  function formatWon(n) {
+    return n.toLocaleString('ko-KR');
+  }
+
+  async function init() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    if (!id) {
+      content.innerHTML = '<div class="state fail">잘못된 접근입니다. 전달받은 링크를 다시 확인해주세요.</div>';
+      return;
+    }
+
+    const { data, error } = await supabase.rpc('get_payment_info', { payment_uuid: id });
+
+    if (error || !data || data.length === 0) {
+      content.innerHTML = '<div class="state fail">결제 정보를 찾을 수 없습니다.<br>링크를 다시 확인해주세요.</div>';
+      return;
+    }
+
+    const payment = data[0];
+
+    if (payment.status === '완료') {
+      content.innerHTML = `
+        <div class="badge">${payment.payment_type}</div>
+        <h1>${payment.project_name}</h1>
+        <p class="client">${payment.client_name}님</p>
+        <p class="done">이미 결제가 완료되었습니다.</p>
+      `;
+      return;
+    }
+
+    content.innerHTML = `
+      <div class="badge">${payment.payment_type}</div>
+      <h1>${payment.project_name}</h1>
+      <p class="client">${payment.client_name}님</p>
+      <p class="amount">${formatWon(payment.amount)}<span>원</span></p>
+      <button id="payBtn">결제하기</button>
+    `;
+
+    document.getElementById('payBtn').addEventListener('click', () => startPayment(payment));
+  }
+
+  function startPayment(payment) {
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.textContent = '결제 진행 중...';
+
+    const IMP = window.IMP;
+    IMP.init(PORTONE_MERCHANT_CODE);
+
+    IMP.request_pay({
+      channelKey: PORTONE_CHANNEL_KEY,
+      pay_method: "trans", // 계좌이체 (카드 승인 후 "card"로 확장 가능)
+      merchant_uid: `machim_${payment.id}_${Date.now()}`,
+      name: `${payment.project_name} - ${payment.payment_type}`,
+      amount: payment.amount,
+      buyer_name: payment.client_name,
+    }, async (rsp) => {
+      if (rsp.success) {
+        await confirmPayment(rsp.imp_uid, payment.id);
+      } else {
+        btn.disabled = false;
+        btn.textContent = '결제하기';
+        alert('결제가 취소되었거나 실패했습니다: ' + rsp.error_msg);
+      }
+    });
+  }
+
+  async function confirmPayment(impUid, paymentId) {
+    try {
+      const res = await fetch('/api/confirm-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imp_uid: impUid, payment_id: paymentId })
+      });
+      const result = await res.json();
+
+      if (result.success) {
+        content.innerHTML = `<p class="done">결제가 완료되었습니다.<br>감사합니다.</p>`;
+      } else {
+        content.innerHTML = `<p class="state fail">결제 확인 중 문제가 발생했습니다.<br>마침으로 직접 문의해주세요.</p>`;
+      }
+    } catch (e) {
+      content.innerHTML = `<p class="state fail">결제 확인 중 문제가 발생했습니다.<br>마침으로 직접 문의해주세요.</p>`;
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
