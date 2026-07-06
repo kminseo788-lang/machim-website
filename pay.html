@@ -113,9 +113,10 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6eGxtY3Z0aGljbXJ1eHh4bXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMjM2MDgsImV4cCI6MjA5ODc5OTYwOH0.ld7qDDJgqK1cQzf1IoCiyglFFQeMRArmWPoavR4bPo8";
 
   // ⚠️ PortOne(포트원) V1 가맹점 식별코드 - machim.net용 PG 등록 완료 후 채워주세요
-  const PORTONE_MERCHANT_CODE = "imp00000000";
-  // ⚠️ PortOne V1 채널키 - 계좌이체/가상계좌 등 사용할 채널의 키
-  const PORTONE_CHANNEL_KEY = "channel-key-여기에-붙여넣기";
+  const PORTONE_MERCHANT_CODE = "imp10806041";
+  // ⚠️ 지금은 칩북과 공유하는 테스트 채널이에요. machim.net 전용 실결제 채널이
+  // 별도로 계약되면, 그때 새 채널키로 교체하면 됩니다.
+  const PORTONE_CHANNEL_KEY = "channel-key-cd1697c8-0052-4b24-b57b-67e1df23a219";
 
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const content = document.getElementById('content');
