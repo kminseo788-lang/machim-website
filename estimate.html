@@ -185,17 +185,17 @@
 
     <div class="addon-row" id="addonRow" style="display:none;">
       <div>
-        <span class="addon-row__label">추가 페이지 수</span>
-        <span class="addon-row__unit" id="addonUnitText">기본 1페이지 포함 · 1페이지 초과 시 추가</span>
+        <span class="addon-row__label">전체 페이지 수</span>
+        <span class="addon-row__unit" id="addonUnitText">기본 5페이지 포함 · 초과 시 1p당 추가</span>
       </div>
       <select class="qty-select" id="pageQty">
-        <option value="0">기본 1페이지</option>
-        <option value="1">+1페이지</option>
-        <option value="2">+2페이지</option>
-        <option value="3">+3페이지</option>
-        <option value="4">+4페이지</option>
-        <option value="5">+5페이지</option>
-        <option value="6">6페이지 이상 (별도 문의)</option>
+        <option value="0">1~5페이지 (기본 포함)</option>
+        <option value="1">6페이지</option>
+        <option value="2">7페이지</option>
+        <option value="3">8페이지</option>
+        <option value="4">9페이지</option>
+        <option value="5">10페이지</option>
+        <option value="6">11페이지 이상 (별도 문의)</option>
       </select>
     </div>
   </div>
@@ -211,7 +211,7 @@
 
   <p class="fixed-note">
     표시된 금액은 확정 가격이며, 결제 시점에 별도 협의 없이 그대로 진행돼요.<br>
-    6페이지 이상 · 특수 기능이 필요한 경우 결제 전 카카오톡으로 먼저 문의해주세요.
+    11페이지 이상 · 특수 기능이 필요한 경우 결제 전 카카오톡으로 먼저 문의해주세요.
   </p>
 
 </div>
@@ -314,7 +314,7 @@
     addonRowEl.style.display = (currentType === 'home') ? 'flex' : 'none';
     if (currentType === 'home') {
       const unit = PRICING.home.sub[currentSub].addonUnit;
-      addonUnitTextEl.textContent = `기본 1페이지 포함 · 초과 시 1p당 +${unit.toLocaleString('ko-KR')}원`;
+      addonUnitTextEl.textContent = `기본 5페이지 포함 · 6페이지부터 1p당 +${unit.toLocaleString('ko-KR')}원`;
     }
     renderTotal();
   }
@@ -339,7 +339,7 @@
 
     if (needsInquiry) {
       totalEl.textContent = '카카오톡 문의 필요';
-      depositEl.textContent = '6페이지 이상은 별도 견적이 필요해요';
+      depositEl.textContent = '11페이지 이상은 별도 견적이 필요해요';
       btn.disabled = true;
       btn.textContent = '카카오톡으로 문의하기';
       return;
