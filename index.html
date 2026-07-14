@@ -222,13 +222,10 @@
 
 </section>
 
-<!-- 손실회피 배너 1 -->
-<a href="landing.html" class="pf-strip">
-  <div class="container pf-strip-inner">
-    <p class="pf-strip-title">오늘도 얼마나 놓쳤을까요?</p>
-    <p class="pf-strip-sub">홈페이지가 없어서 새어나간 매출, 계산해본 적 있으세요?</p>
-    <span class="pf-strip-arrow">더 늦기 전에 확인하기 →</span>
-  </div>
+<!-- 손실회피 티커 1 -->
+<a href="landing.html" class="pf-ticker">
+  <span class="pf-ticker-text">오늘도 얼마나 놓쳤을까요? <em>홈페이지가 없어서 새어나간 매출, 계산해본 적 있으세요?</em></span>
+  <span class="pf-ticker-arrow">확인하기 →</span>
 </a>
 
 <!-- 제작 예시 — 업종별 시안 -->
@@ -347,13 +344,10 @@
   </div>
 </section>
 
-<!-- 손실회피 배너 2 -->
-<a href="landing.html" class="pf-strip" style="background:#20573F;">
-  <div class="container pf-strip-inner">
-    <p class="pf-strip-title">비싼 인건비 없이도 됩니다</p>
-    <p class="pf-strip-sub">상품 바뀔 때마다 개발자 부르지 마세요, 사진·가격은 직접 수정하시면 돼요</p>
-    <span class="pf-strip-arrow">직접 관리하는 법 보기 →</span>
-  </div>
+<!-- 손실회피 티커 2 -->
+<a href="landing.html" class="pf-ticker">
+  <span class="pf-ticker-text">비싼 인건비 없이도 됩니다 <em>상품 바뀔 때마다 개발자 부르지 마세요, 사진·가격은 직접 수정하시면 돼요</em></span>
+  <span class="pf-ticker-arrow">방법 보기 →</span>
 </a>
 
 <section class="why-section">
@@ -437,30 +431,41 @@
 .pf-banner-sub { font-size: 13px; color: rgba(245,242,237,.6); line-height: 1.6; margin-bottom: 20px; }
 .pf-banner-arrow { font-size: 12px; font-weight: 600; color: #F5F2ED; border: 1px solid rgba(245,242,237,.35); padding: 6px 14px; border-radius: 999px; }
 
-/* 풀와이드 손실회피 배너 */
-.pf-strip {
-  display: block;
-  background: #1B4332;
-  text-decoration: none;
-  padding: 22px 0;
-}
-.pf-strip-inner {
+/* 얇은 손실회피 티커바 */
+.pf-ticker {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 14px;
   flex-wrap: wrap;
-  text-align: center;
+  text-decoration: none;
+  background: var(--cream, #F5F2ED);
+  border-top: 1px solid var(--border, #E3DED3);
+  border-bottom: 1px solid var(--border, #E3DED3);
+  padding: 11px 20px;
+  transition: background .15s;
 }
-.pf-strip-title { font-size: 16px; font-weight: 800; color: #fff; margin: 0; }
-.pf-strip-sub { font-size: 13px; color: rgba(245,242,237,.65); margin: 0; }
-.pf-strip-arrow {
-  font-size: 12px; font-weight: 600; color: #F5F2ED;
-  border: 1px solid rgba(245,242,237,.35); padding: 6px 14px; border-radius: 999px;
+.pf-ticker:hover { background: #EFEAE0; }
+.pf-ticker-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1B4332;
+}
+.pf-ticker-text em {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--muted, #6B6B63);
+  margin-left: 6px;
+}
+.pf-ticker-arrow {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1B4332;
   white-space: nowrap;
+  border-bottom: 1px solid #1B4332;
 }
 @media (max-width: 640px) {
-  .pf-strip-inner { flex-direction: column; gap: 8px; }
+  .pf-ticker-text em { display: block; margin-left: 0; margin-top: 2px; }
 }
 </style>
 
