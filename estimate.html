@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마침 · 견적 만들기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1B4332;
+    --green-light: #2D6A4F;
+    --green-bg: #E9F0EB;
+    --green-border: #B7CCBE;
+    --cream: #F5F2ED;
+    --panel: #EFEBE2;
+    --text: #2B2B28;
+    --muted: #6B6B63;
+    --border: #E3DED3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Noto Sans KR', -apple-system, "Pretendard", sans-serif;
+    background: var(--cream);
+    color: var(--text);
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 60px 24px 120px; }
+
+  a.back {
+    display: inline-block;
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 28px;
+  }
+
+  .page-head { text-align: center; margin-bottom: 44px; }
+  .page-eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: .12em;
+    color: var(--green-light); margin: 0 0 14px; text-transform: uppercase;
+  }
+  .page-title { font-size: 27px; font-weight: 800; color: var(--green); margin: 0 0 10px; letter-spacing: -0.3px; }
+  .page-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin: 0; }
+
+  .step {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 26px 26px 22px;
+    margin-bottom: 16px;
+  }
+  .step__num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--green); color: #fff; font-size: 12px; font-weight: 800;
+    margin-right: 8px;
+  }
+  .step__title { font-size: 15px; font-weight: 700; color: var(--text); display: inline-flex; align-items: center; margin: 0 0 4px; }
+  .step__desc { font-size: 12px; color: var(--muted); margin: 0 0 18px 30px; }
+
+  .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .type-opt {
+    border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 8px;
+    text-align: center; cursor: pointer; transition: all .15s;
+  }
+  .type-opt input { display: none; }
+  .type-opt__label { font-size: 13px; font-weight: 700; }
+  .type-opt.active { border-color: var(--green); background: var(--green-bg); }
+
+  .module-list { display: flex; flex-direction: column; gap: 8px; }
+  .module-item {
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px;
+    cursor: pointer; transition: all .15s;
+  }
+  .module-item.checked { border-color: var(--green); background: var(--green-bg); }
+  .module-item__left { display: flex; align-items: center; gap: 12px; }
+  .module-item input { width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
+  .module-item__name { font-size: 14px; font-weight: 700; }
+  .module-item__desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .module-item__price { font-size: 14px; font-weight: 800; color: var(--green); white-space: nowrap; }
+
+  .addon-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--panel); border-radius: 10px; padding: 12px 16px; margin-top: 4px;
+  }
+  .addon-row__label { font-size: 13px; font-weight: 600; }
+  .addon-row__unit { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
+  select.qty-select {
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px;
+    font-size: 13px; font-family: inherit; background: #fff; color: var(--text);
+  }
+
+  .summary {
+    position: sticky; bottom: 16px;
+    background: var(--green);
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 12px 32px rgba(27,67,50,.35);
+    margin-top: 24px;
+  }
+  .summary__left { color: #fff; }
+  .summary__total-label { font-size: 11px; color: rgba(255,255,255,.65); margin: 0 0 2px; }
+  .summary__total-price { font-size: 22px; font-weight: 800; }
+  .summary__deposit { font-size: 11px; color: #B7E4C7; margin-top: 3px; }
+  .btn-checkout {
+    padding: 14px 26px;
+    background: #fff;
+    color: var(--green);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-checkout:disabled { opacity: .5; cursor: not-allowed; }
+
+  .fixed-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 18px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    .type-grid { grid-template-columns: repeat(2, 1fr); }
+    .summary { flex-direction: column; align-items: stretch; gap: 14px; }
+    .btn-checkout { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <a class="back" href="index.html">← 마침으로 돌아가기</a>
+
+  <div class="page-head">
+    <p class="page-eyebrow">마침 · 견적 만들기</p>
+    <h1 class="page-title">필요한 것만 골라서 견적 내기</h1>
+    <p class="page-desc">기획부터 배포까지, 이미 가지고 계신 것은 빼고<br>필요한 단계만 담으면 그 자리에서 가격이 확정돼요.</p>
+  </div>
+
+  <div class="step">
+    <p class="step__title"><span class="step__num">1</span>어떤 프로젝트인가요?</p>
+    <p class="step__desc">유형에 따라 각 단계의 작업량과 가격이 달라져요</p>
+    <div class="type-grid" id="typeGrid">
+      <label class="type-opt active" data-type="detail">
+        <input type="radio" name="type" value="detail" checked>
+        <div class="type-opt__label">상세페이지</div>
+      </label>
+      <label class="type-opt" data-type="landing">
+        <input type="radio" name="type" value="landing">
+        <div class="type-opt__label">랜딩페이지</div>
+      </label>
+      <label class="type-opt" data-type="home">
+        <input type="radio" name="type" value="home">
+        <div class="type-opt__label">홈페이지</div>
+      </label>
+      <label class="type-opt" data-type="shop">
+        <input type="radio" name="type" value="shop">
+        <div class="type-opt__label">쇼핑몰</div>
+      </label>
+    </div>
+  </div>
+
+  <div class="step" id="homeTypeStep" style="display:none;">
+    <p class="step__title"><span class="step__num">1-1</span>정적인가요, 동적인가요?</p>
+    <p class="step__desc">동적 = 회원가입·로그인·DB 연동이 필요한 경우</p>
+    <div class="type-grid" style="grid-template-columns: repeat(2,1fr);" id="homeSubGrid">
+      <label class="type-opt active" data-sub="static">
+        <input type="radio" name="homesub" value="static" checked>
+        <div class="type-opt__label">정적 홈페이지</div>
+      </label>
+      <label class="type-opt" data-sub="dynamic">
+        <input type="radio" name="homesub" value="dynamic">
+        <div class="type-opt__label">동적 홈페이지</div>
+      </label>
+    </div>
+  </div>
+
+  <div class="step">
+    <p class="step__title"><span class="step__num">2</span>필요한 작업 단계를 골라주세요</p>
+    <p class="step__desc">이미 가지고 계신 부분(예: 시안 완성됨)은 체크를 빼주세요</p>
+    <div class="module-list" id="moduleList"></div>
+
+    <div class="addon-row" id="addonRow" style="display:none;">
+      <div>
+        <span class="addon-row__label">추가 페이지 수</span>
+        <span class="addon-row__unit" id="addonUnitText">기본 1페이지 포함 · 1페이지 초과 시 추가</span>
+      </div>
+      <select class="qty-select" id="pageQty">
+        <option value="0">기본 1페이지</option>
+        <option value="1">+1페이지</option>
+        <option value="2">+2페이지</option>
+        <option value="3">+3페이지</option>
+        <option value="4">+4페이지</option>
+        <option value="5">+5페이지</option>
+        <option value="6">6페이지 이상 (별도 문의)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="summary__left">
+      <p class="summary__total-label">선택 항목 합계</p>
+      <p class="summary__total-price" id="totalPrice">0원</p>
+      <p class="summary__deposit" id="depositText">착수금(50%) 0원</p>
+    </div>
+    <button class="btn-checkout" id="checkoutBtn" disabled>착수금 결제하기</button>
+  </div>
+
+  <p class="fixed-note">
+    표시된 금액은 확정 가격이며, 결제 시점에 별도 협의 없이 그대로 진행돼요.<br>
+    6페이지 이상 · 특수 기능이 필요한 경우 결제 전 카카오톡으로 먼저 문의해주세요.
+  </p>
+
+</div>
+
+<script>
+  const PRICING = {
+    detail: {
+      modules: {
+        plan:   { name: '기획',        desc: '콘텐츠 구성안 정리',           price: 50000 },
+        design: { name: '디자인',      desc: '시안 제작 (2차 수정 포함)',    price: 100000 },
+        build:  { name: '퍼블리싱/개발', desc: '실제 코딩·반응형 구현',        price: 150000 },
+      },
+      hasPageAddon: false
+    },
+    landing: {
+      modules: {
+        plan:   { name: '기획',        desc: '사이트 구조·카피 방향 정리',   price: 150000 },
+        design: { name: '디자인',      desc: '시안 제작 (2차 수정 포함)',    price: 250000 },
+        build:  { name: '퍼블리싱/개발', desc: '실제 코딩·반응형 구현',        price: 350000 },
+        deploy: { name: '배포',        desc: '도메인 연결, 호스팅 세팅',     price: 50000 },
+      },
+      hasPageAddon: false
+    },
+    home: {
+      sub: {
+        static: {
+          modules: {
+            plan:   { name: '기획',        desc: '사이트맵·와이어프레임',        price: 300000 },
+            design: { name: '디자인',      desc: '시안 제작 (2차 수정 포함)',    price: 400000 },
+            build:  { name: '퍼블리싱/개발', desc: '실제 코딩·반응형 구현',        price: 700000 },
+            deploy: { name: '배포',        desc: '도메인 연결, 호스팅 세팅',     price: 100000 },
+          },
+          addonUnit: 250000
+        },
+        dynamic: {
+          modules: {
+            plan:   { name: '기획',        desc: '사이트맵·기능 정의서',         price: 400000 },
+            design: { name: '디자인',      desc: '시안 제작 (2차 수정 포함)',    price: 500000 },
+            build:  { name: '퍼블리싱/개발', desc: '회원·로그인·DB 연동 개발',    price: 1500000 },
+            deploy: { name: '배포',        desc: '도메인 연결, 호스팅 세팅',     price: 100000 },
+          },
+          addonUnit: 500000
+        }
+      },
+      hasPageAddon: true
+    },
+    shop: {
+      modules: {
+        plan:   { name: '기획',        desc: '상품·주문 구조 설계',          price: 500000 },
+        design: { name: '디자인',      desc: '시안 제작 (2차 수정 포함)',    price: 600000 },
+        build:  { name: '퍼블리싱/개발', desc: '상품관리·결제·주문 시스템',    price: 1700000 },
+        deploy: { name: '배포',        desc: '도메인 연결, 호스팅 세팅',     price: 200000 },
+      },
+      hasPageAddon: false
+    }
+  };
+
+  let currentType = 'detail';
+  let currentSub = 'static';
+  const checkedModules = new Set();
+
+  const moduleListEl = document.getElementById('moduleList');
+  const addonRowEl = document.getElementById('addonRow');
+  const addonUnitTextEl = document.getElementById('addonUnitText');
+  const homeTypeStepEl = document.getElementById('homeTypeStep');
+  const pageQtyEl = document.getElementById('pageQty');
+
+  function getActiveModules() {
+    if (currentType === 'home') return PRICING.home.sub[currentSub].modules;
+    return PRICING[currentType].modules;
+  }
+
+  function renderModules() {
+    const modules = getActiveModules();
+    checkedModules.clear();
+    Object.keys(modules).forEach(k => checkedModules.add(k));
+
+    moduleListEl.innerHTML = '';
+    Object.entries(modules).forEach(([key, mod]) => {
+      const item = document.createElement('label');
+      item.className = 'module-item checked';
+      item.innerHTML = `
+        <div class="module-item__left">
+          <input type="checkbox" data-key="${key}" checked>
+          <div>
+            <div class="module-item__name">${mod.name}</div>
+            <div class="module-item__desc">${mod.desc}</div>
+          </div>
+        </div>
+        <div class="module-item__price">${mod.price.toLocaleString('ko-KR')}원</div>
+      `;
+      item.querySelector('input').addEventListener('change', (e) => {
+        if (e.target.checked) { checkedModules.add(key); item.classList.add('checked'); }
+        else { checkedModules.delete(key); item.classList.remove('checked'); }
+        renderTotal();
+      });
+      moduleListEl.appendChild(item);
+    });
+
+    addonRowEl.style.display = (currentType === 'home') ? 'flex' : 'none';
+    if (currentType === 'home') {
+      const unit = PRICING.home.sub[currentSub].addonUnit;
+      addonUnitTextEl.textContent = `기본 1페이지 포함 · 초과 시 1p당 +${unit.toLocaleString('ko-KR')}원`;
+    }
+    renderTotal();
+  }
+
+  function renderTotal() {
+    const modules = getActiveModules();
+    let total = 0;
+    checkedModules.forEach(key => { if (modules[key]) total += modules[key].price; });
+
+    let pageQty = 0;
+    if (currentType === 'home') {
+      pageQty = parseInt(pageQtyEl.value, 10);
+      if (pageQty <= 5) {
+        total += PRICING.home.sub[currentSub].addonUnit * pageQty;
+      }
+    }
+
+    const needsInquiry = currentType === 'home' && pageQty >= 6;
+    const totalEl = document.getElementById('totalPrice');
+    const depositEl = document.getElementById('depositText');
+    const btn = document.getElementById('checkoutBtn');
+
+    if (needsInquiry) {
+      totalEl.textContent = '카카오톡 문의 필요';
+      depositEl.textContent = '6페이지 이상은 별도 견적이 필요해요';
+      btn.disabled = true;
+      btn.textContent = '카카오톡으로 문의하기';
+      return;
+    }
+
+    if (total === 0) {
+      totalEl.textContent = '0원';
+      depositEl.textContent = '최소 1개 이상 선택해주세요';
+      btn.disabled = true;
+      btn.textContent = '착수금 결제하기';
+      return;
+    }
+
+    const deposit = Math.round(total / 2);
+    totalEl.textContent = total.toLocaleString('ko-KR') + '원';
+    depositEl.textContent = `착수금(50%) ${deposit.toLocaleString('ko-KR')}원 · 잔금 ${(total-deposit).toLocaleString('ko-KR')}원`;
+    btn.disabled = false;
+    btn.textContent = '착수금 결제하기';
+  }
+
+  document.querySelectorAll('#typeGrid .type-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('#typeGrid .type-opt').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      currentType = opt.dataset.type;
+      homeTypeStepEl.style.display = (currentType === 'home') ? 'block' : 'none';
+      renderModules();
+    });
+  });
+
+  document.querySelectorAll('#homeSubGrid .type-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('#homeSubGrid .type-opt').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      currentSub = opt.dataset.sub;
+      renderModules();
+    });
+  });
+
+  pageQtyEl.addEventListener('change', renderTotal);
+
+  document.getElementById('checkoutBtn').addEventListener('click', () => {
+    alert('결제 연결은 다음 단계에서 붙일 예정이에요.');
+  });
+
+  renderModules();
+</script>
+
+</body>
+</html>
