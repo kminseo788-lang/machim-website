@@ -6,6 +6,7 @@
 <title>마침 · 견적 만들기</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --green: #1B4332;
@@ -25,7 +26,7 @@
     background: var(--cream);
     color: var(--text);
   }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 60px 24px 120px; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 60px 24px 120px; }
 
   a.back {
     display: inline-block;
@@ -36,12 +37,12 @@
     margin-bottom: 28px;
   }
 
-  .page-head { text-align: center; margin-bottom: 44px; }
+  .page-head { text-align: center; margin-bottom: 40px; }
   .page-eyebrow {
     font-size: 12px; font-weight: 700; letter-spacing: .12em;
     color: var(--green-light); margin: 0 0 14px; text-transform: uppercase;
   }
-  .page-title { font-size: 27px; font-weight: 800; color: var(--green); margin: 0 0 10px; letter-spacing: -0.3px; }
+  .page-title { font-size: 26px; font-weight: 800; color: var(--green); margin: 0 0 10px; letter-spacing: -0.3px; }
   .page-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin: 0; }
 
   .step {
@@ -67,20 +68,29 @@
   }
   .type-opt input { display: none; }
   .type-opt__label { font-size: 13px; font-weight: 700; }
+  .type-opt__note { font-size: 10px; color: var(--muted); margin-top: 3px; display: block; }
   .type-opt.active { border-color: var(--green); background: var(--green-bg); }
 
   .module-list { display: flex; flex-direction: column; gap: 8px; }
   .module-item {
-    display: flex; align-items: center; justify-content: space-between;
-    border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    border: 1.5px solid var(--border); border-radius: 10px; padding: 16px;
     cursor: pointer; transition: all .15s;
   }
   .module-item.checked { border-color: var(--green); background: var(--green-bg); }
-  .module-item__left { display: flex; align-items: center; gap: 12px; }
-  .module-item input { width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
+  .module-item.optional { border-style: dashed; }
+  .module-item__left { display: flex; align-items: flex-start; gap: 12px; }
+  .module-item input { width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; flex-shrink: 0; margin-top: 2px; }
   .module-item__name { font-size: 14px; font-weight: 700; }
-  .module-item__desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .module-item__price { font-size: 14px; font-weight: 800; color: var(--green); white-space: nowrap; }
+  .module-item__badge {
+    display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px;
+    border-radius: 20px; margin-left: 6px; vertical-align: middle;
+  }
+  .module-item__badge--included { background: var(--green-bg); color: var(--green); }
+  .module-item__badge--optional { background: var(--panel); color: var(--muted); }
+  .module-item__desc { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.6; }
+  .module-item__price { font-size: 14px; font-weight: 800; color: var(--green); white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+  .module-item__price--zero { color: var(--muted); font-weight: 600; }
 
   .addon-row {
     display: flex; align-items: center; justify-content: space-between;
@@ -93,13 +103,23 @@
     font-size: 13px; font-family: inherit; background: #fff; color: var(--text);
   }
 
+  .included-box {
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+  .included-box b { color: var(--green); }
+
   .summary {
-    position: sticky; bottom: 16px;
     background: var(--green);
     border-radius: 16px;
-    padding: 20px 24px;
+    padding: 22px 26px;
     display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 12px 32px rgba(27,67,50,.35);
+    box-shadow: 0 8px 24px rgba(27,67,50,.22);
     margin-top: 24px;
   }
   .summary__left { color: #fff; }
@@ -121,6 +141,91 @@
 
   .fixed-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 18px; line-height: 1.7; }
 
+  /* ─── 제작기간 타임라인 카드 ─── */
+  .timeline-card {
+    background: #fff;
+    border: 1.5px solid var(--green);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-top: 16px;
+  }
+  .timeline-card__label { font-size: 11px; font-weight: 700; color: var(--green); margin: 0 0 4px; }
+  .timeline-card__range { font-size: 22px; font-weight: 800; color: var(--green); margin: 0 0 4px; }
+  .timeline-card__sub { font-size: 11px; color: var(--muted); margin: 0 0 14px; }
+  .timeline-track {
+    display: flex; align-items: center; gap: 4px; overflow-x: auto; padding-bottom: 4px;
+  }
+  .timeline-step {
+    flex-shrink: 0; text-align: center; width: 72px;
+    background: var(--green-bg); border-radius: 8px; padding: 8px 4px;
+    font-size: 10px; color: var(--green); font-weight: 700; line-height: 1.5;
+  }
+  .timeline-step.wait { background: #FCE9C7; color: #7a4e06; }
+  .timeline-step.final { background: var(--green); color: #fff; }
+  .timeline-arrow { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+  .timeline-card__note { font-size: 10px; color: var(--muted); margin: 12px 0 0; line-height: 1.7; }
+
+  /* ─── 결제 전 안내사항 아코디언 ─── */
+  .info-accordion {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .info-accordion__head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 22px; cursor: pointer; user-select: none;
+  }
+  .info-accordion__title { font-size: 14px; font-weight: 700; color: var(--green); margin: 0; }
+  .info-accordion__chevron { font-size: 12px; color: var(--muted); transition: transform .2s; }
+  .info-accordion.open .info-accordion__chevron { transform: rotate(180deg); }
+  .info-accordion__body { display: none; padding: 0 22px 20px; }
+  .info-accordion.open .info-accordion__body { display: block; }
+  .info-item { padding: 12px 0; border-top: 1px dashed var(--border); }
+  .info-item:first-child { border-top: none; }
+  .info-item__title { font-size: 13px; font-weight: 700; color: var(--text); margin: 0 0 4px; }
+  .info-item__desc { font-size: 12px; color: var(--muted); line-height: 1.75; margin: 0; }
+
+  /* ─── 결제 모달 ─── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(20,20,18,.5);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px; z-index: 999;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: #fff; border-radius: 20px; padding: 32px;
+    max-width: 420px; width: 100%; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-box__title { font-size: 18px; font-weight: 800; color: var(--green); margin: 0 0 6px; }
+  .modal-box__sub { font-size: 13px; color: var(--muted); margin: 0 0 22px; line-height: 1.6; }
+  .modal-field { margin-bottom: 16px; }
+  .modal-field label { display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .modal-field input, .modal-field textarea {
+    width: 100%; border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; font-size: 14px; font-family: inherit; color: var(--text);
+    outline: none; transition: border-color .15s; box-sizing: border-box;
+  }
+  .modal-field input:focus, .modal-field textarea:focus { border-color: var(--green); }
+  .modal-field textarea { resize: vertical; min-height: 70px; }
+  .modal-field__hint { font-size: 11px; color: #A15C00; margin-top: 6px; line-height: 1.6; }
+  .modal-field__error { font-size: 11px; color: #C0392B; margin-top: 6px; display: none; }
+  .modal-summary {
+    background: var(--panel); border-radius: 10px; padding: 12px 14px;
+    font-size: 12px; color: var(--muted); margin-bottom: 18px; line-height: 1.7;
+  }
+  .modal-summary b { color: var(--green); }
+  .modal-btn {
+    width: 100%; padding: 14px; background: var(--green); color: #fff;
+    border: none; border-radius: 10px; font-size: 14px; font-weight: 800; cursor: pointer;
+  }
+  .modal-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .modal-close {
+    display: block; text-align: center; font-size: 12px; color: var(--muted);
+    margin-top: 12px; cursor: pointer; text-decoration: underline; background: none; border: none; width: 100%;
+  }
+
   @media (max-width: 600px) {
     .type-grid { grid-template-columns: repeat(2, 1fr); }
     .summary { flex-direction: column; align-items: stretch; gap: 14px; }
@@ -137,52 +242,81 @@
   <div class="page-head">
     <p class="page-eyebrow">마침 · 견적 만들기</p>
     <h1 class="page-title">필요한 것만 골라서 견적 내기</h1>
-    <p class="page-desc">기획부터 배포까지, 이미 가지고 계신 것은 빼고<br>필요한 단계만 담으면 그 자리에서 가격이 확정돼요.</p>
+    <p class="page-desc">뭘 만드는지에 따라 가격이 왜 다른지, 무엇이 포함되는지<br>전부 미리 보여드려요. 숨겨진 추가금은 없어요.</p>
   </div>
 
+  <!-- STEP 1: 프로젝트 유형 -->
   <div class="step">
     <p class="step__title"><span class="step__num">1</span>어떤 프로젝트인가요?</p>
-    <p class="step__desc">유형에 따라 각 단계의 작업량과 가격이 달라져요</p>
+    <p class="step__desc">유형에 따라 필요한 작업량 자체가 달라서 가격도 달라져요</p>
     <div class="type-grid" id="typeGrid">
       <label class="type-opt active" data-type="detail">
         <input type="radio" name="type" value="detail" checked>
         <div class="type-opt__label">상세페이지</div>
+        <span class="type-opt__note">단일 페이지</span>
       </label>
       <label class="type-opt" data-type="landing">
         <input type="radio" name="type" value="landing">
         <div class="type-opt__label">랜딩페이지</div>
+        <span class="type-opt__note">단일 페이지</span>
       </label>
       <label class="type-opt" data-type="home">
         <input type="radio" name="type" value="home">
         <div class="type-opt__label">홈페이지</div>
+        <span class="type-opt__note">여러 페이지</span>
       </label>
       <label class="type-opt" data-type="shop">
         <input type="radio" name="type" value="shop">
         <div class="type-opt__label">쇼핑몰</div>
+        <span class="type-opt__note">판매·주문</span>
       </label>
     </div>
   </div>
 
+  <!-- STEP 1-1: 홈페이지 - 정적/동적 -->
   <div class="step" id="homeTypeStep" style="display:none;">
     <p class="step__title"><span class="step__num">1-1</span>정적인가요, 동적인가요?</p>
-    <p class="step__desc">동적 = 회원가입·로그인·DB 연동이 필요한 경우</p>
+    <p class="step__desc">동적은 회원가입·로그인·콘텐츠 보안까지 필요해서 작업량이 큽니다</p>
     <div class="type-grid" style="grid-template-columns: repeat(2,1fr);" id="homeSubGrid">
       <label class="type-opt active" data-sub="static">
         <input type="radio" name="homesub" value="static" checked>
         <div class="type-opt__label">정적 홈페이지</div>
+        <span class="type-opt__note">DB 연동 없음</span>
       </label>
       <label class="type-opt" data-sub="dynamic">
         <input type="radio" name="homesub" value="dynamic">
         <div class="type-opt__label">동적 홈페이지</div>
+        <span class="type-opt__note">회원·로그인·보안</span>
       </label>
     </div>
   </div>
 
+  <!-- STEP 1-1: 쇼핑몰 - 심플/풀커머스 -->
+  <div class="step" id="shopTypeStep" style="display:none;">
+    <p class="step__title"><span class="step__num">1-1</span>어떤 방식의 쇼핑몰인가요?</p>
+    <p class="step__desc">상품 수가 적고 주문이 많지 않다면 심플형으로도 충분해요</p>
+    <div class="type-grid" style="grid-template-columns: repeat(2,1fr);" id="shopSubGrid">
+      <label class="type-opt active" data-shopsub="simple">
+        <input type="radio" name="shopsub" value="simple" checked>
+        <div class="type-opt__label">심플형</div>
+        <span class="type-opt__note">구글시트+수동주문</span>
+      </label>
+      <label class="type-opt" data-shopsub="full">
+        <input type="radio" name="shopsub" value="full">
+        <div class="type-opt__label">풀커머스형</div>
+        <span class="type-opt__note">DB+실시간재고+관리자</span>
+      </label>
+    </div>
+    <div class="included-box" id="shopSubNote"></div>
+  </div>
+
+  <!-- STEP 2: 모듈 선택 -->
   <div class="step">
     <p class="step__title"><span class="step__num">2</span>필요한 작업 단계를 골라주세요</p>
     <p class="step__desc">이미 가지고 계신 부분(예: 시안 완성됨)은 체크를 빼주세요</p>
     <div class="module-list" id="moduleList"></div>
 
+    <!-- 추가 페이지 (홈페이지에서만) -->
     <div class="addon-row" id="addonRow" style="display:none;">
       <div>
         <span class="addon-row__label">전체 페이지 수</span>
@@ -197,6 +331,71 @@
         <option value="5">10페이지</option>
         <option value="6">11페이지 이상 (별도 문의)</option>
       </select>
+    </div>
+
+    <!-- 쇼핑몰 심플형 전용 추가 옵션 -->
+    <div id="shopOptionalModules" style="display:none;margin-top:8px;"></div>
+  </div>
+
+  <!-- STEP 3: 예상 제작 기간 -->
+  <div class="timeline-card">
+    <p class="timeline-card__label">예상 제작 기간</p>
+    <p class="timeline-card__range" id="timelineRange">-</p>
+    <p class="timeline-card__sub" id="timelineSub">고객님 피드백이 1영업일 이내로 오는 경우 기준</p>
+    <div class="timeline-track" id="timelineTrack"></div>
+    <p class="timeline-card__note" id="timelineNote"></p>
+  </div>
+
+  <!-- 결제 전 확인사항 아코디언 -->
+  <div class="info-accordion" id="infoAccordion">
+    <div class="info-accordion__head" id="infoAccordionHead">
+      <p class="info-accordion__title">📋 결제 전 꼭 확인해주세요</p>
+      <span class="info-accordion__chevron">▾</span>
+    </div>
+    <div class="info-accordion__body">
+      <div class="info-item">
+        <p class="info-item__title">📦 진행 절차</p>
+        <p class="info-item__desc">착수금 결제 확인 후, 영업일 기준 1~3일 이내 카카오톡으로 먼저 연락드려요. 이후 자료 요청·시안 공유·피드백까지 전 과정은 카카오톡으로 진행됩니다.</p>
+      </div>
+      <div class="info-item">
+        <p class="info-item__title">✍️ 콘텐츠(글)</p>
+        <p class="info-item__desc">사이트에 들어갈 문구는 기획 단계에서 함께 잡아드려요. 다만 정확한 상품 스펙, 법적 문구 등 꼭 그대로 써야 하는 내용은 고객님이 확인·전달해주셔야 해요.</p>
+      </div>
+      <div class="info-item">
+        <p class="info-item__title">💳 결제 수단 안내</p>
+        <p class="info-item__desc">
+          기본 제작비는 카드결제로 진행돼요. 견적 빌더에 없는 추가 요청(11페이지 이상, 특수 기능 등)은 카카오톡으로 별도 협의 후, 그 추가분만 계좌이체로 결제돼요.<br><br>
+          <b style="color:var(--green)">카드결제(온라인 결제) 기능이 필요한 사이트라면:</b><br>
+          · 결제대행사(PG) 가입, 채널 개설, 이행보증보험 가입, 카드사 심사 신청은 고객님이 직접 진행하셔야 해요 (사업자 명의 계약이라 대행이 불가능해요). 절차는 단계별로 안내해드려요.<br>
+          · 심사 완료 후 발급되는 <b>채널키·가맹점 코드 두 가지만</b> 저희에게 전달해주시면, 그걸 사이트에 연동해드려요.<br>
+          · 심사 기간(약 2주) 동안은 계좌이체로 우선 오픈 가능해요.<br>
+          · 카드사 심사 결과는 고객님의 사업자 상태·서류에 따라 달라져 마침이 결과를 보장할 수 없어요.
+        </p>
+      </div>
+      <div class="info-item">
+        <p class="info-item__title">☁️ 도메인 · 서버 · 데이터베이스</p>
+        <p class="info-item__desc">
+          도메인(사이트 주소), 호스팅(서버), 데이터베이스는 고객님 명의로 직접 가입하셔야 해요. 가입 방법은 저희가 단계별로 안내해드려요.<br><br>
+          가입 후 <b>비밀번호는 저희에게 알려주지 않으셔도 돼요</b> — 대신 "공동 작업자 초대" 또는 "협업 링크" 기능으로 접근 권한만 부여해주시면 돼요 (예: Vercel 팀 초대, Supabase 프로젝트 멤버 추가 등). 이렇게 하면 계정은 항상 고객님 소유로 안전하게 남아있어요.<br><br>
+          무료 사용량(트래픽·데이터 용량)을 초과하면 유료 전환이 필요할 수 있어요. 이 경우 사전에 안내드리고, 비용은 고객님 부담이에요.
+        </p>
+      </div>
+      <div class="info-item">
+        <p class="info-item__title">🖼 폰트 · 이미지</p>
+        <p class="info-item__desc">무료 폰트·이미지를 우선으로 사용해요. 유료 소스가 꼭 필요한 경우, 사전 안내 후 실비로 청구돼요.</p>
+      </div>
+      <div class="info-item">
+        <p class="info-item__title">🔧 오픈 후 추가 요청</p>
+        <p class="info-item__desc">오픈 후 3개월 이내의 추가 요청(페이지 추가 등)은 견적 빌더 단가 그대로 적용돼요. 3개월 이후는 별도 협의가 필요해요.</p>
+      </div>
+      <div class="info-item">
+        <p class="info-item__title">❌ 취소 · 환불</p>
+        <p class="info-item__desc">결제 취소·환불은 카카오톡으로 요청해주시면, 이용약관 제7조 기준에 따라 확인 후 결제 시스템에서 직접 처리해드려요. 영업일 기준 3~5일 이내 처리됩니다. 잔금 완납 전까지는 실제 도메인 연결(최종 오픈)이 진행되지 않아요.</p>
+      </div>
+      <div class="info-item">
+        <p class="info-item__title">🛠 제작 방식</p>
+        <p class="info-item__desc">마침은 HTML/CSS/바닐라 JavaScript + Supabase 조합으로 제작해요. 가볍고 빠르며 유지보수가 쉬운 방식이에요. 특정 프레임워크(React 등) 지정이 꼭 필요하신 경우, 사전에 말씀해주시면 가능 여부를 확인해드려요.</p>
+      </div>
     </div>
   </div>
 
@@ -216,22 +415,53 @@
 
 </div>
 
+<!-- 결제 모달 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <p class="modal-box__title">마지막 단계예요</p>
+    <p class="modal-box__sub">착수금 결제 후, 입력하신 연락처로 카카오톡 연락을 드려요.</p>
+
+    <div class="modal-summary" id="modalSummary"></div>
+
+    <div class="modal-field">
+      <label for="modalName">이름</label>
+      <input type="text" id="modalName" placeholder="홍길동">
+      <p class="modal-field__error" id="nameError">이름을 입력해주세요.</p>
+    </div>
+    <div class="modal-field">
+      <label for="modalContact">연락처</label>
+      <input type="tel" id="modalContact" placeholder="010-1234-5678">
+      <p class="modal-field__hint">⚠️ 입력하신 번호로 카카오톡 연락을 드려요. 번호를 잘못 입력하시면 연락이 어려울 수 있으니 정확히 확인해주세요.</p>
+      <p class="modal-field__error" id="contactError">연락처 형식을 다시 확인해주세요. (예: 01012345678)</p>
+    </div>
+    <div class="modal-field">
+      <label for="modalNotes">비고 <span style="font-weight:400;color:var(--muted);">(선택)</span></label>
+      <textarea id="modalNotes" placeholder="원하시는 스타일, 참고 사이트, 꼭 필요한 기능 등 자유롭게 적어주세요."></textarea>
+    </div>
+
+    <button class="modal-btn" id="modalSubmitBtn">착수금 결제하기</button>
+    <button class="modal-close" id="modalCloseBtn">닫기</button>
+  </div>
+</div>
+
 <script>
+  // 프로젝트 유형별 모듈 고정가
+  // (모든 기본 모듈을 더하면 = 해당 유형의 "전체 제작가"가 되도록 설계)
   const PRICING = {
     detail: {
       modules: {
-        plan:   { name: '기획',        desc: '콘텐츠 구성안 정리',           price: 50000 },
-        design: { name: '디자인',      desc: '시안 제작 (2차 수정 포함)',    price: 100000 },
-        build:  { name: '퍼블리싱/개발', desc: '실제 코딩·반응형 구현',        price: 150000 },
+        plan:   { name: '기획',        desc: '어떤 내용을 어떤 순서로 보여줄지 미리 구성안을 짜는 단계예요.', price: 50000 },
+        design: { name: '디자인',      desc: '실제로 어떤 색·글씨·배치로 보일지 시안을 만들어요. 마음에 안 들면 2번까지 무료로 수정해드려요.', price: 100000 },
+        build:  { name: '퍼블리싱/개발', desc: '디자인 시안을 실제로 클릭·작동하는 페이지로 만들어요. PC·태블릿·휴대폰 어디서 봐도 안 깨지게 만들어요.', price: 150000 },
       },
       hasPageAddon: false
     },
     landing: {
       modules: {
-        plan:   { name: '기획',        desc: '사이트 구조·카피 방향 정리',   price: 150000 },
-        design: { name: '디자인',      desc: '시안 제작 (2차 수정 포함)',    price: 250000 },
-        build:  { name: '퍼블리싱/개발', desc: '실제 코딩·반응형 구현',        price: 350000 },
-        deploy: { name: '배포',        desc: '도메인 연결, 호스팅 세팅',     price: 50000 },
+        plan:   { name: '기획',        desc: '방문자가 어떤 순서로 정보를 보고 행동하게(문의·신청 등) 할지 흐름을 설계해요.', price: 150000 },
+        design: { name: '디자인',      desc: '실제로 어떤 색·글씨·배치로 보일지 시안을 만들어요. 마음에 안 들면 2번까지 무료로 수정해드려요.', price: 250000 },
+        build:  { name: '퍼블리싱/개발', desc: '디자인 시안을 실제로 클릭·작동하는 페이지로 만들어요. PC·태블릿·휴대폰 어디서 봐도 안 깨지게 만들어요.', price: 350000 },
+        deploy: { name: '배포',        desc: '완성된 페이지를 실제 인터넷 주소(도메인)로 접속할 수 있게 서버에 올리는 마지막 단계예요.', price: 50000 },
       },
       hasPageAddon: false
     },
@@ -239,31 +469,55 @@
       sub: {
         static: {
           modules: {
-            plan:   { name: '기획',        desc: '사이트맵·와이어프레임',        price: 300000 },
-            design: { name: '디자인',      desc: '시안 제작 (2차 수정 포함)',    price: 400000 },
-            build:  { name: '퍼블리싱/개발', desc: '실제 코딩·반응형 구현',        price: 700000 },
-            deploy: { name: '배포',        desc: '도메인 연결, 호스팅 세팅',     price: 100000 },
+            plan:   { name: '기획',        desc: '어떤 페이지들이 필요하고 각 페이지에 뭘 담을지 전체 구조(사이트맵)를 짜는 단계예요.', price: 300000 },
+            design: { name: '디자인',      desc: '실제로 어떤 색·글씨·배치로 보일지 시안을 만들어요. 마음에 안 들면 2번까지 무료로 수정해드려요.', price: 400000 },
+            build:  { name: '퍼블리싱/개발', desc: '디자인 시안을 실제로 클릭·작동하는 사이트로 만들어요. PC·태블릿·휴대폰 어디서 봐도 안 깨지게 만들어요.', price: 700000 },
+            deploy: { name: '배포',        desc: '완성된 사이트를 실제 인터넷 주소(도메인)로 접속할 수 있게 서버에 올리는 마지막 단계예요.', price: 100000 },
           },
-          addonUnit: 250000
+          addonUnit: 250000,
+          note: '회원가입·로그인 같은 기능 없이, 정보를 보여주기만 하는 사이트예요. 방문자는 그냥 둘러보고 나가는 구조라 상대적으로 가벼워요.'
         },
         dynamic: {
           modules: {
-            plan:   { name: '기획',        desc: '사이트맵·기능 정의서',         price: 400000 },
-            design: { name: '디자인',      desc: '시안 제작 (2차 수정 포함)',    price: 500000 },
-            build:  { name: '퍼블리싱/개발', desc: '회원·로그인·DB 연동 개발',    price: 1500000 },
-            deploy: { name: '배포',        desc: '도메인 연결, 호스팅 세팅',     price: 100000 },
+            plan:   { name: '기획',        desc: '페이지 구조뿐 아니라 회원가입·로그인 후 뭘 볼 수 있는지까지 기능 설계까지 함께 짜는 단계예요.', price: 400000 },
+            design: { name: '디자인',      desc: '실제로 어떤 색·글씨·배치로 보일지 시안을 만들어요. 마음에 안 들면 2번까지 무료로 수정해드려요.', price: 500000 },
+            build:  { name: '퍼블리싱/개발', desc: '방문자가 회원가입·로그인 하고, 결제(또는 인증)한 사람만 특정 콘텐츠를 볼 수 있게 막는 보안 처리까지 개발하는 작업이에요. 일반 홈페이지보다 훨씬 손이 많이 가요.', price: 1800000 },
+            deploy: { name: '배포',        desc: '완성된 사이트를 실제 인터넷 주소(도메인)로 접속할 수 있게 서버에 올리는 마지막 단계예요.', price: 150000 },
           },
-          addonUnit: 500000
+          addonUnit: 500000,
+          note: '회원가입·로그인·데이터베이스·콘텐츠 보안(값을 낸 사람만 볼 수 있게 막기)까지 다 들어가는, 가장 손이 많이 가는 유형이에요. 예를 들어 회원제 커뮤니티, 유료 콘텐츠 사이트 등이 여기 해당돼요.'
         }
       },
       hasPageAddon: true
     },
     shop: {
-      modules: {
-        plan:   { name: '기획',        desc: '상품·주문 구조 설계',          price: 500000 },
-        design: { name: '디자인',      desc: '시안 제작 (2차 수정 포함)',    price: 600000 },
-        build:  { name: '퍼블리싱/개발', desc: '상품관리·결제·주문 시스템',    price: 1700000 },
-        deploy: { name: '배포',        desc: '도메인 연결, 호스팅 세팅',     price: 200000 },
+      sub: {
+        simple: {
+          modules: {
+            plan:   { name: '기획',        desc: '어떤 상품을 어떻게 진열하고, 주문이 들어오면 어떤 순서로 처리할지 흐름을 짜는 단계예요.', price: 300000 },
+            design: { name: '디자인',      desc: '실제로 어떤 색·글씨·배치로 보일지 시안을 만들어요. 마음에 안 들면 2번까지 무료로 수정해드려요.', price: 500000 },
+            build:  { name: '퍼블리싱/개발', desc: '상품 목록과 장바구니 화면을 만들고, 상품 정보는 구글 엑셀시트에서 직접 관리할 수 있게 연결해드려요. 주문이 들어오면 카카오톡·이메일로 알림을 받아요.', price: 1000000 },
+            deploy: { name: '배포',        desc: '완성된 사이트를 실제 인터넷 주소(도메인)로 접속할 수 있게 서버에 올리는 마지막 단계예요.', price: 150000 },
+          },
+          optional: {
+            realtime_stock: { name: '실시간 재고관리', desc: '상품이 팔릴 때마다 재고 수량이 자동으로 줄어들고, 다 팔리면 자동으로 "품절" 표시가 떠요. 직접 재고를 세서 수동으로 바꿔줄 필요가 없어져요.', price: 400000 },
+            auto_pay: { name: '자동 정산/카드결제 연동(PG)', desc: '고객이 카드로 결제하면 자동으로 승인·정산까지 처리되는 시스템이에요. 결제대행사(PG) 가맹점 등록·심사 과정이 포함돼요.', price: 600000 },
+            membership: { name: '회원 등급/포인트', desc: '구매 금액에 따라 등급이 자동으로 올라가고, 적립금이 쌓이고 사용할 수 있는 시스템이에요.', price: 300000 },
+          },
+          note: '상품 데이터는 엑셀(구글시트)로 관리하고, 이미지는 무료 저장소를 활용해요. 주문은 카카오톡·이메일로 알림 받아 직접 확인·처리하는 방식이에요. 상품 수가 많지 않은 소규모 판매에 적합해요.'
+        },
+        full: {
+          modules: {
+            plan:   { name: '기획',        desc: '상품·주문·재고가 어떻게 데이터베이스에 저장되고 연결될지 구조부터 설계하는 단계예요.', price: 400000 },
+            design: { name: '디자인',      desc: '실제로 어떤 색·글씨·배치로 보일지 시안을 만들어요. 마음에 안 들면 2번까지 무료로 수정해드려요.', price: 600000 },
+            build:  { name: '퍼블리싱/개발', desc: '상품을 데이터베이스로 관리하고, 재고가 자동으로 줄고 품절되면 자동 표시되며, 카드결제까지 자동 처리되는 시스템을 만들어요. 주문 현황을 관리자 화면에서 한눈에 볼 수 있어요.', price: 2200000 },
+            deploy: { name: '배포',        desc: '완성된 사이트를 실제 인터넷 주소(도메인)로 접속할 수 있게 서버에 올리는 마지막 단계예요.', price: 200000 },
+          },
+          optional: {
+            membership: { name: '회원 등급/포인트', desc: '구매 금액에 따라 등급이 자동으로 올라가고, 적립금이 쌓이고 사용할 수 있는 시스템이에요.', price: 300000 },
+          },
+          note: '실시간 재고관리와 카드결제 자동 정산이 기본으로 포함된, 상품이 많고 주문이 활발한 쇼핑몰에 적합한 방식이에요.'
+        }
       },
       hasPageAddon: false
     }
@@ -271,25 +525,97 @@
 
   let currentType = 'detail';
   let currentSub = 'static';
+  let currentShopSub = 'simple';
   const checkedModules = new Set();
+  const checkedOptional = new Set();
+
+  // ─── 제작 기간 타임라인 데이터 ───
+  const TIMELINE = {
+    detail: { range: '3~5일', steps: [
+      {label:'기획·시안', days:'2일'}, {label:'고객확인', days:'대기', wait:true}, {label:'수정', days:'1일'}, {label:'완성', days:'1일', final:true}
+    ], note: '' },
+    landing: { range: '5~7일', steps: [
+      {label:'기획', days:'1일'}, {label:'시안', days:'2일'}, {label:'고객확인', days:'대기', wait:true}, {label:'수정', days:'1일'}, {label:'개발', days:'2일'}, {label:'오픈', days:'1일', final:true}
+    ], note: '' },
+    home_static: { range: '10~14일', steps: [
+      {label:'기획', days:'2일'}, {label:'시안1차', days:'3일'}, {label:'고객확인', days:'대기', wait:true}, {label:'수정 1회', days:'2일'}, {label:'개발', days:'4일'}, {label:'오픈', days:'1일', final:true}
+    ], note: '고객님 피드백이 늦어지면 그만큼 일정이 순연돼요.' },
+    home_dynamic: { range: '20~28일', steps: [
+      {label:'기획', days:'3일'}, {label:'시안1차', days:'4일'}, {label:'고객확인', days:'대기', wait:true}, {label:'수정 1회', days:'2일'}, {label:'개발(보안포함)', days:'12일'}, {label:'오픈', days:'2일', final:true}
+    ], note: '고객님 피드백이 늦어지면 그만큼 일정이 순연돼요. 카드결제 연동 시 PG 심사 기간(약 2주)이 별도로 더해져요.' },
+    shop_simple: { range: '14~18일', steps: [
+      {label:'기획', days:'3일'}, {label:'시안1차', days:'3일'}, {label:'고객확인', days:'대기', wait:true}, {label:'수정 1회', days:'2일'}, {label:'개발', days:'6일'}, {label:'오픈', days:'2일', final:true}
+    ], note: '고객님 피드백이 늦어지면 그만큼 일정이 순연돼요. 계좌이체 결제 방식이라 PG 심사 없이 바로 오픈 가능해요.' },
+    shop_full: { range: '개발 15~20일 + PG 심사 약 2주', steps: [
+      {label:'기획', days:'4일'}, {label:'시안1차', days:'4일'}, {label:'고객확인', days:'대기', wait:true}, {label:'수정 1회', days:'2일'}, {label:'개발', days:'10일'}, {label:'PG심사', days:'~2주', wait:true}, {label:'오픈', days:'2일', final:true}
+    ], note: '고객님 피드백이 늦어지면 그만큼 일정이 순연돼요. PG 심사 기간엔 계좌이체로 우선 오픈 가능해요.' },
+  };
+
+  function getTimelineKey() {
+    if (currentType === 'home') return 'home_' + currentSub;
+    if (currentType === 'shop') return 'shop_' + currentShopSub;
+    return currentType;
+  }
+
+  function renderTimeline() {
+    const tl = TIMELINE[getTimelineKey()];
+    if (!tl) return;
+    document.getElementById('timelineRange').textContent = tl.range;
+    document.getElementById('timelineNote').textContent = tl.note;
+    const track = document.getElementById('timelineTrack');
+    track.innerHTML = '';
+    tl.steps.forEach((s, i) => {
+      if (i > 0) {
+        const arrow = document.createElement('span');
+        arrow.className = 'timeline-arrow';
+        arrow.textContent = '→';
+        track.appendChild(arrow);
+      }
+      const el = document.createElement('div');
+      el.className = 'timeline-step' + (s.wait ? ' wait' : '') + (s.final ? ' final' : '');
+      el.innerHTML = `${s.label}<br>${s.days}`;
+      track.appendChild(el);
+    });
+  }
+
+  const TYPE_LABELS = { detail: '상세페이지', landing: '랜딩페이지', home: '홈페이지', shop: '쇼핑몰' };
+  const SUB_LABELS = {
+    home: { static: '정적', dynamic: '동적' },
+    shop: { simple: '심플형', full: '풀커머스형' }
+  };
 
   const moduleListEl = document.getElementById('moduleList');
   const addonRowEl = document.getElementById('addonRow');
   const addonUnitTextEl = document.getElementById('addonUnitText');
   const homeTypeStepEl = document.getElementById('homeTypeStep');
+  const shopTypeStepEl = document.getElementById('shopTypeStep');
+  const shopSubNoteEl = document.getElementById('shopSubNote');
+  const shopOptionalModulesEl = document.getElementById('shopOptionalModules');
   const pageQtyEl = document.getElementById('pageQty');
 
-  function getActiveModules() {
-    if (currentType === 'home') return PRICING.home.sub[currentSub].modules;
-    return PRICING[currentType].modules;
+  function getActiveConfig() {
+    if (currentType === 'home') return PRICING.home.sub[currentSub];
+    if (currentType === 'shop') return PRICING.shop.sub[currentShopSub];
+    return PRICING[currentType];
   }
 
   function renderModules() {
-    const modules = getActiveModules();
+    const config = getActiveConfig();
+    const modules = config.modules;
     checkedModules.clear();
+    checkedOptional.clear();
     Object.keys(modules).forEach(k => checkedModules.add(k));
 
     moduleListEl.innerHTML = '';
+
+    // 포함사항 안내 박스 (있는 경우)
+    if (config.note) {
+      const note = document.createElement('div');
+      note.className = 'included-box';
+      note.innerHTML = `<b>ℹ️ 이 방식은:</b> ${config.note}`;
+      moduleListEl.appendChild(note);
+    }
+
     Object.entries(modules).forEach(([key, mod]) => {
       const item = document.createElement('label');
       item.className = 'module-item checked';
@@ -311,18 +637,60 @@
       moduleListEl.appendChild(item);
     });
 
+    // 홈페이지 페이지 추가 옵션
     addonRowEl.style.display = (currentType === 'home') ? 'flex' : 'none';
     if (currentType === 'home') {
       const unit = PRICING.home.sub[currentSub].addonUnit;
       addonUnitTextEl.textContent = `기본 5페이지 포함 · 6페이지부터 1p당 +${unit.toLocaleString('ko-KR')}원`;
     }
+
+    // 쇼핑몰 선택형 추가 옵션
+    shopOptionalModulesEl.innerHTML = '';
+    if (currentType === 'shop' && config.optional) {
+      shopOptionalModulesEl.style.display = 'block';
+      const label = document.createElement('p');
+      label.className = 'step__desc';
+      label.style.margin = '4px 0 8px 0';
+      label.textContent = '필요하면 추가로 담을 수 있는 기능이에요 (선택)';
+      shopOptionalModulesEl.appendChild(label);
+
+      Object.entries(config.optional).forEach(([key, mod]) => {
+        const item = document.createElement('label');
+        item.className = 'module-item optional';
+        item.innerHTML = `
+          <div class="module-item__left">
+            <input type="checkbox" data-optkey="${key}">
+            <div>
+              <div class="module-item__name">${mod.name}<span class="module-item__badge module-item__badge--optional">선택</span></div>
+              <div class="module-item__desc">${mod.desc}</div>
+            </div>
+          </div>
+          <div class="module-item__price">+${mod.price.toLocaleString('ko-KR')}원</div>
+        `;
+        item.querySelector('input').addEventListener('change', (e) => {
+          if (e.target.checked) { checkedOptional.add(key); item.classList.add('checked'); }
+          else { checkedOptional.delete(key); item.classList.remove('checked'); }
+          renderTotal();
+        });
+        shopOptionalModulesEl.appendChild(item);
+      });
+    } else {
+      shopOptionalModulesEl.style.display = 'none';
+    }
+
+    renderTimeline();
     renderTotal();
   }
 
   function renderTotal() {
-    const modules = getActiveModules();
+    const config = getActiveConfig();
+    const modules = config.modules;
     let total = 0;
     checkedModules.forEach(key => { if (modules[key]) total += modules[key].price; });
+
+    if (currentType === 'shop' && config.optional) {
+      checkedOptional.forEach(key => { if (config.optional[key]) total += config.optional[key].price; });
+    }
 
     let pageQty = 0;
     if (currentType === 'home') {
@@ -366,6 +734,7 @@
       opt.classList.add('active');
       currentType = opt.dataset.type;
       homeTypeStepEl.style.display = (currentType === 'home') ? 'block' : 'none';
+      shopTypeStepEl.style.display = (currentType === 'shop') ? 'block' : 'none';
       renderModules();
     });
   });
@@ -379,10 +748,153 @@
     });
   });
 
+  document.querySelectorAll('#shopSubGrid .type-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('#shopSubGrid .type-opt').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      currentShopSub = opt.dataset.shopsub;
+      renderModules();
+    });
+  });
+
   pageQtyEl.addEventListener('change', renderTotal);
 
+  // ─── 안내사항 아코디언 토글 ───
+  document.getElementById('infoAccordionHead').addEventListener('click', () => {
+    document.getElementById('infoAccordion').classList.toggle('open');
+  });
+
+  // ─── Supabase 설정 (machim.net 프로젝트) ───
+  const SUPABASE_URL = "https://jzxlmcvthicmruxxxmzg.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6eGxtY3Z0aGljbXJ1eHh4bXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMjM2MDgsImV4cCI6MjA5ODc5OTYwOH0.ld7qDDJgqK1cQzf1IoCiyglFFQeMRArmWPoavR4bPo8";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let pendingTotal = 0;
+  let pendingDeposit = 0;
+  let pendingBalance = 0;
+
+  function buildScopeSummary() {
+    const config = getActiveConfig();
+    const parts = [];
+    Object.entries(config.modules).forEach(([key, mod]) => {
+      if (checkedModules.has(key)) parts.push(mod.name);
+    });
+    if (currentType === 'shop' && config.optional) {
+      Object.entries(config.optional).forEach(([key, mod]) => {
+        if (checkedOptional.has(key)) parts.push('+' + mod.name);
+      });
+    }
+    if (currentType === 'home') {
+      const pageQty = parseInt(pageQtyEl.value, 10);
+      if (pageQty > 0) parts.push(`(${5 + pageQty}페이지)`);
+    }
+    return parts.join(' · ');
+  }
+
+  function buildProductType() {
+    let label = TYPE_LABELS[currentType];
+    if (currentType === 'home') label += ` - ${SUB_LABELS.home[currentSub]}`;
+    if (currentType === 'shop') label += ` - ${SUB_LABELS.shop[currentShopSub]}`;
+    return label;
+  }
+
+  // ─── 결제 버튼 → 모달 열기 ───
   document.getElementById('checkoutBtn').addEventListener('click', () => {
-    alert('결제 연결은 다음 단계에서 붙일 예정이에요.');
+    if (document.getElementById('checkoutBtn').disabled) return;
+
+    const config = getActiveConfig();
+    const modules = config.modules;
+    let total = 0;
+    checkedModules.forEach(key => { if (modules[key]) total += modules[key].price; });
+    if (currentType === 'shop' && config.optional) {
+      checkedOptional.forEach(key => { if (config.optional[key]) total += config.optional[key].price; });
+    }
+    if (currentType === 'home') {
+      const pageQty = parseInt(pageQtyEl.value, 10);
+      if (pageQty <= 5) total += PRICING.home.sub[currentSub].addonUnit * pageQty;
+    }
+    pendingTotal = total;
+    pendingDeposit = Math.round(total / 2);
+    pendingBalance = total - pendingDeposit;
+
+    document.getElementById('modalSummary').innerHTML =
+      `<b>${buildProductType()}</b> · ${buildScopeSummary()}<br>` +
+      `총액 ${pendingTotal.toLocaleString('ko-KR')}원 → 지금 결제할 착수금 <b>${pendingDeposit.toLocaleString('ko-KR')}원</b>`;
+
+    document.getElementById('modalName').value = '';
+    document.getElementById('modalContact').value = '';
+    document.getElementById('modalNotes').value = '';
+    document.getElementById('nameError').style.display = 'none';
+    document.getElementById('contactError').style.display = 'none';
+    document.getElementById('modalOverlay').classList.add('open');
+  });
+
+  document.getElementById('modalCloseBtn').addEventListener('click', () => {
+    document.getElementById('modalOverlay').classList.remove('open');
+  });
+
+  function isValidContact(raw) {
+    const digits = raw.replace(/[^0-9]/g, '');
+    return digits.length >= 10 && digits.length <= 11;
+  }
+
+  // ─── 모달 제출 → Supabase 저장 → pay.html 이동 ───
+  document.getElementById('modalSubmitBtn').addEventListener('click', async () => {
+    const nameEl = document.getElementById('modalName');
+    const contactEl = document.getElementById('modalContact');
+    const notesEl = document.getElementById('modalNotes');
+    const nameError = document.getElementById('nameError');
+    const contactError = document.getElementById('contactError');
+
+    let hasError = false;
+    if (!nameEl.value.trim()) { nameError.style.display = 'block'; hasError = true; } else { nameError.style.display = 'none'; }
+    if (!isValidContact(contactEl.value)) { contactError.style.display = 'block'; hasError = true; } else { contactError.style.display = 'none'; }
+    if (hasError) return;
+
+    const btn = document.getElementById('modalSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = '처리 중...';
+
+    try {
+      // 1) 프로젝트 생성
+      const { data: project, error: projectErr } = await sb
+        .from('projects')
+        .insert({
+          client_name: nameEl.value.trim(),
+          project_name: buildProductType(),
+          total_amount: pendingTotal,
+          contact: contactEl.value.trim(),
+          product_type: buildProductType(),
+          scope_summary: buildScopeSummary(),
+          notes: notesEl.value.trim(),
+          progress_status: '착수금 대기'
+        })
+        .select()
+        .single();
+
+      if (projectErr) throw projectErr;
+
+      // 2) 착수금/잔금 결제건 생성
+      const { data: paymentsData, error: paymentsErr } = await sb
+        .from('payments')
+        .insert([
+          { project_id: project.id, payment_type: '착수금', amount: pendingDeposit, status: '대기' },
+          { project_id: project.id, payment_type: '잔금', amount: pendingBalance, status: '대기' }
+        ])
+        .select();
+
+      if (paymentsErr) throw paymentsErr;
+
+      const deposit = paymentsData.find(p => p.payment_type === '착수금');
+
+      // 3) 착수금 결제 페이지로 이동
+      window.location.href = `pay.html?id=${deposit.id}`;
+
+    } catch (err) {
+      alert('처리 중 문제가 발생했어요: ' + err.message + '\n잠시 후 다시 시도해주시거나, 카카오톡으로 문의해주세요.');
+      btn.disabled = false;
+      btn.textContent = '착수금 결제하기';
+    }
   });
 
   renderModules();
