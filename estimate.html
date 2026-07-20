@@ -165,10 +165,10 @@
   .timeline-arrow { color: var(--muted); font-size: 11px; flex-shrink: 0; }
   .timeline-card__note { font-size: 10px; color: var(--muted); margin: 12px 0 0; line-height: 1.7; }
 
-  /* ─── 결제 전 안내사항 아코디언 ─── */
+  /* ─── 결제 전 안내사항 아코디언 (경고 톤) ─── */
   .info-accordion {
-    background: #fff;
-    border: 1px solid var(--border);
+    background: #FDF2F1;
+    border: 1.5px solid #D9695C;
     border-radius: 16px;
     margin-top: 16px;
     overflow: hidden;
@@ -177,13 +177,18 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 18px 22px; cursor: pointer; user-select: none;
   }
-  .info-accordion__title { font-size: 14px; font-weight: 700; color: var(--green); margin: 0; }
-  .info-accordion__chevron { font-size: 12px; color: var(--muted); transition: transform .2s; }
+  .info-accordion__title-row { display: flex; align-items: center; gap: 8px; }
+  .info-accordion__badge {
+    background: #B3261E; color: #fff; font-size: 10px; font-weight: 800;
+    padding: 3px 8px; border-radius: 20px; flex-shrink: 0;
+  }
+  .info-accordion__title { font-size: 14px; font-weight: 800; color: #B3261E; margin: 0; }
+  .info-accordion__chevron { font-size: 13px; color: #B3261E; font-weight: 800; transition: transform .2s; flex-shrink: 0; }
   .info-accordion.open .info-accordion__chevron { transform: rotate(180deg); }
-  .info-accordion__body { display: none; padding: 0 22px 20px; }
+  .info-accordion__body { display: none; padding: 0 22px 20px; background: #fff; }
   .info-accordion.open .info-accordion__body { display: block; }
   .info-item { padding: 12px 0; border-top: 1px dashed var(--border); }
-  .info-item:first-child { border-top: none; }
+  .info-item:first-child { border-top: none; padding-top: 16px; }
   .info-item__title { font-size: 13px; font-weight: 700; color: var(--text); margin: 0 0 4px; }
   .info-item__desc { font-size: 12px; color: var(--muted); line-height: 1.75; margin: 0; }
 
@@ -349,7 +354,10 @@
   <!-- 결제 전 확인사항 아코디언 -->
   <div class="info-accordion" id="infoAccordion">
     <div class="info-accordion__head" id="infoAccordionHead">
-      <p class="info-accordion__title">📋 결제 전 꼭 확인해주세요</p>
+      <div class="info-accordion__title-row">
+        <span class="info-accordion__badge">필독</span>
+        <p class="info-accordion__title">📋 결제 전 꼭 확인해주세요</p>
+      </div>
       <span class="info-accordion__chevron">▾</span>
     </div>
     <div class="info-accordion__body">
