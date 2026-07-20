@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마침 · 명확한 프로세스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1B4332;
+    --green-light: #2D6A4F;
+    --cream: #F5F2ED;
+    --panel: #EFEBE2;
+    --text: #2B2B28;
+    --muted: #6B6B63;
+    --border: #E3DED3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+  a.back {
+    display: inline-block; color: var(--green); font-size: 13px; font-weight: 700;
+    text-decoration: none; margin: 24px 0 0;
+  }
+
+  .hero { padding: 40px 0 44px; }
+  .hero-inner { display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+  .hero-text { flex: 1; min-width: 280px; }
+  .hero-badge {
+    display: inline-block; background: var(--panel); color: var(--green);
+    font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; margin-bottom: 16px;
+  }
+  .hero-title { font-size: 30px; font-weight: 800; color: var(--green); line-height: 1.4; margin: 0 0 14px; letter-spacing: -0.3px; }
+  .hero-sub { font-size: 15px; color: var(--muted); line-height: 1.7; margin: 0; }
+  .hero-image {
+    flex: 1; min-width: 240px; min-height: 200px; background: var(--panel);
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 12px; border: 1.5px dashed var(--border);
+  }
+
+  .section { padding: 30px 0; }
+  .section-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--green); color: #fff;
+    font-size: 12px; font-weight: 800; margin-right: 8px;
+  }
+  .section-title { font-size: 20px; font-weight: 800; color: var(--green); margin: 0 0 6px; display: flex; align-items: center; }
+  .section-sub { font-size: 13px; color: var(--muted); margin: 0 0 22px 34px; }
+
+  /* 비교표 */
+  .compare-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; }
+  .compare-col { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+  .compare-col--machim { background: var(--green); border: none; }
+  .compare-col h4 { font-size: 15px; font-weight: 800; text-align: center; margin: 0 0 18px; color: var(--text); }
+  .compare-col--machim h4 { color: #fff; }
+  .compare-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; padding: 8px 0; color: var(--muted); }
+  .compare-col--machim .compare-item { color: rgba(245,242,237,.85); }
+  .compare-vs {
+    width: 46px; height: 46px; border-radius: 50%; background: var(--green); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0;
+  }
+
+  /* 프로세스 */
+  .step-flow { display: flex; align-items: flex-start; gap: 8px; margin: 10px 0 20px; overflow-x: auto; }
+  .step-item { flex: 1; min-width: 140px; text-align: center; }
+  .step-icon {
+    width: 54px; height: 54px; border-radius: 50%; background: var(--green); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 12px;
+  }
+  .step-name { font-size: 13px; font-weight: 700; color: var(--text); margin: 0 0 6px; }
+  .step-desc { font-size: 11px; color: var(--muted); line-height: 1.6; margin: 0; }
+  .step-arrow { color: var(--border); font-size: 16px; padding-top: 18px; flex-shrink: 0; }
+  .final-note {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px;
+    text-align: center; font-size: 12px; color: var(--green); font-weight: 600;
+  }
+
+  .cta-section {
+    background: var(--green); border-radius: 18px; padding: 36px 32px; margin: 30px 0 60px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+  }
+  .cta-text h3 { font-size: 19px; font-weight: 800; color: #fff; margin: 0 0 6px; }
+  .cta-text p { font-size: 12px; color: rgba(245,242,237,.65); margin: 0; }
+  .cta-btn {
+    background: #fff; color: var(--green); padding: 14px 28px; border-radius: 10px;
+    font-size: 14px; font-weight: 800; text-decoration: none; white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .compare-grid { grid-template-columns: 1fr; }
+    .compare-vs { margin: 0 auto; }
+    .step-flow { flex-direction: column; }
+    .step-arrow { display: none; }
+    .hero-title { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a class="back" href="index.html#funnel-compare">← 마침으로 돌아가기</a>
+
+  <!-- 히어로 -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <span class="hero-badge">이미 여러 곳 비교 중이신 분께</span>
+        <h1 class="hero-title">견적만 받다가<br>시간만 지나고 계신가요?</h1>
+        <p class="hero-sub">복잡한 비교보다 명확한 프로세스를 확인해보세요.</p>
+      </div>
+      <div class="hero-image">이미지 자리<br>(추후 삽입)</div>
+    </div>
+  </section>
+
+  <!-- 비교표 -->
+  <section class="section">
+    <p class="section-title"><span class="section-num">2</span>전통적인 외주 방식 vs 마침</p>
+    <p class="section-sub">같은 결과를 만드는 데 드는 시간과 과정이 다릅니다.</p>
+
+    <div class="compare-grid">
+      <div class="compare-col">
+        <h4>전통적인 외주 방식</h4>
+        <div class="compare-item">✕ 기획, 디자인, 개발 담당자 각각 컨택</div>
+        <div class="compare-item">✕ 담당자마다 일정 확인 및 커뮤니케이션</div>
+        <div class="compare-item">✕ 견적 협의 및 추가 비용 발생</div>
+        <div class="compare-item">✕ 전체 일정 지연 및 불확실한 마무리</div>
+      </div>
+      <div class="compare-vs">VS</div>
+      <div class="compare-col compare-col--machim">
+        <h4>마침</h4>
+        <div class="compare-item">✓ 하나의 프로세스로 모든 과정 진행</div>
+        <div class="compare-item">✓ 명확한 일정과 확정 가격</div>
+        <div class="compare-item">✓ 소통 시간 최소화, 빠른 완성</div>
+        <div class="compare-item">✓ 처음부터 끝까지 책임지는 원스톱 프로세스</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 프로세스 -->
+  <section class="section">
+    <p class="section-title"><span class="section-num">3</span>기획부터 운영까지, 하나의 프로세스로 완성</p>
+    <p class="section-sub">복잡한 과정은 줄이고, 결과에 집중합니다.</p>
+
+    <div class="step-flow">
+      <div class="step-item">
+        <div class="step-icon">💬</div>
+        <p class="step-name">01. 상담</p>
+        <p class="step-desc">목표와 방향을 함께 정리합니다.</p>
+      </div>
+      <span class="step-arrow">→</span>
+      <div class="step-item">
+        <div class="step-icon">🎨</div>
+        <p class="step-name">02. 기획·디자인</p>
+        <p class="step-desc">전략에 맞는 구조와 디자인을 만듭니다.</p>
+      </div>
+      <span class="step-arrow">→</span>
+      <div class="step-item">
+        <div class="step-icon">💻</div>
+        <p class="step-name">03. 개발</p>
+        <p class="step-desc">기능 구현과 최적화로 안정적인 웹사이트를 구현합니다.</p>
+      </div>
+      <span class="step-arrow">→</span>
+      <div class="step-item">
+        <div class="step-icon">🚀</div>
+        <p class="step-name">04. 배포·운영</p>
+        <p class="step-desc">배포 후 지속적인 관리와 운영 가이드까지 지원합니다.</p>
+      </div>
+    </div>
+
+    <p class="final-note">✔ 기획부터 배포까지, 중간에 멈추지 않는 체계적인 프로세스로 완성합니다.</p>
+  </section>
+
+  <!-- 최종 CTA -->
+  <section class="cta-section">
+    <div class="cta-text">
+      <h3>지금 바로 확정 가격을 확인해보세요</h3>
+      <p>복잡한 과정 없이, 필요한 범위와 옵션을 선택하면 바로 확인할 수 있습니다.</p>
+    </div>
+    <a href="estimate.html" class="cta-btn">가격 확인하러 가기 →</a>
+  </section>
+
+</div>
+</body>
+</html>

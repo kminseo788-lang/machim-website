@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마침 · 1인 1홈페이지 시대</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1B4332;
+    --green-light: #2D6A4F;
+    --cream: #F5F2ED;
+    --panel: #EFEBE2;
+    --text: #2B2B28;
+    --muted: #6B6B63;
+    --border: #E3DED3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+  a.back {
+    display: inline-block; color: var(--green); font-size: 13px; font-weight: 700;
+    text-decoration: none; margin: 24px 0 0;
+  }
+
+  /* 히어로 */
+  .hero { padding: 40px 0 50px; }
+  .hero-inner { display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+  .hero-text { flex: 1; min-width: 280px; }
+  .hero-badge {
+    display: inline-block; background: var(--panel); color: var(--green);
+    font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; margin-bottom: 16px;
+  }
+  .hero-title { font-size: 30px; font-weight: 800; color: var(--green); line-height: 1.4; margin: 0 0 14px; letter-spacing: -0.3px; }
+  .hero-sub { font-size: 15px; color: var(--muted); line-height: 1.7; margin: 0; }
+  .hero-image {
+    flex: 1; min-width: 240px; min-height: 200px; background: var(--panel);
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 12px; border: 1.5px dashed var(--border);
+  }
+
+  /* 섹션 공통 */
+  .section { padding: 36px 0; }
+  .section-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--green); color: #fff;
+    font-size: 12px; font-weight: 800; margin-right: 8px;
+  }
+  .section-title { font-size: 20px; font-weight: 800; color: var(--green); margin: 0 0 6px; display: flex; align-items: center; }
+  .section-sub { font-size: 13px; color: var(--muted); margin: 0 0 22px 34px; }
+
+  /* 카드 3개 */
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .card {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 22px 18px; text-align: center;
+  }
+  .card-icon { font-size: 26px; margin-bottom: 12px; }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); margin: 0 0 8px; line-height: 1.5; }
+  .card-desc { font-size: 12px; color: var(--muted); line-height: 1.7; margin: 0; }
+
+  /* 더 알아보기 버튼 + 구분선 */
+  .reveal-btn-wrap { text-align: center; margin-top: 26px; }
+  .reveal-btn {
+    background: #fff; border: 1.5px solid var(--green); color: var(--green);
+    font-size: 13px; font-weight: 700; padding: 11px 24px; border-radius: 30px; cursor: pointer;
+  }
+  .reveal-btn:hover { background: var(--green); color: #fff; }
+  .reveal-divider {
+    text-align: center; font-size: 11px; color: var(--muted); margin: 24px 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .reveal-divider::before, .reveal-divider::after { content: ''; flex: 1; border-top: 1px dashed var(--border); }
+
+  /* 펼쳐지는 영역 */
+  #revealArea { display: none; background: var(--panel); margin: 0 -24px; padding: 40px 24px; }
+  #revealArea.open { display: block; }
+  .reveal-inner { max-width: 880px; margin: 0 auto; }
+
+  .note-box {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
+    display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--muted); margin: 20px 0;
+  }
+  .note-box b { color: var(--green); }
+
+  .step-flow { display: flex; align-items: flex-start; gap: 8px; margin: 24px 0; overflow-x: auto; }
+  .step-item { flex: 1; min-width: 140px; text-align: center; }
+  .step-icon {
+    width: 54px; height: 54px; border-radius: 50%; background: var(--green); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 12px;
+  }
+  .step-name { font-size: 13px; font-weight: 700; color: var(--text); margin: 0 0 6px; }
+  .step-desc { font-size: 11px; color: var(--muted); line-height: 1.6; margin: 0; }
+  .step-arrow { color: var(--border); font-size: 16px; padding-top: 18px; flex-shrink: 0; }
+
+  .final-note {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px;
+    text-align: center; font-size: 12px; color: var(--green); font-weight: 600; margin-top: 20px;
+  }
+
+  /* 신뢰요소 */
+  .trust-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+  .trust-item { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px 14px; text-align: center; }
+  .trust-title { font-size: 13px; font-weight: 700; margin: 0 0 6px; }
+  .trust-desc { font-size: 11px; color: var(--muted); line-height: 1.6; margin: 0; }
+
+  /* 최종 CTA */
+  .cta-section {
+    background: var(--green); border-radius: 18px; padding: 36px 32px; margin: 40px 0 60px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+  }
+  .cta-text h3 { font-size: 19px; font-weight: 800; color: #fff; margin: 0 0 6px; }
+  .cta-text p { font-size: 12px; color: rgba(245,242,237,.65); margin: 0; }
+  .cta-btn {
+    background: #fff; color: var(--green); padding: 14px 28px; border-radius: 10px;
+    font-size: 14px; font-weight: 800; text-decoration: none; white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .card-grid { grid-template-columns: 1fr; }
+    .step-flow { flex-direction: column; }
+    .step-arrow { display: none; }
+    .hero-title { font-size: 24px; }
+    #revealArea { margin: 0 -24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a class="back" href="index.html#funnel-side">← 마침으로 돌아가기</a>
+
+  <!-- 히어로 -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <span class="hero-badge">시간 날 때 부수입을 원하신다면</span>
+        <h1 class="hero-title">지금은<br>1인 1홈페이지 시대</h1>
+        <p class="hero-sub">남들은 홈페이지 하나로 자는 동안에도 자산을 만들고 있습니다.</p>
+      </div>
+      <div class="hero-image">이미지 자리<br>(추후 삽입)</div>
+    </div>
+  </section>
+
+  <!-- 문제 공감 -->
+  <section class="section">
+    <p class="section-title"><span class="section-num">2</span>이런 방식으로 부수입을 알아보고 계신가요?</p>
+    <p class="section-sub">잠시만요. 혹시 이런 구조에 시간과 돈을 쓰고 계신 건 아닌가요?</p>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">📋</div><p class="card-title">가입비·교육비만 내고<br>정작 수익은<br>못 만드는 부업</p><p class="card-desc">비싼 돈 내고 배웠지만, 결국 내 주머니만 가벼워졌다면 한 번 멈춰보세요.</p></div><div class="card"><div class="card-icon">🔗</div><p class="card-title">링크 공유하면<br>얼마씩 준다는 식의<br>다단계형 구조</p><p class="card-desc">내가 번 만큼 다른 사람을 끌어와야 수익이 생기는 구조, 지치기 쉽습니다.</p></div><div class="card"><div class="card-icon">📱</div><p class="card-title">시간과 노력을 들여도<br>전부 플랫폼(남의 시스템)<br>안에서만 남는 활동</p><p class="card-desc">알고리즘이 바뀌면, 지금까지 쌓아온 것도 한순간에 사라질 수 있습니다.</p></div>
+    </div>
+    <div class="reveal-btn-wrap">
+      <button class="reveal-btn" id="revealBtn">더 알아보기 ↓</button>
+    </div>
+  </section>
+
+  <div class="reveal-divider">아래 내용은 클릭 후 펼쳐집니다</div>
+
+</div>
+
+<!-- 펼쳐지는 영역 -->
+<div id="revealArea">
+  <div class="reveal-inner">
+    <p class="section-title"><span class="section-num">3</span>홈페이지 하나로 이런 구조를 만들 수 있습니다</p>
+    <p class="section-sub">이건 남 좋은 일 시키는 구조가 아니라, 내가 직접 운영하는 내 자산의 시작입니다.</p>
+
+    <div class="card-grid"><div class="card"><div class="card-icon">🔗</div><p class="card-title">제휴마케팅 큐레이션<br><span style="font-weight:400;font-size:11px;">(사업자등록 없이도 가능)</span></p><p class="card-desc">내가 직접 고른 상품을 소개하고 수수료 수익을 만들 수 있습니다.</p></div><div class="card"><div class="card-icon">📖</div><p class="card-title">전자책/콘텐츠 판매<br><span style="font-weight:400;font-size:11px;">(재고·배송 없음)</span></p><p class="card-desc">내 지식과 경험을 전자책, 자료, 콘텐츠로 만들어 판매할 수 있습니다.</p></div><div class="card"><div class="card-icon">🎬</div><p class="card-title">온라인 클래스/<br>노하우 판매 페이지</p><p class="card-desc">강의, 노하우, 컨설팅 등 내 전문성을 온라인으로 전달하고 수익으로 연결합니다.</p></div></div>
+
+    <div class="step-flow">
+      <div class="step-item"><div class="step-icon">💡</div><p class="step-name">01. 기획</p><p class="step-desc">현재 상황과 목표를 함께 정리하고, 사이트 구조와 필요한 기능을 설계합니다.</p></div><span class="step-arrow">→</span><div class="step-item"><div class="step-icon">🎨</div><p class="step-name">02. 디자인</p><p class="step-desc">브랜드에 맞는 디자인을 만들고, 사용자 경험 중심으로 화면을 구성합니다.</p></div><span class="step-arrow">→</span><div class="step-item"><div class="step-icon">💻</div><p class="step-name">03. 개발</p><p class="step-desc">안정적인 코드로 기능을 구현하고, 모바일·속도·보안까지 꼼꼼하게 개발합니다.</p></div><span class="step-arrow">→</span><div class="step-item"><div class="step-icon">🚀</div><p class="step-name">04. 배포</p><p class="step-desc">도메인 연결, 테스트, 최종 점검 후 안정적으로 배포하고 운영 가이드를 제공합니다.</p></div>
+    </div>
+
+    <p class="final-note">✔ 기획부터 배포까지, 원스톱으로 진행되니 따로 알아볼 필요가 없습니다.</p>
+  </div>
+</div>
+
+<div class="container">
+  <section class="section">
+    <p class="section-title"><span class="section-num">4</span>이런 분들께 추천합니다</p>
+    <p class="section-sub">시간과 공간의 제약 없이, 내 방식대로 수익을 만들고 싶은 분들께 적합합니다.</p>
+    <div class="trust-grid">
+      <div class="trust-item"><p class="trust-title">아이 케어로<br>시간 제약이 있는 분</p><p class="trust-desc">집에서도 가능한 수익 구조가 필요하신 분</p></div><div class="trust-item"><p class="trust-title">정해진 출퇴근이<br>어려운 분</p><p class="trust-desc">내 스케줄에 맞춰 일하고 싶으신 분</p></div><div class="trust-item"><p class="trust-title">SNS·블로그에<br>노하우를 쌓아온 분</p><p class="trust-desc">콘텐츠를 내 자산으로 연결하고 싶으신 분</p></div><div class="trust-item"><p class="trust-title">부업·투잡으로<br>수입 파이프라인을 늘리고 싶은 분</p><p class="trust-desc">월급 외에 또 다른 수익원을 만들고 싶으신 분</p></div><div class="trust-item"><p class="trust-title">온라인으로<br>나만의 일을 시작하고 싶은 분</p><p class="trust-desc">지식·경험·취미를 수익으로 바꾸고 싶으신 분</p></div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-text">
+      <h3>지금 바로 확정 가격을 확인해보세요</h3>
+      <p>복잡한 상담 없이, 필요한 범위와 옵션을 선택하면 바로 확인할 수 있습니다.</p>
+    </div>
+    <a href="estimate.html" class="cta-btn">가격 확인하러 가기 →</a>
+  </section>
+</div>
+
+<script>
+  document.getElementById('revealBtn').addEventListener('click', function() {
+    var area = document.getElementById('revealArea');
+    area.classList.add('open');
+    area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    this.style.display = 'none';
+  });
+</script>
+
+</body>
+</html>

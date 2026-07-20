@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마침 · 고객이 찾아오는 구조</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1B4332;
+    --green-light: #2D6A4F;
+    --cream: #F5F2ED;
+    --panel: #EFEBE2;
+    --text: #2B2B28;
+    --muted: #6B6B63;
+    --border: #E3DED3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+  a.back {
+    display: inline-block; color: var(--green); font-size: 13px; font-weight: 700;
+    text-decoration: none; margin: 24px 0 0;
+  }
+
+  /* 히어로 */
+  .hero { padding: 40px 0 50px; }
+  .hero-inner { display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+  .hero-text { flex: 1; min-width: 280px; }
+  .hero-badge {
+    display: inline-block; background: var(--panel); color: var(--green);
+    font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; margin-bottom: 16px;
+  }
+  .hero-title { font-size: 30px; font-weight: 800; color: var(--green); line-height: 1.4; margin: 0 0 14px; letter-spacing: -0.3px; }
+  .hero-sub { font-size: 15px; color: var(--muted); line-height: 1.7; margin: 0; }
+  .hero-image {
+    flex: 1; min-width: 240px; min-height: 200px; background: var(--panel);
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 12px; border: 1.5px dashed var(--border);
+  }
+
+  /* 섹션 공통 */
+  .section { padding: 36px 0; }
+  .section-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--green); color: #fff;
+    font-size: 12px; font-weight: 800; margin-right: 8px;
+  }
+  .section-title { font-size: 20px; font-weight: 800; color: var(--green); margin: 0 0 6px; display: flex; align-items: center; }
+  .section-sub { font-size: 13px; color: var(--muted); margin: 0 0 22px 34px; }
+
+  /* 카드 3개 */
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .card {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 22px 18px; text-align: center;
+  }
+  .card-icon { font-size: 26px; margin-bottom: 12px; }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); margin: 0 0 8px; line-height: 1.5; }
+  .card-desc { font-size: 12px; color: var(--muted); line-height: 1.7; margin: 0; }
+
+  /* 더 알아보기 버튼 + 구분선 */
+  .reveal-btn-wrap { text-align: center; margin-top: 26px; }
+  .reveal-btn {
+    background: #fff; border: 1.5px solid var(--green); color: var(--green);
+    font-size: 13px; font-weight: 700; padding: 11px 24px; border-radius: 30px; cursor: pointer;
+  }
+  .reveal-btn:hover { background: var(--green); color: #fff; }
+  .reveal-divider {
+    text-align: center; font-size: 11px; color: var(--muted); margin: 24px 0;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .reveal-divider::before, .reveal-divider::after { content: ''; flex: 1; border-top: 1px dashed var(--border); }
+
+  /* 펼쳐지는 영역 */
+  #revealArea { display: none; background: var(--panel); margin: 0 -24px; padding: 40px 24px; }
+  #revealArea.open { display: block; }
+  .reveal-inner { max-width: 880px; margin: 0 auto; }
+
+  .note-box {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
+    display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--muted); margin: 20px 0;
+  }
+  .note-box b { color: var(--green); }
+
+  .step-flow { display: flex; align-items: flex-start; gap: 8px; margin: 24px 0; overflow-x: auto; }
+  .step-item { flex: 1; min-width: 140px; text-align: center; }
+  .step-icon {
+    width: 54px; height: 54px; border-radius: 50%; background: var(--green); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 12px;
+  }
+  .step-name { font-size: 13px; font-weight: 700; color: var(--text); margin: 0 0 6px; }
+  .step-desc { font-size: 11px; color: var(--muted); line-height: 1.6; margin: 0; }
+  .step-arrow { color: var(--border); font-size: 16px; padding-top: 18px; flex-shrink: 0; }
+
+  .final-note {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px;
+    text-align: center; font-size: 12px; color: var(--green); font-weight: 600; margin-top: 20px;
+  }
+
+  /* 신뢰요소 */
+  .trust-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+  .trust-item { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px 14px; text-align: center; }
+  .trust-title { font-size: 13px; font-weight: 700; margin: 0 0 6px; }
+  .trust-desc { font-size: 11px; color: var(--muted); line-height: 1.6; margin: 0; }
+
+  /* 최종 CTA */
+  .cta-section {
+    background: var(--green); border-radius: 18px; padding: 36px 32px; margin: 40px 0 60px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+  }
+  .cta-text h3 { font-size: 19px; font-weight: 800; color: #fff; margin: 0 0 6px; }
+  .cta-text p { font-size: 12px; color: rgba(245,242,237,.65); margin: 0; }
+  .cta-btn {
+    background: #fff; color: var(--green); padding: 14px 28px; border-radius: 10px;
+    font-size: 14px; font-weight: 800; text-decoration: none; white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .card-grid { grid-template-columns: 1fr; }
+    .step-flow { flex-direction: column; }
+    .step-arrow { display: none; }
+    .hero-title { font-size: 24px; }
+    #revealArea { margin: 0 -24px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a class="back" href="index.html#funnel-need">← 마침으로 돌아가기</a>
+
+  <!-- 히어로 -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <span class="hero-badge">고객 확보에 비용을 쓰고 계신다면</span>
+        <h1 class="hero-title">아직도 고객 데이터<br>몇만원씩 주고<br>구매하고 계신가요?</h1>
+        <p class="hero-sub">내 홈페이지에 관심고객이 알아서 찾아와 모이는 구조를 만들어보세요.</p>
+      </div>
+      <div class="hero-image">이미지 자리<br>(추후 삽입)</div>
+    </div>
+  </section>
+
+  <!-- 문제 공감 -->
+  <section class="section">
+    <p class="section-title"><span class="section-num">2</span>이런 방식으로 고객을 찾고 계신가요?</p>
+    <p class="section-sub">보이지 않는 비용이 계속 쌓이고 있습니다.</p>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">📞</div><p class="card-title">DB 업체에서<br>리스트를 사서<br>전화·문자 영업</p><p class="card-desc">관심 없는 사람에게 반복 연락, 거절에 시간과 에너지가 계속 소모됩니다.</p></div><div class="card"><div class="card-icon">📢</div><p class="card-title">광고를 계속<br>돌려야만 겨우<br>유입이 생기는 구조</p><p class="card-desc">광고를 멈추면 유입도 바로 끊기고, 광고비가 없으면 고객이 사라집니다.</p></div><div class="card"><div class="card-icon">💬</div><p class="card-title">소개·입소문에만<br>의존해서 매출이<br>들쑥날쑥함</p><p class="card-desc">예측이 어렵고, 일이 끊길까 봐 항상 불안한 상태가 반복됩니다.</p></div>
+    </div>
+    <div class="reveal-btn-wrap">
+      <button class="reveal-btn" id="revealBtn">더 알아보기 ↓</button>
+    </div>
+  </section>
+
+  <div class="reveal-divider">아래 내용은 클릭 후 펼쳐집니다</div>
+
+</div>
+
+<!-- 펼쳐지는 영역 -->
+<div id="revealArea">
+  <div class="reveal-inner">
+    <p class="section-title"><span class="section-num">3</span>광고비는 쓰는 순간 사라지지만,<br>홈페이지에 쌓은 콘텐츠와 SEO는 계속 남아 고객을 데려옵니다.</p>
+    <p class="section-sub">마침은 처음부터 끝까지 원스톱으로, 고객이 찾아오는 구조를 설계·구현합니다.</p>
+
+    <div class="note-box" style="display:block;"><b>광고(비용) 구조</b> — 광고비 지출 → 짧은기간 노출 → 효과가 없어지면 유입도 0<br><br><b>홈페이지(자산) 구조</b> — 콘텐츠·SEO 자산 축적 → 시간이 지날수록 신뢰 축적 → 지속적으로 고객 유입</div>
+
+    <div class="step-flow">
+      <div class="step-item"><div class="step-icon">💡</div><p class="step-name">01. 기획</p><p class="step-desc">현재 상황과 목표를 함께 정리하고, 사이트 구조와 필요한 기능을 설계합니다.</p></div><span class="step-arrow">→</span><div class="step-item"><div class="step-icon">🎨</div><p class="step-name">02. 디자인</p><p class="step-desc">브랜드에 맞는 디자인을 만들고, 사용자 경험 중심으로 화면을 구성합니다.</p></div><span class="step-arrow">→</span><div class="step-item"><div class="step-icon">💻</div><p class="step-name">03. 개발</p><p class="step-desc">안정적인 코드로 기능을 구현하고, 모바일·속도·보안까지 꼼꼼하게 개발합니다.</p></div><span class="step-arrow">→</span><div class="step-item"><div class="step-icon">🚀</div><p class="step-name">04. 배포</p><p class="step-desc">도메인 연결, 테스트, 최종 점검 후 안정적으로 배포하고 운영 가이드를 제공합니다.</p></div>
+    </div>
+
+    <p class="final-note">✔ 제작 후에도 운영과 성장을 위한 콘텐츠·SEO·마케팅 방향을 함께 제안합니다.</p>
+  </div>
+</div>
+
+<div class="container">
+  <section class="section">
+    <p class="section-title"><span class="section-num">4</span>이런 분들께 추천합니다</p>
+    <p class="section-sub">고객 확보에 시간과 비용을 쓰고, 안정적인 성장을 만들고 싶은 분들께 적합합니다.</p>
+    <div class="trust-grid">
+      <div class="trust-item"><p class="trust-title">매장·오프라인<br>사업자</p><p class="trust-desc">지역 고객을 더 안정적으로 모으고 싶은 분</p></div><div class="trust-item"><p class="trust-title">소개영업 위주<br>업종</p><p class="trust-desc">입소문에만 의존하지 않고 새로운 고객 흐름이 필요한 분</p></div><div class="trust-item"><p class="trust-title">광고비 부담이 큰<br>자영업자</p><p class="trust-desc">광고 효율이 떨어져 비용 대비 성과가 아쉬운 분</p></div><div class="trust-item"><p class="trust-title">전문 서비스<br>제공자</p><p class="trust-desc">상담·예약·신뢰가 중요한 업종의 프리랜서·전문가</p></div><div class="trust-item"><p class="trust-title">온라인 판매/예약<br>사업자</p><p class="trust-desc">상활·서비스 추가 매출 채널이 필요한 분</p></div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-text">
+      <h3>지금 바로 확정 가격을 확인해보세요</h3>
+      <p>복잡한 상담 없이, 필요한 범위와 옵션을 선택하면 바로 확인할 수 있습니다.</p>
+    </div>
+    <a href="estimate.html" class="cta-btn">가격 확인하러 가기 →</a>
+  </section>
+</div>
+
+<script>
+  document.getElementById('revealBtn').addEventListener('click', function() {
+    var area = document.getElementById('revealArea');
+    area.classList.add('open');
+    area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    this.style.display = 'none';
+  });
+</script>
+
+</body>
+</html>
