@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>마침 · 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --green: #1B4332;
+    --green-light: #2D6A4F;
+    --cream: #F5F2ED;
+    --panel: #EFEBE2;
+    --text: #2B2B28;
+    --muted: #6B6B63;
+    --border: #E3DED3;
+    --red: #B3261E;
+    --red-bg: #FDF2F1;
+    --amber: #7a4e06;
+    --amber-bg: #FCE9C7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Pretendard", "Apple SD Gothic Neo", sans-serif;
+    background: var(--cream);
+    color: var(--text);
+  }
+
+  /* 로그인 화면 */
+  .login-wrap {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .login-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px;
+    padding: 40px; width: 100%; max-width: 380px;
+  }
+  .login-card h1 { font-size: 19px; color: var(--green); margin: 0 0 4px; }
+  .login-card p { font-size: 13px; color: var(--muted); margin: 0 0 24px; }
+  .login-card label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; }
+  .login-card input {
+    width: 100%; padding: 11px 12px; border: 1px solid var(--border);
+    border-radius: 8px; font-size: 14px; font-family: inherit;
+  }
+  .login-card button {
+    width: 100%; margin-top: 22px; padding: 12px; background: var(--green);
+    color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .login-error { color: var(--red); font-size: 12px; margin-top: 10px; display: none; }
+
+  /* 대시보드 화면 */
+  .dash-wrap { max-width: 1180px; margin: 0 auto; padding: 32px 20px 80px; display: none; }
+  .dash-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+  }
+  .dash-title { font-size: 18px; font-weight: 800; color: var(--green); margin: 0; }
+  .dash-count { font-size: 12px; color: var(--muted); }
+  .logout-btn {
+    background: none; border: none; color: var(--muted); font-size: 12px;
+    text-decoration: underline; cursor: pointer;
+  }
+
+  /* 오늘 할 일 패널 */
+  .todo-panel {
+    background: var(--red-bg); border: 1px solid #D9695C; border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 20px; display: none;
+  }
+  .todo-panel__title { font-size: 12px; font-weight: 800; color: var(--red); margin: 0 0 10px; }
+  .todo-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 0; border-top: 1px dashed #E8B4AC; font-size: 12px;
+  }
+  .todo-row:first-of-type { border-top: none; }
+  .todo-row__name { font-weight: 700; }
+  .todo-row__action { color: var(--muted); margin-left: 8px; }
+  .todo-badge {
+    font-size: 10px; font-weight: 700; color: #fff; padding: 3px 9px; border-radius: 20px; flex-shrink: 0;
+  }
+  .todo-badge--overdue { background: var(--red); }
+  .todo-badge--today { background: var(--amber); }
+
+  /* 테이블 */
+  .table-wrap {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th {
+    background: var(--panel); text-align: left; padding: 10px 12px;
+    font-size: 10px; font-weight: 700; color: var(--muted); white-space: nowrap;
+  }
+  tbody td { padding: 12px; border-top: 1px solid var(--border); vertical-align: top; }
+  tbody tr:hover { background: #FAFAF7; }
+  .cell-name { font-weight: 700; }
+  .cell-contact { color: var(--muted); font-size: 11px; margin-top: 2px; }
+  .status-pill {
+    display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+  }
+  .status-pill--done { background: #E9F0EB; color: var(--green); }
+  .status-pill--wait { background: var(--amber-bg); color: var(--amber); }
+  .status-pill--none { background: #F0F0EC; color: var(--muted); }
+  select.status-select, input.date-input, input.action-input {
+    font-size: 11px; border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 7px; font-family: inherit; width: 100%; color: var(--text);
+  }
+  .notes-toggle {
+    background: none; border: none; font-size: 15px; cursor: pointer; opacity: .25;
+  }
+  .notes-toggle.has-notes { opacity: 1; }
+  .notes-row td { background: var(--panel); font-size: 12px; line-height: 1.7; padding: 12px 16px; display: none; }
+  .notes-row.open td { display: table-cell; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; }
+  .save-badge { font-size: 10px; color: var(--green); margin-left: 4px; opacity: 0; transition: opacity .3s; }
+  .save-badge.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- 로그인 화면 -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <h1>마침 대시보드</h1>
+    <p>프로젝트 현황을 관리합니다.</p>
+    <label for="email">이메일</label>
+    <input type="email" id="email" autocomplete="username">
+    <label for="password">비밀번호</label>
+    <input type="password" id="password" autocomplete="current-password">
+    <button id="loginBtn">로그인</button>
+    <p class="login-error" id="loginError">이메일 또는 비밀번호가 올바르지 않습니다.</p>
+  </div>
+</div>
+
+<!-- 대시보드 화면 -->
+<div class="dash-wrap" id="dashWrap">
+  <div class="dash-header">
+    <div>
+      <p class="dash-title">마침 · 프로젝트 현황</p>
+      <span class="dash-count" id="dashCount">총 0건</span>
+    </div>
+    <button class="logout-btn" id="logoutBtn">로그아웃</button>
+  </div>
+
+  <div class="todo-panel" id="todoPanel">
+    <p class="todo-panel__title">⏰ 오늘 할 일</p>
+    <div id="todoList"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>고객</th>
+          <th>상품유형</th>
+          <th>구매범위</th>
+          <th>착수금</th>
+          <th>잔금</th>
+          <th>진행 상태</th>
+          <th>다음 할 일</th>
+          <th>날짜</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody id="projectsBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none;">아직 등록된 프로젝트가 없어요.</div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = "https://jzxlmcvthicmruxxxmzg.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6eGxtY3Z0aGljbXJ1eHh4bXpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMjM2MDgsImV4cCI6MjA5ODc5OTYwOH0.ld7qDDJgqK1cQzf1IoCiyglFFQeMRArmWPoavR4bPo8";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const PROGRESS_OPTIONS = [
+    '착수금 대기', '작업 대기', '기획 중', '시안 1차 발송', '시안 수정 중',
+    '시안 확정', '개발 중', '잔금 대기', '배포·오픈 완료'
+  ];
+
+  const loginWrap = document.getElementById('loginWrap');
+  const dashWrap = document.getElementById('dashWrap');
+  const loginError = document.getElementById('loginError');
+
+  async function checkSession() {
+    const { data } = await sb.auth.getSession();
+    if (data.session) {
+      loginWrap.style.display = 'none';
+      dashWrap.style.display = 'block';
+      loadProjects();
+    } else {
+      loginWrap.style.display = 'flex';
+      dashWrap.style.display = 'none';
+    }
+  }
+  checkSession();
+
+  document.getElementById('loginBtn').addEventListener('click', async () => {
+    loginError.style.display = 'none';
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { loginError.style.display = 'block'; return; }
+    checkSession();
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    checkSession();
+  });
+
+  function formatWon(n) { return (n || 0).toLocaleString('ko-KR') + '원'; }
+
+  function statusPillHtml(payments, type) {
+    const p = payments.find(x => x.payment_type === type);
+    if (!p) return `<span class="status-pill status-pill--none">-</span>`;
+    if (p.status === '완료') return `<span class="status-pill status-pill--done">완료 · ${formatWon(p.amount)}</span>`;
+    return `<span class="status-pill status-pill--wait">대기 · ${formatWon(p.amount)}</span>`;
+  }
+
+  function daysDiffLabel(dateStr) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const target = new Date(dateStr); target.setHours(0,0,0,0);
+    const diff = Math.round((target - today) / 86400000);
+    if (diff < 0) return { cls: 'todo-badge--overdue', text: `${-diff}일 지남` };
+    if (diff === 0) return { cls: 'todo-badge--today', text: '오늘' };
+    return null;
+  }
+
+  let allProjects = [];
+
+  async function loadProjects() {
+    const { data: projects, error: projErr } = await sb
+      .from('projects')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (projErr) { console.error(projErr); return; }
+
+    const { data: payments, error: payErr } = await sb
+      .from('payments')
+      .select('*');
+
+    if (payErr) { console.error(payErr); return; }
+
+    allProjects = projects.map(p => ({
+      ...p,
+      payments: payments.filter(pay => pay.project_id === p.id)
+    }));
+
+    renderTodo();
+    renderTable();
+  }
+
+  function renderTodo() {
+    const todoPanel = document.getElementById('todoPanel');
+    const todoList = document.getElementById('todoList');
+    const items = allProjects
+      .filter(p => p.next_action_date)
+      .map(p => ({ p, badge: daysDiffLabel(p.next_action_date) }))
+      .filter(x => x.badge)
+      .sort((a, b) => new Date(a.p.next_action_date) - new Date(b.p.next_action_date));
+
+    if (items.length === 0) {
+      todoPanel.style.display = 'none';
+      return;
+    }
+    todoPanel.style.display = 'block';
+    todoList.innerHTML = items.map(({p, badge}) => `
+      <div class="todo-row">
+        <div>
+          <span class="todo-row__name">${p.client_name || '이름없음'}</span>
+          <span class="todo-row__action">${p.next_action || ''}</span>
+        </div>
+        <span class="todo-badge ${badge.cls}">${badge.text}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('projectsBody');
+    const emptyState = document.getElementById('emptyState');
+    document.getElementById('dashCount').textContent = `총 ${allProjects.length}건`;
+
+    if (allProjects.length === 0) {
+      tbody.innerHTML = '';
+      emptyState.style.display = 'block';
+      return;
+    }
+    emptyState.style.display = 'none';
+
+    tbody.innerHTML = '';
+    allProjects.forEach(p => {
+      const tr = document.createElement('tr');
+      const hasNotes = p.notes && p.notes.trim().length > 0;
+      tr.innerHTML = `
+        <td>
+          <div class="cell-name">${p.client_name || '-'}</div>
+          <div class="cell-contact">${p.contact || ''}</div>
+        </td>
+        <td>${p.product_type || '-'}</td>
+        <td>${p.scope_summary || '-'}</td>
+        <td>${statusPillHtml(p.payments, '착수금')}</td>
+        <td>${statusPillHtml(p.payments, '잔금')}</td>
+        <td>
+          <select class="status-select" data-id="${p.id}" data-field="progress_status">
+            ${PROGRESS_OPTIONS.map(s => `<option value="${s}" ${p.progress_status === s ? 'selected' : ''}>${s}</option>`).join('')}
+          </select>
+          <span class="save-badge" id="saved-${p.id}-status">✓</span>
+        </td>
+        <td>
+          <input type="text" class="action-input" data-id="${p.id}" data-field="next_action" value="${p.next_action || ''}" placeholder="예: 시안 발송">
+        </td>
+        <td>
+          <input type="date" class="date-input" data-id="${p.id}" data-field="next_action_date" value="${p.next_action_date || ''}">
+        </td>
+        <td>
+          <button class="notes-toggle ${hasNotes ? 'has-notes' : ''}" data-id="${p.id}">💬</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      const notesTr = document.createElement('tr');
+      notesTr.className = 'notes-row';
+      notesTr.id = `notes-${p.id}`;
+      notesTr.innerHTML = `<td colspan="9">${hasNotes ? p.notes : '비고 없음'}</td>`;
+      tbody.appendChild(notesTr);
+    });
+
+    // 이벤트 바인딩
+    document.querySelectorAll('.notes-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById(`notes-${btn.dataset.id}`).classList.toggle('open');
+      });
+    });
+
+    document.querySelectorAll('[data-field]').forEach(el => {
+      const eventType = el.tagName === 'SELECT' ? 'change' : 'blur';
+      el.addEventListener(eventType, async () => {
+        const id = el.dataset.id;
+        const field = el.dataset.field;
+        const value = el.value;
+        const { error } = await sb.from('projects').update({ [field]: value || null }).eq('id', id);
+        if (!error) {
+          const proj = allProjects.find(p => p.id === id);
+          if (proj) proj[field] = value;
+          if (field === 'progress_status') {
+            const badge = document.getElementById(`saved-${id}-status`);
+            badge.classList.add('show');
+            setTimeout(() => badge.classList.remove('show'), 1200);
+          }
+          renderTodo();
+        } else {
+          alert('저장 중 오류가 발생했어요: ' + error.message);
+        }
+      });
+    });
+  }
+</script>
+
+</body>
+</html>
