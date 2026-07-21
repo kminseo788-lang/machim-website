@@ -45,18 +45,18 @@
         기획부터 디자인, 개발, 배포까지 <span class="hero-accent">마침</span>이<br>
         흩어진 조각들을 연결해 하나의 결과물로 완성해 드립니다.
       </p>
-      <a href="landing-side.html" class="hero-funnel-btn hero-funnel-btn--main" id="funnel-side">
-        <span class="hero-funnel-btn__dot"></span>
-        <span class="hero-funnel-btn__text">
-          <span class="hero-funnel-btn__line1">지금은 1인 1홈페이지 시대</span>
-          <span class="hero-funnel-btn__line2">홈페이지가 있는 사람은 자는 동안에도 자산을 만듭니다</span>
-        </span>
-        <span class="hero-funnel-btn__arrow">→</span>
-      </a>
-      <a href="#portfolio" class="hero-portfolio-link">포트폴리오 먼저 보기 ↓</a>
+      <div class="hero-btns">
+        <a href="#portfolio" class="btn-outline">포트폴리오 보기</a>
+        <a href="estimate.html" class="btn-primary">가격 바로 확인하기 →</a>
+      </div>
     </div>
     <div class="hero-right">
       <img src="./img/img-hero.png" alt="마침 작업 목업" class="hero-mockup-img">
+      <a href="landing-side.html" class="hero-float-card" id="funnel-side">
+        <span class="hero-float-card__line1">지금은 1인 1홈페이지 시대</span>
+        <span class="hero-float-card__line2">홈페이지가 있는 사람은 자는 동안에도 자산을 만듭니다</span>
+        <span class="hero-float-card__arrow">→</span>
+      </a>
     </div>
   </div>
 </section>
@@ -430,9 +430,14 @@
   padding: 7px 15px; border-radius: 999px; display: inline-block;
 }
 .pf-banner-card--standalone {
-  max-width: 420px;
+  max-width: 560px;
   margin: 0 auto 40px;
+  background: #C97158 !important;
 }
+.pf-banner-card--standalone .pf-banner-title { font-size: 27px; }
+.pf-banner-card--standalone .pf-banner-sub { font-size: 14px; }
+.pf-banner-card--standalone .pf-banner-arrow { background: #fff; color: #C97158; }
+.pf-banner-card--standalone .pf-banner-dot { background: #fff; }
 
 /* 맨 아래 최종 선택 카드 2개 */
 .final-choice-grid {
@@ -444,17 +449,21 @@
 }
 .final-choice-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(27,67,50,.12); }
 .final-choice-card--solid { background: #1B4332; border-color: #1B4332; }
+.final-choice-card--coral { background: #C97158; border-color: #C97158; }
 .final-choice-card__eyebrow { font-size: 11px; font-weight: 700; color: var(--muted); margin: 0 0 10px; }
-.final-choice-card--solid .final-choice-card__eyebrow { color: rgba(245,242,237,.6); }
+.final-choice-card--solid .final-choice-card__eyebrow,
+.final-choice-card--coral .final-choice-card__eyebrow { color: rgba(245,242,237,.7); }
 .final-choice-card__title { font-size: 19px; font-weight: 800; color: #1B4332; line-height: 1.4; margin: 0 0 10px; }
-.final-choice-card--solid .final-choice-card__title { color: #fff; }
+.final-choice-card--solid .final-choice-card__title,
+.final-choice-card--coral .final-choice-card__title { color: #fff; }
 .final-choice-card__desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin: 0 0 20px; }
-.final-choice-card--solid .final-choice-card__desc { color: rgba(245,242,237,.65); }
+.final-choice-card--solid .final-choice-card__desc,
+.final-choice-card--coral .final-choice-card__desc { color: rgba(245,242,237,.7); }
 .final-choice-card__btn {
   display: inline-block; background: #C97158; color: #fff; font-size: 13px; font-weight: 800;
   padding: 11px 22px; border-radius: 999px;
 }
-.final-choice-card__btn--outline { background: transparent; color: #C97158; border: 1.5px solid #C97158; }
+.final-choice-card__btn--white { background: #fff; color: #C97158; }
 @media (max-width: 640px) {
   .final-choice-grid { grid-template-columns: 1fr; }
 }
@@ -519,49 +528,38 @@
   .pf-ticker-arrow { align-self: flex-end; }
 }
 
-/* 히어로 퍼널 버튼 (부업형 랜딩 연결) */
-.hero-funnel-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 22px;
-  background: #fff;
-  border: 1.5px solid #C97158;
-  color: #C97158;
-  padding: 12px 20px;
-  border-radius: 16px;
-  text-decoration: none;
-  transition: all .15s;
-}
-.hero-funnel-btn--main {
+/* 히어로 이미지 위 둥둥 뜨는 랜딩 카드 (부업형) */
+.hero-right { position: relative; }
+.hero-float-card {
+  position: absolute;
+  top: 42%;
+  left: 58%;
+  max-width: 260px;
   background: #C97158;
-  border-color: #C97158;
-  padding: 18px 26px;
-  box-shadow: 0 10px 26px rgba(201,113,88,.35);
+  color: #fff;
+  text-decoration: none;
+  padding: 20px 22px;
+  border-radius: 18px;
+  box-shadow: 0 16px 34px rgba(201,113,88,.4);
+  animation: heroFloat 3.2s ease-in-out infinite;
+  z-index: 5;
 }
-.hero-funnel-btn--main .hero-funnel-btn__line1,
-.hero-funnel-btn--main .hero-funnel-btn__line2,
-.hero-funnel-btn--main .hero-funnel-btn__arrow { color: #fff; }
-.hero-funnel-btn--main .hero-funnel-btn__line1 { font-size: 16px; }
-.hero-funnel-btn--main .hero-funnel-btn__dot { background: #fff; }
-.hero-funnel-btn--main:hover { transform: translateY(-3px); box-shadow: 0 14px 32px rgba(201,113,88,.45); background: #C97158; }
-.hero-funnel-btn:hover { background: #C97158; transform: translateY(-2px); }
-.hero-funnel-btn:hover .hero-funnel-btn__line1,
-.hero-funnel-btn:hover .hero-funnel-btn__line2 { color: #fff; }
-.hero-funnel-btn__text { display: flex; flex-direction: column; gap: 2px; }
-.hero-funnel-btn__line1 { font-size: 14px; font-weight: 800; color: #C97158; }
-.hero-funnel-btn__line2 { font-size: 12px; font-weight: 500; color: #A8836F; }
-.hero-funnel-btn--main .hero-funnel-btn__line2 { color: rgba(255,255,255,.8); }
-.hero-funnel-btn__dot {
-  width: 8px; height: 8px; border-radius: 50%; background: #C97158; flex-shrink: 0;
-  transition: background .15s;
+.hero-float-card__line1 {
+  display: block; font-size: 18px; font-weight: 800; line-height: 1.4; margin-bottom: 8px;
 }
-.hero-funnel-btn:hover .hero-funnel-btn__dot { background: #fff; }
-.hero-funnel-btn__arrow { font-weight: 800; flex-shrink: 0; color: #C97158; }
-.hero-funnel-btn:hover .hero-funnel-btn__arrow { color: #fff; }
-.hero-portfolio-link {
-  display: block; margin-top: 14px; font-size: 12px; color: var(--muted);
-  text-decoration: underline; width: fit-content;
+.hero-float-card__line2 {
+  display: block; font-size: 12px; color: rgba(255,255,255,.85); line-height: 1.6; margin-bottom: 14px;
+}
+.hero-float-card__arrow {
+  display: inline-block; background: #fff; color: #C97158; font-size: 13px; font-weight: 800;
+  padding: 6px 14px; border-radius: 999px;
+}
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+@media (max-width: 900px) {
+  .hero-float-card { position: static; margin-top: 20px; max-width: 100%; animation: none; }
 }
 </style>
 
@@ -889,11 +887,11 @@
 <section class="section" style="padding:50px 0 10px;">
   <div class="container">
     <div class="final-choice-grid">
-      <a href="landing-compare.html" class="final-choice-card" id="funnel-compare">
+      <a href="landing-compare.html" class="final-choice-card final-choice-card--coral" id="funnel-compare">
         <p class="final-choice-card__eyebrow">이미 비교 중이신가요?</p>
         <p class="final-choice-card__title">견적만 받다가<br>시간만 지나고 계신가요?</p>
         <p class="final-choice-card__desc">복잡한 비교보다 명확한 프로세스를 확인해보세요</p>
-        <span class="final-choice-card__btn final-choice-card__btn--outline">프로세스 보기 →</span>
+        <span class="final-choice-card__btn final-choice-card__btn--white">프로세스 보기 →</span>
       </a>
       <a href="estimate.html" class="final-choice-card final-choice-card--solid">
         <p class="final-choice-card__eyebrow">이미 마음을 정하셨다면</p>
@@ -902,14 +900,6 @@
         <span class="final-choice-card__btn">가격 확인하러 가기 →</span>
       </a>
     </div>
-  </div>
-</section>
-
-<!-- 마무리 안내 (문의폼 대신 최소화) -->
-<section style="padding:50px 0;">
-  <div class="container" style="text-align:center;">
-    <p style="font-size:15px;font-weight:700;color:#1B4332;margin:0 0 8px;">궁금한 점이 있으시면 카카오톡으로 편하게 물어보세요.</p>
-    <p style="font-size:13px;color:var(--muted);margin:0;">답변은 순차적으로 드려요. 급하시면 바로 가격을 확인해보시는 게 더 빨라요.</p>
   </div>
 </section>
 
