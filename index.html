@@ -447,7 +447,10 @@
 .pf-banner-dot { width: 8px; height: 8px; border-radius: 50%; background: #F5F2ED; margin-bottom: 16px; flex-shrink: 0; }
 .pf-banner-title { font-size: 22px; font-weight: 800; color: #F5F2ED; line-height: 1.3; margin-bottom: 10px; }
 .pf-banner-sub { font-size: 13px; color: rgba(245,242,237,.6); line-height: 1.6; margin-bottom: 20px; }
-.pf-banner-arrow { font-size: 12px; font-weight: 600; color: #F5F2ED; border: 1px solid rgba(245,242,237,.35); padding: 6px 14px; border-radius: 999px; }
+.pf-banner-arrow {
+  font-size: 12px; font-weight: 700; color: #fff; background: #C97158;
+  padding: 7px 15px; border-radius: 999px; display: inline-block;
+}
 
 /* 가운데 정렬된 초록색 필 배너 (더 눈에 띄게) */
 .pf-ticker {
@@ -471,9 +474,9 @@
 .pf-ticker-arrow {
   font-size: 13px;
   font-weight: 800;
-  color: #1B4332;
+  color: #fff;
   white-space: nowrap;
-  background: #F5F2ED;
+  background: #C97158;
   padding: 8px 16px;
   border-radius: 999px;
   flex-shrink: 0;
@@ -490,25 +493,25 @@
   gap: 12px;
   margin-top: 18px;
   background: #fff;
-  border: 1.5px solid #1B4332;
-  color: #1B4332;
+  border: 1.5px solid #C97158;
+  color: #C97158;
   padding: 12px 20px;
   border-radius: 16px;
   text-decoration: none;
   transition: all .15s;
 }
-.hero-funnel-btn:hover { background: #1B4332; transform: translateY(-2px); }
+.hero-funnel-btn:hover { background: #C97158; transform: translateY(-2px); }
 .hero-funnel-btn:hover .hero-funnel-btn__line1,
 .hero-funnel-btn:hover .hero-funnel-btn__line2 { color: #fff; }
 .hero-funnel-btn__text { display: flex; flex-direction: column; gap: 2px; }
-.hero-funnel-btn__line1 { font-size: 14px; font-weight: 800; color: #1B4332; }
-.hero-funnel-btn__line2 { font-size: 12px; font-weight: 500; color: #5C7A6D; }
+.hero-funnel-btn__line1 { font-size: 14px; font-weight: 800; color: #C97158; }
+.hero-funnel-btn__line2 { font-size: 12px; font-weight: 500; color: #A8836F; }
 .hero-funnel-btn__dot {
-  width: 8px; height: 8px; border-radius: 50%; background: #1B4332; flex-shrink: 0;
+  width: 8px; height: 8px; border-radius: 50%; background: #C97158; flex-shrink: 0;
   transition: background .15s;
 }
 .hero-funnel-btn:hover .hero-funnel-btn__dot { background: #fff; }
-.hero-funnel-btn__arrow { font-weight: 800; flex-shrink: 0; }
+.hero-funnel-btn__arrow { font-weight: 800; flex-shrink: 0; color: #C97158; }
 .hero-funnel-btn:hover .hero-funnel-btn__arrow { color: #fff; }
 </style>
 
