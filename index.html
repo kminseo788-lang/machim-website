@@ -20,7 +20,6 @@
       <li><a href="estimate.html">가격</a></li>
       <li><a href="#cases">제작 예시</a></li>
       <li><a href="#process">작업 과정</a></li>
-      <li><a href="#contact">문의하기</a></li>
       <li><a href="http://pf.kakao.com/_HxgDXX/chat" class="nav-cta" target="_blank">카카오 상담</a></li>
     </ul>
   </div>
@@ -46,11 +45,7 @@
         기획부터 디자인, 개발, 배포까지 <span class="hero-accent">마침</span>이<br>
         흩어진 조각들을 연결해 하나의 결과물로 완성해 드립니다.
       </p>
-      <div class="hero-btns">
-        <a href="#portfolio" class="btn-outline">포트폴리오 보기</a>
-        <a href="estimate.html" class="btn-primary">가격 바로 확인하기 →</a>
-     </div>
-      <a href="landing-side.html" class="hero-funnel-btn" id="funnel-side">
+      <a href="landing-side.html" class="hero-funnel-btn hero-funnel-btn--main" id="funnel-side">
         <span class="hero-funnel-btn__dot"></span>
         <span class="hero-funnel-btn__text">
           <span class="hero-funnel-btn__line1">지금은 1인 1홈페이지 시대</span>
@@ -58,6 +53,7 @@
         </span>
         <span class="hero-funnel-btn__arrow">→</span>
       </a>
+      <a href="#portfolio" class="hero-portfolio-link">포트폴리오 먼저 보기 ↓</a>
     </div>
     <div class="hero-right">
       <img src="./img/img-hero.png" alt="마침 작업 목업" class="hero-mockup-img">
@@ -228,12 +224,10 @@
 </section>
 
 <!-- 손실회피 티커 1 -->
-<a href="landing-need.html" class="pf-ticker" id="funnel-need">
-  <span class="pf-ticker-text">
-    <span class="pf-ticker-line1">아직도 고객 데이터 몇만원씩 주고 구매하고 계신가요?</span>
-    <span class="pf-ticker-line2">내 홈페이지에 관심고객이 알아서 찾아와 모이는 구조를 만들어보세요</span>
-  </span>
-  <span class="pf-ticker-arrow">확인하기 →</span>
+<a href="landing-need.html" class="funnel-tall-card" id="funnel-need">
+  <p class="funnel-tall-card__line1">아직도 고객 데이터<br>몇만원씩 주고<br>구매하고 계신가요?</p>
+  <p class="funnel-tall-card__line2">내 홈페이지에 관심고객이 알아서 찾아와 모이는 구조를 만들어보세요</p>
+  <span class="funnel-tall-card__btn">확인하기 →</span>
 </a>
 
 <!-- 제작 예시 — 업종별 시안 -->
@@ -347,26 +341,10 @@
         </div>
       </a>
 
-      <a href="landing-fail.html" class="portfolio-card pf-banner-card" id="funnel-fail">
-        <span class="pf-banner-dot"></span>
-        <p class="pf-banner-title">돈만 쓰다가 멈추고<br>방치된 홈페이지가 있으신가요?</p>
-        <p class="pf-banner-sub">이번에는 끝까지 완성되는<br>과정을 경험해보세요</p>
-        <span class="pf-banner-arrow">이어서 완성하기 →</span>
-      </a>
-
     </div>
     <p style="font-size:12px;color:var(--muted);margin-top:24px;line-height:1.7;">※ 위 제작 예시는 제작 역량을 보여드리기 위한 디자인 시안입니다. 표기된 상호·연락처는 실존 업체와 무관한 예시입니다.</p>
   </div>
 </section>
-
-<!-- 손실회피 티커 2 -->
-<a href="landing-compare.html" class="pf-ticker" id="funnel-compare">
-  <span class="pf-ticker-text">
-    <span class="pf-ticker-line1">견적만 받다가 시간만 지나고 계신가요?</span>
-    <span class="pf-ticker-line2">복잡한 비교보다 명확한 프로세스를 확인해보세요</span>
-  </span>
-  <span class="pf-ticker-arrow">비교하기 →</span>
-</a>
 
 <section class="why-section">
   <div class="container">
@@ -451,8 +429,63 @@
   font-size: 12px; font-weight: 700; color: #fff; background: #C97158;
   padding: 7px 15px; border-radius: 999px; display: inline-block;
 }
+.pf-banner-card--standalone {
+  max-width: 420px;
+  margin: 0 auto 40px;
+}
 
-/* 가운데 정렬된 초록색 필 배너 (더 눈에 띄게) */
+/* 맨 아래 최종 선택 카드 2개 */
+.final-choice-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.final-choice-card {
+  display: block; text-decoration: none; border-radius: 18px; padding: 30px 26px;
+  background: #fff; border: 1.5px solid var(--border); transition: transform .15s, box-shadow .15s;
+}
+.final-choice-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(27,67,50,.12); }
+.final-choice-card--solid { background: #1B4332; border-color: #1B4332; }
+.final-choice-card__eyebrow { font-size: 11px; font-weight: 700; color: var(--muted); margin: 0 0 10px; }
+.final-choice-card--solid .final-choice-card__eyebrow { color: rgba(245,242,237,.6); }
+.final-choice-card__title { font-size: 19px; font-weight: 800; color: #1B4332; line-height: 1.4; margin: 0 0 10px; }
+.final-choice-card--solid .final-choice-card__title { color: #fff; }
+.final-choice-card__desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin: 0 0 20px; }
+.final-choice-card--solid .final-choice-card__desc { color: rgba(245,242,237,.65); }
+.final-choice-card__btn {
+  display: inline-block; background: #C97158; color: #fff; font-size: 13px; font-weight: 800;
+  padding: 11px 22px; border-radius: 999px;
+}
+.final-choice-card__btn--outline { background: transparent; color: #C97158; border: 1.5px solid #C97158; }
+@media (max-width: 640px) {
+  .final-choice-grid { grid-template-columns: 1fr; }
+}
+
+/* 세로형 강조 카드 (고객DB 랜딩용) */
+.funnel-tall-card {
+  display: block;
+  max-width: 340px;
+  margin: 48px auto;
+  background: #1B4332;
+  border-radius: 20px;
+  padding: 32px 28px;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 12px 30px rgba(27,67,50,.3);
+  transition: transform .15s, box-shadow .15s;
+}
+.funnel-tall-card:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(27,67,50,.4); }
+.funnel-tall-card__line1 {
+  font-size: 20px; font-weight: 800; color: #fff; line-height: 1.5; margin: 0 0 12px;
+}
+.funnel-tall-card__line2 {
+  font-size: 13px; color: rgba(245,242,237,.7); line-height: 1.6; margin: 0 0 22px;
+}
+.funnel-tall-card__btn {
+  display: inline-block; background: #C97158; color: #fff; font-size: 13px; font-weight: 800;
+  padding: 12px 28px; border-radius: 999px;
+}
+@media (max-width: 640px) {
+  .funnel-tall-card { margin: 40px 16px; }
+}
 .pf-ticker {
   display: flex;
   align-items: center;
@@ -491,7 +524,7 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  margin-top: 18px;
+  margin-top: 22px;
   background: #fff;
   border: 1.5px solid #C97158;
   color: #C97158;
@@ -500,12 +533,25 @@
   text-decoration: none;
   transition: all .15s;
 }
+.hero-funnel-btn--main {
+  background: #C97158;
+  border-color: #C97158;
+  padding: 18px 26px;
+  box-shadow: 0 10px 26px rgba(201,113,88,.35);
+}
+.hero-funnel-btn--main .hero-funnel-btn__line1,
+.hero-funnel-btn--main .hero-funnel-btn__line2,
+.hero-funnel-btn--main .hero-funnel-btn__arrow { color: #fff; }
+.hero-funnel-btn--main .hero-funnel-btn__line1 { font-size: 16px; }
+.hero-funnel-btn--main .hero-funnel-btn__dot { background: #fff; }
+.hero-funnel-btn--main:hover { transform: translateY(-3px); box-shadow: 0 14px 32px rgba(201,113,88,.45); background: #C97158; }
 .hero-funnel-btn:hover { background: #C97158; transform: translateY(-2px); }
 .hero-funnel-btn:hover .hero-funnel-btn__line1,
 .hero-funnel-btn:hover .hero-funnel-btn__line2 { color: #fff; }
 .hero-funnel-btn__text { display: flex; flex-direction: column; gap: 2px; }
 .hero-funnel-btn__line1 { font-size: 14px; font-weight: 800; color: #C97158; }
 .hero-funnel-btn__line2 { font-size: 12px; font-weight: 500; color: #A8836F; }
+.hero-funnel-btn--main .hero-funnel-btn__line2 { color: rgba(255,255,255,.8); }
 .hero-funnel-btn__dot {
   width: 8px; height: 8px; border-radius: 50%; background: #C97158; flex-shrink: 0;
   transition: background .15s;
@@ -513,6 +559,10 @@
 .hero-funnel-btn:hover .hero-funnel-btn__dot { background: #fff; }
 .hero-funnel-btn__arrow { font-weight: 800; flex-shrink: 0; color: #C97158; }
 .hero-funnel-btn:hover .hero-funnel-btn__arrow { color: #fff; }
+.hero-portfolio-link {
+  display: block; margin-top: 14px; font-size: 12px; color: var(--muted);
+  text-decoration: underline; width: fit-content;
+}
 </style>
 
 <!-- ===== 서비스 모달들 ===== -->
@@ -731,6 +781,16 @@
 })();
 </script>
 
+<!-- 실패경험 카드 (작업 과정 바로 위) -->
+<div class="container" style="padding-top:20px;">
+  <a href="landing-fail.html" class="pf-banner-card pf-banner-card--standalone" id="funnel-fail">
+    <span class="pf-banner-dot"></span>
+    <p class="pf-banner-title">돈만 쓰다가 멈추고<br>방치된 홈페이지가 있으신가요?</p>
+    <p class="pf-banner-sub">이번에는 끝까지 완성되는 과정을 경험해보세요 — 바로 아래처럼요.</p>
+    <span class="pf-banner-arrow">이어서 완성하기 →</span>
+  </a>
+</div>
+
 <!-- PROCESS — 흰색 -->
 <section class="process" id="process">
   <div class="container">
@@ -825,81 +885,33 @@
 }
 </style>
 
-<!-- CTA + 문의 폼 -->
-<section class="cta-section" id="contact">
+<!-- 최종 선택 — 비교 랜딩 + 바로 결제 -->
+<section class="section" style="padding:50px 0 10px;">
   <div class="container">
-    <div class="cta-inner">
-      <div>
-        <p class="cta-eyebrow">Consultation</p>
-        <h2 class="cta-title">아이디어만 있어도 됩니다.<br>나머지는 마침.이 합니다.</h2>
-        <p class="cta-desc">
-          간단한 아이디어만 있어도 상담 가능합니다.<br>
-          아래 양식을 작성해 주시면 24시간 내 답변드립니다.
-        </p>
-        <p class="cta-contact" style="margin-top:16px">hello@machim.kr &nbsp;·&nbsp; 010-1234-5678</p>
-      </div>
-      <div class="cta-right" style="min-width:320px">
-        <div class="contact-form" id="contactForm">
-          <div class="cf-group">
-            <input type="text" id="cf-name" placeholder="이름 *" class="cf-input">
-          </div>
-          <div class="cf-group">
-            <input type="text" id="cf-phone" placeholder="연락처 (전화 또는 카카오 ID) *" class="cf-input">
-          </div>
-          <div class="cf-group">
-            <select id="cf-service" class="cf-input">
-              <option value="">원하시는 서비스</option>
-              <option>랜딩페이지</option>
-              <option>홈페이지</option>
-              <option>플랫폼 · 회원제 사이트</option>
-              <option>상세페이지</option>
-              <option>쇼핑몰</option>
-              <option>리뉴얼 · 유지보수</option>
-              <option>아직 모르겠어요</option>
-            </select>
-          </div>
-          <div class="cf-group">
-            <textarea id="cf-memo" placeholder="간단한 내용을 적어주세요 (선택)" class="cf-input cf-textarea"></textarea>
-          </div>
-          <button onclick="submitContactForm()" class="btn-green" style="width:100%;border:none;cursor:pointer;font-size:14px">무료 상담 신청 →</button>
-          <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">개인정보는 상담 목적으로만 사용됩니다.</p>
-        </div>
-        <div id="contactSuccess" style="display:none;text-align:center;padding:40px 0">
-          <p style="font-size:28px;margin-bottom:12px">✅</p>
-          <p style="font-weight:700;font-size:16px;color:var(--green);margin-bottom:6px">접수되었습니다!</p>
-          <p style="font-size:13px;color:var(--muted)">24시간 내로 연락드리겠습니다.</p>
-        </div>
-      </div>
+    <div class="final-choice-grid">
+      <a href="landing-compare.html" class="final-choice-card" id="funnel-compare">
+        <p class="final-choice-card__eyebrow">이미 비교 중이신가요?</p>
+        <p class="final-choice-card__title">견적만 받다가<br>시간만 지나고 계신가요?</p>
+        <p class="final-choice-card__desc">복잡한 비교보다 명확한 프로세스를 확인해보세요</p>
+        <span class="final-choice-card__btn final-choice-card__btn--outline">프로세스 보기 →</span>
+      </a>
+      <a href="estimate.html" class="final-choice-card final-choice-card--solid">
+        <p class="final-choice-card__eyebrow">이미 마음을 정하셨다면</p>
+        <p class="final-choice-card__title">지금 바로<br>확정 가격을 확인하세요</p>
+        <p class="final-choice-card__desc">필요한 범위만 골라 담으면 그 자리에서 가격이 확정돼요</p>
+        <span class="final-choice-card__btn">가격 확인하러 가기 →</span>
+      </a>
     </div>
   </div>
 </section>
 
-<style>
-.cf-group { margin-bottom: 10px; }
-.cf-input { width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:8px; font-size:14px; font-family:inherit; background:var(--white); outline:none; box-sizing:border-box; transition:border .2s; color:var(--text); }
-.cf-input:focus { border-color:var(--green); }
-.cf-textarea { height:80px; resize:vertical; }
-select.cf-input { appearance:none; }
-</style>
-
-<script>
-function submitContactForm() {
-  const name = document.getElementById('cf-name').value.trim();
-  const phone = document.getElementById('cf-phone').value.trim();
-  if (!name || !phone) { alert('이름과 연락처는 필수입니다.'); return; }
-  const data = {
-    이름: name,
-    연락처: phone,
-    서비스: document.getElementById('cf-service').value || '미선택',
-    메모: document.getElementById('cf-memo').value,
-    접수일시: new Date().toLocaleString('ko-KR')
-  };
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwJhaS2MxakeCB9Ojb-OoXCApyNhmzvd8J4EsB2lrB2-QMAybPGJdXLSBWdkiifZNAU/exec';
-  fetch(SCRIPT_URL, { method:'POST', body:JSON.stringify(data) }).catch(()=>{});
-  document.getElementById('contactForm').style.display = 'none';
-  document.getElementById('contactSuccess').style.display = 'block';
-}
-</script>
+<!-- 마무리 안내 (문의폼 대신 최소화) -->
+<section style="padding:50px 0;">
+  <div class="container" style="text-align:center;">
+    <p style="font-size:15px;font-weight:700;color:#1B4332;margin:0 0 8px;">궁금한 점이 있으시면 카카오톡으로 편하게 물어보세요.</p>
+    <p style="font-size:13px;color:var(--muted);margin:0;">답변은 순차적으로 드려요. 급하시면 바로 가격을 확인해보시는 게 더 빨라요.</p>
+  </div>
+</section>
 
 <!-- FOOTER — 녹색 박스 -->
 <footer>
