@@ -127,6 +127,52 @@
     .step-arrow { display: none; }
     .hero.dark { padding: 40px 24px 48px; margin: 0 -24px; }
   }
+
+  /* Before/After */
+  .ba-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:center; margin-top:4px; }
+  .ba-box { border-radius:14px; padding:20px; }
+  .ba-box--before { background:#EFEBE2; }
+  .ba-box--after { background:var(--green); }
+  .ba-label { font-size:11px; font-weight:800; margin:0 0 10px; }
+  .ba-box--before .ba-label { color:var(--muted); }
+  .ba-box--after .ba-label { color:rgba(245,242,237,.7); }
+  .ba-text { font-size:13px; line-height:1.6; margin:0; }
+  .ba-box--before .ba-text { color:var(--text); font-weight:600; }
+  .ba-box--after .ba-text { color:#fff; font-weight:600; }
+  .ba-arrow { font-size:18px; color:var(--green); font-weight:800; text-align:center; }
+
+  /* FAQ */
+  .faq-list { display:flex; flex-direction:column; gap:10px; }
+  .faq-item { background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px 18px; }
+  .faq-q { font-size:14px; font-weight:800; color:var(--green); margin:0 0 6px; }
+  .faq-a { font-size:13px; color:var(--muted); margin:0; line-height:1.6; }
+
+  /* 프로세스 한 줄 설명 */
+  .step-desc { font-size:11px; color:var(--muted); line-height:1.5; margin:6px 0 0; }
+
+  @media (max-width: 640px) {
+    .ba-grid { grid-template-columns: 1fr; }
+    .ba-arrow { transform: rotate(90deg); }
+  }
+
+  .hook-item--more {
+    background: transparent; border: none; border-left: none;
+    font-size: 13px; font-weight: 500; font-style: italic; color: var(--muted);
+    padding: 8px 20px; text-align: center;
+  }
+
+  /* 플랫폼 리스크 상세 카드 */
+  .risk-list { display: flex; flex-direction: column; gap: 10px; }
+  .risk-item {
+    background: #fff; border: 1px solid var(--border); border-left: 4px solid #C97158;
+    border-radius: 10px; padding: 16px 20px;
+  }
+  .risk-item__title { font-size: 14px; font-weight: 800; color: var(--text); margin: 0 0 5px; }
+  .risk-item__desc { font-size: 12px; color: var(--muted); line-height: 1.65; margin: 0; }
+  .final-note {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px;
+    text-align: center; font-size: 12px; color: var(--green); font-weight: 600;
+  }
 </style>
 </head>
 <body>
@@ -175,18 +221,80 @@
   </section>
 
   <section class="section tight">
+    <p class="section-eyebrow">The Real Risk</p>
+    <p class="section-title">플랫폼에만 의존하면, <b>이런 위험</b>도 있어요</p>
+    <div class="risk-list">
+      <div class="risk-item">
+        <p class="risk-item__title">📉 알고리즘이 바뀌는 순간, 순위가 갑자기 떨어져요</p>
+        <p class="risk-item__desc">내가 잘못한 게 없어도, 플랫폼 정책이 바뀌면 노출이 확 줄어들 수 있어요.</p>
+      </div>
+      <div class="risk-item">
+        <p class="risk-item__title">✏️ 자주 수정하면 지수가 떨어져요</p>
+        <p class="risk-item__desc">잘못 올린 내용을 고치고 싶어도, 수정 자체가 신호로 읽혀 콘텐츠 순위가 떨어질 수 있어요. 결국 틀린 내용을 그대로 둘 수밖에 없는 상황도 생겨요.</p>
+      </div>
+      <div class="risk-item">
+        <p class="risk-item__title">⚖️ 정확해야 하는 정보는 법적 문제로 번질 수도 있어요</p>
+        <p class="risk-item__desc">매물 정보처럼 정확성이 중요한 내용을 잘못 올리거나 늦게 고치면, 과태료 같은 문제로 이어질 수 있어요.</p>
+      </div>
+      <div class="risk-item">
+        <p class="risk-item__title">🚫 무리하게 수익을 내려다 저품질에 걸릴 수 있어요</p>
+        <p class="risk-item__desc">플랫폼 규정에 어긋나는 방식으로 단기 수익을 노리면, 계정 자체가 페널티를 받아 그동안 쌓은 게 한순간에 무너질 수 있어요.</p>
+      </div>
+    </div>
+    <p class="final-note" style="margin-top:14px;">✔ 홈페이지는 내가 만든 대로, 내가 고친 만큼만 남아요 — 알고리즘도, 지수도, 저품질 위험도 없어요.</p>
+  </section>
+
+  <section class="section tight">
+    <p class="section-eyebrow">Before / After</p>
+    <p class="section-title">플랫폼 말고 <b>내 공간</b>에 쌓으면</p>
+    <div class="ba-grid">
+      <div class="ba-box ba-box--before">
+        <p class="ba-label">플랫폼에만 쌓으면</p>
+        <p class="ba-text">알고리즘이 바뀌면 노출도 함께 사라짐</p>
+      </div>
+      <span class="ba-arrow">→</span>
+      <div class="ba-box ba-box--after">
+        <p class="ba-label">홈페이지에 쌓으면</p>
+        <p class="ba-text">검색으로 꾸준히, 알고리즘 상관없이 발견됨</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
     <p class="section-title">SNS는 계속하고, <b>내 자산</b>도 함께 쌓아요</p>
     
 <div class="step-flow">
-  <div class="step-item"><div class="step-icon">💬</div><p class="step-name">상담</p></div>
+  <div class="step-item"><div class="step-icon">💬</div><p class="step-name">상담</p><p class="step-desc">목표와 방향을 정리해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">🎨</div><p class="step-name">기획·디자인</p></div>
+  <div class="step-item"><div class="step-icon">🎨</div><p class="step-name">기획·디자인</p><p class="step-desc">구조와 화면을 설계해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">💻</div><p class="step-name">개발</p></div>
+  <div class="step-item"><div class="step-icon">💻</div><p class="step-name">개발</p><p class="step-desc">안정적으로 구현해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">🚀</div><p class="step-name">배포·운영</p></div>
+  <div class="step-item"><div class="step-icon">🚀</div><p class="step-name">배포·운영</p><p class="step-desc">오픈하고 운영을 지원해요</p></div>
 </div>
 
+  </section>
+
+  <section class="section tight">
+    <p class="section-eyebrow">Sound Familiar?</p>
+    <p class="section-title">이런 순간, <b>있으셨죠</b></p>
+    <div class="hook-list">
+      <div class="hook-item">알고리즘 눈치 보느라 콘텐츠 방향까지 바뀌셨나요?</div>
+      <div class="hook-item">열심히 올렸는데 다음 날 묻혀서 허탈하셨나요?</div>
+      <div class="hook-item">계정 정지될까봐 조마조마했던 적 있으셨나요?</div>
+      <div class="hook-item">SNS 프로필에 링크 하나 걸 곳이 마땅치 않으셨나요?</div>
+      <div class="hook-item">내 콘텐츠인데 정작 내 마음대로 못 한다고 느끼셨나요?</div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <p class="section-eyebrow">No Code Needed</p>
+    <p class="section-title">SNS 쓰듯, <b>그대로 옮기면 돼요</b></p>
+    <div class="hook-list">
+      <div class="hook-item">SNS에 쓰던 것처럼 글 쓰고 사진 올리면 끝이에요</div>
+      <div class="hook-item">레이아웃 걱정 없이, 있는 그대로 채우기만 하면 돼요</div>
+      <div class="hook-item">새 글 쓰는 데 코드 지식은 전혀 필요 없어요</div>
+    </div>
   </section>
 
   <section class="section tight">
@@ -197,7 +305,13 @@
   </section>
 
   
-<section class="cta-section">
+
+  <section class="section tight">
+    <p class="section-title">자주 묻는 질문</p>
+    <div class="faq-list"><div class="faq-item"><p class="faq-q">Q. SNS 활동을 그만둬야 하나요?</p><p class="faq-a">A. 아니요, SNS는 그대로 하시고 홈페이지로 연결만 하시면 돼요.</p></div><div class="faq-item"><p class="faq-q">Q. 검색에 노출되게 하려면 뭘 해야 하나요?</p><p class="faq-a">A. 기본적인 SEO 세팅은 제작 시 함께 진행해드려요.</p></div><div class="faq-item"><p class="faq-q">Q. 기존 콘텐츠를 옮기는 것도 도와주시나요?</p><p class="faq-a">A. 네, 기존에 쓰신 글이나 자료를 최대한 활용해서 옮겨드려요.</p></div></div>
+  </section>
+
+  <section class="cta-section">
   <div class="cta-text">
     <h3>지금 바로 확정 가격을 확인해보세요</h3>
     <p>복잡한 상담 없이, 필요한 범위와 옵션을 선택하면 바로 확인할 수 있습니다.</p>

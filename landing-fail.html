@@ -127,6 +127,39 @@
     .step-arrow { display: none; }
     .hero.dark { padding: 40px 24px 48px; margin: 0 -24px; }
   }
+
+  /* Before/After */
+  .ba-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:center; margin-top:4px; }
+  .ba-box { border-radius:14px; padding:20px; }
+  .ba-box--before { background:#EFEBE2; }
+  .ba-box--after { background:var(--green); }
+  .ba-label { font-size:11px; font-weight:800; margin:0 0 10px; }
+  .ba-box--before .ba-label { color:var(--muted); }
+  .ba-box--after .ba-label { color:rgba(245,242,237,.7); }
+  .ba-text { font-size:13px; line-height:1.6; margin:0; }
+  .ba-box--before .ba-text { color:var(--text); font-weight:600; }
+  .ba-box--after .ba-text { color:#fff; font-weight:600; }
+  .ba-arrow { font-size:18px; color:var(--green); font-weight:800; text-align:center; }
+
+  /* FAQ */
+  .faq-list { display:flex; flex-direction:column; gap:10px; }
+  .faq-item { background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px 18px; }
+  .faq-q { font-size:14px; font-weight:800; color:var(--green); margin:0 0 6px; }
+  .faq-a { font-size:13px; color:var(--muted); margin:0; line-height:1.6; }
+
+  /* 프로세스 한 줄 설명 */
+  .step-desc { font-size:11px; color:var(--muted); line-height:1.5; margin:6px 0 0; }
+
+  @media (max-width: 640px) {
+    .ba-grid { grid-template-columns: 1fr; }
+    .ba-arrow { transform: rotate(90deg); }
+  }
+
+  .hook-item--more {
+    background: transparent; border: none; border-left: none;
+    font-size: 13px; font-weight: 500; font-style: italic; color: var(--muted);
+    padding: 8px 20px; text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -154,21 +187,59 @@
   </section>
 
   <section class="section tight">
+    <p class="section-eyebrow">Before / After</p>
+    <p class="section-title">이번엔 <b>다른 방식</b>으로 진행돼요</p>
+    <div class="ba-grid">
+      <div class="ba-box ba-box--before">
+        <p class="ba-label">예전 방식</p>
+        <p class="ba-text">담당자 따로, 소통 따로, 결국 중간에 멈춤</p>
+      </div>
+      <span class="ba-arrow">→</span>
+      <div class="ba-box ba-box--after">
+        <p class="ba-label">마침에서는</p>
+        <p class="ba-text">한 팀이 기획부터 배포까지 끝까지 진행</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
     <p class="section-title">한 팀이 <b>끝까지</b> 책임집니다</p>
     <div class="hook-list">
       <div class="hook-item">✅ 지금 가지고 계신 시안·코드·도메인, 최대한 살려서 이어받아요</div>
     </div>
     
 <div class="step-flow">
-  <div class="step-item"><div class="step-icon">💬</div><p class="step-name">상담</p></div>
+  <div class="step-item"><div class="step-icon">💬</div><p class="step-name">상담</p><p class="step-desc">목표와 방향을 정리해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">🎨</div><p class="step-name">기획·디자인</p></div>
+  <div class="step-item"><div class="step-icon">🎨</div><p class="step-name">기획·디자인</p><p class="step-desc">구조와 화면을 설계해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">💻</div><p class="step-name">개발</p></div>
+  <div class="step-item"><div class="step-icon">💻</div><p class="step-name">개발</p><p class="step-desc">안정적으로 구현해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">🚀</div><p class="step-name">배포·운영</p></div>
+  <div class="step-item"><div class="step-icon">🚀</div><p class="step-name">배포·운영</p><p class="step-desc">오픈하고 운영을 지원해요</p></div>
 </div>
 
+  </section>
+
+  <section class="section tight">
+    <p class="section-eyebrow">Sound Familiar?</p>
+    <p class="section-title">이런 마음, <b>이해해요</b></p>
+    <div class="hook-list">
+      <div class="hook-item">다시 시작하기가 두려우신가요?</div>
+      <div class="hook-item">또 사기당할까봐 아무나 못 믿으시겠나요?</div>
+      <div class="hook-item">돈 얘기 꺼내기도 지치셨나요?</div>
+      <div class="hook-item">이번엔 제대로 확인하고 시작하고 싶으신가요?</div>
+      <div class="hook-item">완성된 모습을 한 번도 못 봐서 답답하셨나요?</div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <p class="section-eyebrow">No Code Needed</p>
+    <p class="section-title">완성 후엔 <b>직접 관리</b>도 쉬워요</p>
+    <div class="hook-list">
+      <div class="hook-item">완성 후에는 글이나 사진도 직접 쉽게 바꾸실 수 있어요</div>
+      <div class="hook-item">코드를 몰라도 관리자 화면에서 클릭 몇 번이면 끝나요</div>
+      <div class="hook-item">또 누군가에게 맡기지 않아도, 스스로 유지관리 가능해요</div>
+    </div>
   </section>
 
   <section class="section tight">
@@ -179,7 +250,13 @@
   </section>
 
   
-<section class="cta-section">
+
+  <section class="section tight">
+    <p class="section-title">자주 묻는 질문</p>
+    <div class="faq-list"><div class="faq-item"><p class="faq-q">Q. 기존 시안이나 코드가 있는데 활용 가능한가요?</p><p class="faq-a">A. 네, 최대한 살려서 이어받아 진행해요.</p></div><div class="faq-item"><p class="faq-q">Q. 예전 업체와 연락이 안 되는데 괜찮나요?</p><p class="faq-a">A. 네, 지금 갖고 계신 자료만으로도 이어서 진행 가능해요.</p></div><div class="faq-item"><p class="faq-q">Q. 계약금을 또 날릴까 걱정돼요.</p><p class="faq-a">A. 착수금 50%는 계약 확정 후, 잔금은 결과물 확인 후 결제하는 구조라 안심하셔도 돼요.</p></div></div>
+  </section>
+
+  <section class="cta-section">
   <div class="cta-text">
     <h3>지금 바로 확정 가격을 확인해보세요</h3>
     <p>복잡한 상담 없이, 필요한 범위와 옵션을 선택하면 바로 확인할 수 있습니다.</p>

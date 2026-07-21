@@ -61,6 +61,11 @@
     background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--green);
     border-radius: 10px; padding: 18px 20px; font-size: 16px; font-weight: 700; color: var(--text);
   }
+  .hook-item--more {
+    background: transparent; border: none; border-left: none;
+    font-size: 13px; font-weight: 500; font-style: italic; color: var(--muted);
+    padding: 8px 20px; text-align: center;
+  }
 
   /* 좌우 대비 (플랫폼형 전용) */
   .split-compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin: 20px 0; }
@@ -127,6 +132,39 @@
     .step-arrow { display: none; }
     .hero.dark { padding: 40px 24px 48px; margin: 0 -24px; }
   }
+
+  /* Before/After */
+  .ba-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:center; margin-top:4px; }
+  .ba-box { border-radius:14px; padding:20px; }
+  .ba-box--before { background:#EFEBE2; }
+  .ba-box--after { background:var(--green); }
+  .ba-label { font-size:11px; font-weight:800; margin:0 0 10px; }
+  .ba-box--before .ba-label { color:var(--muted); }
+  .ba-box--after .ba-label { color:rgba(245,242,237,.7); }
+  .ba-text { font-size:13px; line-height:1.6; margin:0; }
+  .ba-box--before .ba-text { color:var(--text); font-weight:600; }
+  .ba-box--after .ba-text { color:#fff; font-weight:600; }
+  .ba-arrow { font-size:18px; color:var(--green); font-weight:800; text-align:center; }
+
+  /* FAQ */
+  .faq-list { display:flex; flex-direction:column; gap:10px; }
+  .faq-item { background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px 18px; }
+  .faq-q { font-size:14px; font-weight:800; color:var(--green); margin:0 0 6px; }
+  .faq-a { font-size:13px; color:var(--muted); margin:0; line-height:1.6; }
+
+  /* 프로세스 한 줄 설명 */
+  .step-desc { font-size:11px; color:var(--muted); line-height:1.5; margin:6px 0 0; }
+
+  @media (max-width: 640px) {
+    .ba-grid { grid-template-columns: 1fr; }
+    .ba-arrow { transform: rotate(90deg); }
+  }
+
+  .hook-item--more {
+    background: transparent; border: none; border-left: none;
+    font-size: 13px; font-weight: 500; font-style: italic; color: var(--muted);
+    padding: 8px 20px; text-align: center;
+  }
 </style>
 </head>
 <body>
@@ -151,6 +189,22 @@
   </section>
 
   <section class="section tight">
+    <p class="section-eyebrow">Before / After</p>
+    <p class="section-title">광고 대신 <b>이런 구조</b>로 바뀌어요</p>
+    <div class="ba-grid">
+      <div class="ba-box ba-box--before">
+        <p class="ba-label">광고 끄는 순간</p>
+        <p class="ba-text">유입도 함께 끊김, 매달 반복 지출</p>
+      </div>
+      <span class="ba-arrow">→</span>
+      <div class="ba-box ba-box--after">
+        <p class="ba-label">홈페이지가 있으면</p>
+        <p class="ba-text">콘텐츠가 쌓일수록 자연 유입 증가</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
     <p class="section-eyebrow">The Difference</p>
     <p class="section-title"><b>광고비</b>는 사라지지만, <b>홈페이지</b>는 계속 남아요</p>
     <div class="stat-strip">
@@ -166,18 +220,58 @@
   </section>
 
   <section class="section tight">
+    <p class="section-eyebrow">Not Just Local</p>
+    <p class="section-title">동네가 아니라, <b>전국이 상권</b>이 됩니다</p>
+    <div class="hook-list">
+      <div class="hook-item">🏢 부동산 투자 물건, 동네 손님만 기다리지 말고 전국의 투자자를 홈페이지로 모아보세요</div>
+      <div class="hook-item">🛡 보험 상담, 소개에만 기대지 말고 필요한 사람이 검색해서 먼저 찾아오게 하세요</div>
+      <div class="hook-item">📚 학습지·아동도서, 전단지 대신 검색으로 학부모가 찾아오는 구조를 만드세요</div>
+      <div class="hook-item">🛋 전국구 인테리어 시공, 한 지역이 아니라 전국 어디서든 문의가 오게 하세요</div>
+      <div class="hook-item">💄 기능성 화장품, 성분·효능을 제대로 설명할 내 공간이 필요할 때</div>
+      <div class="hook-item">⚖️ 변호사·법무사, 전문 상담이 필요한 사람이 검색으로 먼저 찾아오게</div>
+      <div class="hook-item">💒 웨딩플래너, 전국 예비부부가 포트폴리오를 보고 문의하게</div>
+      <div class="hook-item">🐾 반려동물 훈련사·펫시터, 전국 출장 서비스도 지역 제한 없이 알려요</div>
+      <div class="hook-item">🎓 온라인 과외·강사, 지역 상관없이 어디서든 수강생을 모아요</div>
+      <div class="hook-item">🏡 농산물 직거래 농가, 전국 어디든 배송 가능한 단골을 만들어요</div>
+      <div class="hook-item hook-item--more">· · · 어떤 업종이든, 찾는 사람이 있다면 홈페이지가 답이 될 수 있어요</div>
+    </div>
+  </section>
+
+  <section class="section tight">
     <p class="section-title">고객이 찾아오는 구조, <b>원스톱</b>으로 설계해요</p>
     
 <div class="step-flow">
-  <div class="step-item"><div class="step-icon">💬</div><p class="step-name">상담</p></div>
+  <div class="step-item"><div class="step-icon">💬</div><p class="step-name">상담</p><p class="step-desc">목표와 방향을 정리해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">🎨</div><p class="step-name">기획·디자인</p></div>
+  <div class="step-item"><div class="step-icon">🎨</div><p class="step-name">기획·디자인</p><p class="step-desc">구조와 화면을 설계해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">💻</div><p class="step-name">개발</p></div>
+  <div class="step-item"><div class="step-icon">💻</div><p class="step-name">개발</p><p class="step-desc">안정적으로 구현해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">🚀</div><p class="step-name">배포·운영</p></div>
+  <div class="step-item"><div class="step-icon">🚀</div><p class="step-name">배포·운영</p><p class="step-desc">오픈하고 운영을 지원해요</p></div>
 </div>
 
+  </section>
+
+  <section class="section tight">
+    <p class="section-eyebrow">Sound Familiar?</p>
+    <p class="section-title">이런 고민, <b>많이들 하세요</b></p>
+    <div class="hook-list">
+      <div class="hook-item">매달 광고비 나가는데 효과가 들쭉날쭉해서 불안하셨나요?</div>
+      <div class="hook-item">소개·입소문에만 의존하다 일이 끊길까 늘 걱정되셨나요?</div>
+      <div class="hook-item">고객 DB 사놓고 전화·문자 돌리는 게 지치셨나요?</div>
+      <div class="hook-item">경쟁업체는 이미 검색 상단에 있는데 나만 없다고 느끼셨나요?</div>
+      <div class="hook-item">바빠서 마케팅에 신경 쓸 시간이 없으셨나요?</div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <p class="section-eyebrow">No Code Needed</p>
+    <p class="section-title">상품·가격 관리도 <b>직접 하실 수 있어요</b></p>
+    <div class="hook-list">
+      <div class="hook-item">상품·가격이 바뀌어도 개발자 안 불러도 돼요</div>
+      <div class="hook-item">사진 교체, 공지 작성 다 직접 하실 수 있어요</div>
+      <div class="hook-item">관리자 화면에서 클릭 몇 번이면 끝나요</div>
+    </div>
   </section>
 
   <section class="section tight">
@@ -188,7 +282,13 @@
   </section>
 
   
-<section class="cta-section">
+
+  <section class="section tight">
+    <p class="section-title">자주 묻는 질문</p>
+    <div class="faq-list"><div class="faq-item"><p class="faq-q">Q. 이미 있는 로고·사진을 써도 되나요?</p><p class="faq-a">A. 네, 최대한 살려서 제작해드려요.</p></div><div class="faq-item"><p class="faq-q">Q. 결제(카드) 기능도 넣을 수 있나요?</p><p class="faq-a">A. 네, 다만 카드사 심사 절차가 별도로 필요해요.</p></div><div class="faq-item"><p class="faq-q">Q. 완성 후에 사진이나 가격을 직접 바꿀 수 있나요?</p><p class="faq-a">A. 네, 코드를 몰라도 관리자 화면에서 클릭 몇 번으로 바로 수정하실 수 있어요.</p></div></div>
+  </section>
+
+  <section class="cta-section">
   <div class="cta-text">
     <h3>지금 바로 확정 가격을 확인해보세요</h3>
     <p>복잡한 상담 없이, 필요한 범위와 옵션을 선택하면 바로 확인할 수 있습니다.</p>

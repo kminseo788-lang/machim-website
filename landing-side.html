@@ -61,6 +61,11 @@
     background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--green);
     border-radius: 10px; padding: 18px 20px; font-size: 16px; font-weight: 700; color: var(--text);
   }
+  .hook-item--more {
+    background: transparent; border: none; border-left: none;
+    font-size: 13px; font-weight: 500; font-style: italic; color: var(--muted);
+    padding: 8px 20px; text-align: center;
+  }
 
   /* 좌우 대비 (플랫폼형 전용) */
   .split-compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin: 20px 0; }
@@ -127,6 +132,33 @@
     .step-arrow { display: none; }
     .hero.dark { padding: 40px 24px 48px; margin: 0 -24px; }
   }
+
+  /* Before/After */
+  .ba-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:center; margin-top:4px; }
+  .ba-box { border-radius:14px; padding:20px; }
+  .ba-box--before { background:#EFEBE2; }
+  .ba-box--after { background:var(--green); }
+  .ba-label { font-size:11px; font-weight:800; margin:0 0 10px; }
+  .ba-box--before .ba-label { color:var(--muted); }
+  .ba-box--after .ba-label { color:rgba(245,242,237,.7); }
+  .ba-text { font-size:13px; line-height:1.6; margin:0; }
+  .ba-box--before .ba-text { color:var(--text); font-weight:600; }
+  .ba-box--after .ba-text { color:#fff; font-weight:600; }
+  .ba-arrow { font-size:18px; color:var(--green); font-weight:800; text-align:center; }
+
+  /* FAQ */
+  .faq-list { display:flex; flex-direction:column; gap:10px; }
+  .faq-item { background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px 18px; }
+  .faq-q { font-size:14px; font-weight:800; color:var(--green); margin:0 0 6px; }
+  .faq-a { font-size:13px; color:var(--muted); margin:0; line-height:1.6; }
+
+  /* 프로세스 한 줄 설명 */
+  .step-desc { font-size:11px; color:var(--muted); line-height:1.5; margin:6px 0 0; }
+
+  @media (max-width: 640px) {
+    .ba-grid { grid-template-columns: 1fr; }
+    .ba-arrow { transform: rotate(90deg); }
+  }
 </style>
 </head>
 <body>
@@ -151,6 +183,22 @@
   </section>
 
   <section class="section tight">
+    <p class="section-eyebrow">Before / After</p>
+    <p class="section-title">홈페이지 하나가 <b>이렇게</b> 달라지게 해요</p>
+    <div class="ba-grid">
+      <div class="ba-box ba-box--before">
+        <p class="ba-label">지금까지</p>
+        <p class="ba-text">가입비 내고 나면 끝, 수익은 남 얘기</p>
+      </div>
+      <span class="ba-arrow">→</span>
+      <div class="ba-box ba-box--after">
+        <p class="ba-label">홈페이지가 있으면</p>
+        <p class="ba-text">내 콘텐츠·내 상품으로 직접 수익화</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
     <p class="section-eyebrow">The Alternative</p>
     <p class="section-title">홈페이지 하나로 <b>내 자산</b>을 시작할 수 있어요</p>
     <div class="chip-row">
@@ -159,18 +207,55 @@
   </section>
 
   <section class="section tight">
+    <p class="section-eyebrow">"나도 책을 쓸 수 있을까?"</p>
+    <p class="section-title">어떤 소재든, <b>책이 될 수 있어요</b></p>
+    <div class="hook-list">
+      <div class="hook-item">📖 당신만 아는 분야가 있다면, 그걸 필요로 하는 사람은 어딘가 있어요</div>
+      <div class="hook-item">✍️ 글 써서 올려두면, 주소 하나만 홍보해도 필요한 사람들이 알아서 찾아와요</div>
+      <div class="hook-item">🔗 제휴마케팅도 마찬가지예요 — 내가 써본 제품을 소개하고 연결만 해줘도 수수료가 쌓여요</div>
+      <div class="hook-item">📰 뉴스레터 유료 구독 — 전문 정보를 정기적으로 발행하고 구독료를 받아요</div>
+      <div class="hook-item">📐 템플릿·양식 판매 — 노션, 엑셀, PDF 등 내가 만든 서식을 파는 것도 콘텐츠예요</div>
+      <div class="hook-item">🔔 원데이클래스·상담 예약 페이지 — 시간 정해서 예약받고 진행하는 방식도 가능해요</div>
+      <div class="hook-item">👥 유료 멤버십·커뮤니티 — 매달 구독료를 받고 정보·모임을 운영할 수 있어요</div>
+      <div class="hook-item hook-item--more">· · · 내가 잘 아는 것이 있다면, 그걸 돈으로 바꾸는 방법은 무궁무진해요</div>
+    </div>
+  </section>
+
+  <section class="section tight">
     <p class="section-title">기획부터 배포까지, <b>원스톱</b>으로</p>
     
 <div class="step-flow">
-  <div class="step-item"><div class="step-icon">💬</div><p class="step-name">상담</p></div>
+  <div class="step-item"><div class="step-icon">💬</div><p class="step-name">상담</p><p class="step-desc">목표와 방향을 정리해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">🎨</div><p class="step-name">기획·디자인</p></div>
+  <div class="step-item"><div class="step-icon">🎨</div><p class="step-name">기획·디자인</p><p class="step-desc">구조와 화면을 설계해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">💻</div><p class="step-name">개발</p></div>
+  <div class="step-item"><div class="step-icon">💻</div><p class="step-name">개발</p><p class="step-desc">안정적으로 구현해요</p></div>
   <span class="step-arrow">→</span>
-  <div class="step-item"><div class="step-icon">🚀</div><p class="step-name">배포·운영</p></div>
+  <div class="step-item"><div class="step-icon">🚀</div><p class="step-name">배포·운영</p><p class="step-desc">오픈하고 운영을 지원해요</p></div>
 </div>
 
+  </section>
+
+  <section class="section tight">
+    <p class="section-eyebrow">Sound Familiar?</p>
+    <p class="section-title">이런 분들, <b>정말 많아요</b></p>
+    <div class="hook-list">
+      <div class="hook-item">⏰ 시간이 없어서 부업은 꿈도 못 꾸셨나요? 짬짬이 글 하나씩 쌓아가는 방식이라 내 페이스대로 가능해요</div>
+      <div class="hook-item">😮‍💨 회사 스트레스에 뭘 더 시작할 에너지가 없으셨나요? 한번 만들어두면 그다음부터는 훨씬 가벼워요</div>
+      <div class="hook-item">🔄 이것저것 시도했지만 흐지부지 끝났나요? 이번엔 링크 하나로 남는, 사라지지 않는 방식이에요</div>
+      <div class="hook-item">🌙 아이 재우고 나서야 겨우 시간이 나시나요? 그 짧은 시간에도 충분히 시작할 수 있어요</div>
+      <div class="hook-item">🤫 회사 다니면서 조용히 준비하고 싶으신가요? 완전히 개인 공간이라 눈치 볼 필요 없어요</div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <p class="section-eyebrow">No Code Needed</p>
+    <p class="section-title">운영도 <b>어렵지 않아요</b></p>
+    <div class="hook-list">
+      <div class="hook-item">💻 복잡한 코드는 몰라도 돼요 — 첨부파일 누르고 사진만 올리면 끝이에요</div>
+      <div class="hook-item">✍️ 블로그 쓰듯 글 쓰고 저장 버튼만 누르면, 바로 홈페이지에 반영돼요</div>
+      <div class="hook-item">🔁 내용이 바뀌어도 걱정 마세요 — 사진 갈아 끼우고 글자만 고치면 돼요</div>
+    </div>
   </section>
 
   <section class="section tight">
@@ -181,7 +266,13 @@
   </section>
 
   
-<section class="cta-section">
+
+  <section class="section tight">
+    <p class="section-title">자주 묻는 질문</p>
+    <div class="faq-list"><div class="faq-item"><p class="faq-q">Q. 사업자등록 없이도 시작할 수 있나요?</p><p class="faq-a">A. 네, 제휴마케팅·전자책 판매 등은 사업자등록 없이도 가능한 모델이에요.</p></div><div class="faq-item"><p class="faq-q">Q. 컴퓨터를 잘 몰라도 운영할 수 있나요?</p><p class="faq-a">A. 처음 세팅은 저희가 다 해드리고, 이후엔 글이나 사진만 올리시면 되도록 만들어드려요.</p></div><div class="faq-item"><p class="faq-q">Q. 얼마나 걸리나요?</p><p class="faq-a">A. 상품 유형에 따라 다른데, 견적 페이지에서 바로 확인 가능해요.</p></div></div>
+  </section>
+
+  <section class="cta-section">
   <div class="cta-text">
     <h3>지금 바로 확정 가격을 확인해보세요</h3>
     <p>복잡한 상담 없이, 필요한 범위와 옵션을 선택하면 바로 확인할 수 있습니다.</p>
