@@ -52,7 +52,10 @@
      </div>
       <a href="landing-side.html" class="hero-funnel-btn" id="funnel-side">
         <span class="hero-funnel-btn__dot"></span>
-        지금은 1인 1홈페이지 시대 — 남들은 자는 동안에도 자산을 만듭니다
+        <span class="hero-funnel-btn__text">
+          <span class="hero-funnel-btn__line1">지금은 1인 1홈페이지 시대</span>
+          <span class="hero-funnel-btn__line2">홈페이지가 있는 사람은 자는 동안에도 자산을 만듭니다</span>
+        </span>
         <span class="hero-funnel-btn__arrow">→</span>
       </a>
     </div>
@@ -226,7 +229,10 @@
 
 <!-- 손실회피 티커 1 -->
 <a href="landing-need.html" class="pf-ticker" id="funnel-need">
-  <span class="pf-ticker-text">아직도 고객 데이터 몇만원씩 주고 구매하고 계신가요? <em>내 홈페이지에 관심고객이 알아서 찾아와 모이는 구조를 만들어보세요</em></span>
+  <span class="pf-ticker-text">
+    <span class="pf-ticker-line1">아직도 고객 데이터 몇만원씩 주고 구매하고 계신가요?</span>
+    <span class="pf-ticker-line2">내 홈페이지에 관심고객이 알아서 찾아와 모이는 구조를 만들어보세요</span>
+  </span>
   <span class="pf-ticker-arrow">확인하기 →</span>
 </a>
 
@@ -355,7 +361,10 @@
 
 <!-- 손실회피 티커 2 -->
 <a href="landing-compare.html" class="pf-ticker" id="funnel-compare">
-  <span class="pf-ticker-text">견적만 받다가 시간만 지나고 계신가요? <em>복잡한 비교보다 명확한 프로세스를 확인해보세요</em></span>
+  <span class="pf-ticker-text">
+    <span class="pf-ticker-line1">견적만 받다가 시간만 지나고 계신가요?</span>
+    <span class="pf-ticker-line2">복잡한 비교보다 명확한 프로세스를 확인해보세요</span>
+  </span>
   <span class="pf-ticker-arrow">비교하기 →</span>
 </a>
 
@@ -444,30 +453,21 @@
 .pf-ticker {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 16px;
-  flex-wrap: wrap;
   text-decoration: none;
   background: #1B4332;
-  border-radius: 999px;
-  padding: 18px 32px;
-  max-width: 920px;
+  border-radius: 16px;
+  padding: 18px 28px;
+  max-width: 620px;
   margin: 48px auto;
   box-shadow: 0 10px 28px rgba(27,67,50,.3);
   transition: transform .15s, box-shadow .15s;
 }
-.pf-ticker:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 14px 34px rgba(27,67,50,.38); }
-.pf-ticker-text {
-  font-size: 15px;
-  font-weight: 800;
-  color: #fff;
-}
-.pf-ticker-text em {
-  font-style: normal;
-  font-weight: 400;
-  color: rgba(245,242,237,.75);
-  margin-left: 8px;
-}
+.pf-ticker:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(27,67,50,.38); }
+.pf-ticker-text { display: flex; flex-direction: column; gap: 4px; }
+.pf-ticker-line1 { font-size: 15px; font-weight: 800; color: #fff; }
+.pf-ticker-line2 { font-size: 12px; font-weight: 400; color: rgba(245,242,237,.7); }
 .pf-ticker-arrow {
   font-size: 13px;
   font-weight: 800;
@@ -479,33 +479,37 @@
   flex-shrink: 0;
 }
 @media (max-width: 640px) {
-  .pf-ticker { margin: 32px 16px; padding: 16px 22px; }
-  .pf-ticker-text em { display: block; margin-left: 0; margin-top: 3px; }
+  .pf-ticker { margin: 32px 16px; padding: 16px 20px; flex-direction: column; align-items: flex-start; }
+  .pf-ticker-arrow { align-self: flex-end; }
 }
 
 /* 히어로 퍼널 버튼 (부업형 랜딩 연결) */
 .hero-funnel-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-top: 18px;
   background: #fff;
   border: 1.5px solid #1B4332;
   color: #1B4332;
-  font-size: 14px;
-  font-weight: 800;
   padding: 12px 20px;
-  border-radius: 999px;
+  border-radius: 16px;
   text-decoration: none;
   transition: all .15s;
 }
-.hero-funnel-btn:hover { background: #1B4332; color: #fff; transform: translateY(-2px); }
+.hero-funnel-btn:hover { background: #1B4332; transform: translateY(-2px); }
+.hero-funnel-btn:hover .hero-funnel-btn__line1,
+.hero-funnel-btn:hover .hero-funnel-btn__line2 { color: #fff; }
+.hero-funnel-btn__text { display: flex; flex-direction: column; gap: 2px; }
+.hero-funnel-btn__line1 { font-size: 14px; font-weight: 800; color: #1B4332; }
+.hero-funnel-btn__line2 { font-size: 12px; font-weight: 500; color: #5C7A6D; }
 .hero-funnel-btn__dot {
   width: 8px; height: 8px; border-radius: 50%; background: #1B4332; flex-shrink: 0;
   transition: background .15s;
 }
 .hero-funnel-btn:hover .hero-funnel-btn__dot { background: #fff; }
-.hero-funnel-btn__arrow { font-weight: 800; }
+.hero-funnel-btn__arrow { font-weight: 800; flex-shrink: 0; }
+.hero-funnel-btn:hover .hero-funnel-btn__arrow { color: #fff; }
 </style>
 
 <!-- ===== 서비스 모달들 ===== -->
