@@ -155,6 +155,46 @@
   /* 프로세스 한 줄 설명 */
   .step-desc { font-size:11px; color:var(--muted); line-height:1.5; margin:6px 0 0; }
 
+  /* 몰라도 된다 안심 박스 */
+  .reassure-box {
+    background: var(--panel); border-radius: 16px; padding: 26px 24px; margin-top: 4px;
+  }
+  .reassure-box__title { font-size: 17px; font-weight: 800; color: var(--green); margin: 0 0 10px; }
+  .reassure-box__desc { font-size: 13px; color: var(--muted); line-height: 1.75; margin: 0; }
+
+  /* 4가지 수익화 유형 카드 */
+  .type-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .type-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 18px;
+  }
+  .type-card__label { font-size: 13px; font-weight: 800; color: var(--green); margin: 0 0 6px; }
+  .type-card__desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin: 0; }
+  @media (max-width: 640px) { .type-grid2 { grid-template-columns: 1fr; } }
+
+  /* 퀴즈형 CTA */
+  .quiz-intro { text-align: center; }
+  .quiz-intro__title { font-size: 18px; font-weight: 800; color: var(--green); margin: 0 0 8px; }
+  .quiz-intro__desc { font-size: 13px; color: var(--muted); margin: 0 0 20px; }
+  .quiz-btn {
+    background: var(--green); color: #fff; border: none; padding: 14px 28px;
+    border-radius: 999px; font-size: 14px; font-weight: 800; cursor: pointer;
+  }
+  .quiz-options { display: none; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .quiz-options.open { display: flex; }
+  .quiz-option {
+    background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 16px 18px;
+    text-align: left; cursor: pointer; font-size: 14px; font-weight: 700; color: var(--text);
+    transition: border-color .15s;
+  }
+  .quiz-option:hover { border-color: var(--green); }
+  .quiz-result { display: none; background: var(--green); border-radius: 14px; padding: 22px; margin-top: 16px; text-align: left; }
+  .quiz-result.open { display: block; }
+  .quiz-result__text { font-size: 14px; color: #fff; line-height: 1.7; margin: 0 0 16px; }
+  .quiz-result__btn {
+    display: inline-block; background: #fff; color: var(--green); padding: 12px 24px;
+    border-radius: 10px; font-size: 13px; font-weight: 800; text-decoration: none;
+  }
+
   @media (max-width: 640px) {
     .ba-grid { grid-template-columns: 1fr; }
     .ba-arrow { transform: rotate(90deg); }
@@ -170,6 +210,13 @@
     <span class="hero-badge">시간 날 때 부수입을 원하신다면</span>
     <h1 class="hero-title">지금은<br>1인 1홈페이지 시대</h1>
     <p class="hero-sub">남들은 홈페이지 하나로 자는 동안에도 자산을 만들고 있습니다.</p>
+  </section>
+
+  <section class="section tight">
+    <div class="reassure-box">
+      <p class="reassure-box__title">💡 아직 뭘 팔지 몰라도 괜찮아요</p>
+      <p class="reassure-box__desc">"팔 아이템도 없는데 무슨 홈페이지"라고 생각하셨다면, 그게 오히려 가장 흔한 시작점이에요. 지금 하고 계신 일, 잘 아는 분야, 갖고 계신 경험을 정리하는 것부터가 시작이에요. 아래에서 나한테 맞는 방식을 먼저 찾아보세요.</p>
+    </div>
   </section>
 
   <section class="section tight">
@@ -200,9 +247,24 @@
 
   <section class="section tight">
     <p class="section-eyebrow">The Alternative</p>
-    <p class="section-title">홈페이지 하나로 <b>내 자산</b>을 시작할 수 있어요</p>
-    <div class="chip-row">
-      <span class="chip">💰 제휴마케팅 (사업자등록 없이도)</span><span class="chip">📖 전자책·콘텐츠 판매</span><span class="chip">🎬 온라인 클래스</span><span class="chip">🪪 개인 브랜드 포트폴리오</span>
+    <p class="section-title">나는 <b>어떤 유형</b>에 가까울까요?</p>
+    <div class="type-grid2">
+      <div class="type-card">
+        <p class="type-card__label">📚 지식이 있다면</p>
+        <p class="type-card__desc">전자책, 자료, 템플릿, 온라인 콘텐츠 판매</p>
+      </div>
+      <div class="type-card">
+        <p class="type-card__label">💬 사람을 상대하는 일을 한다면</p>
+        <p class="type-card__desc">상담 신청, 예약, 견적 문의, 고객 DB 수집</p>
+      </div>
+      <div class="type-card">
+        <p class="type-card__label">🔗 제품을 추천할 수 있다면</p>
+        <p class="type-card__desc">제휴마케팅, 큐레이션 사이트, 추천 콘텐츠</p>
+      </div>
+      <div class="type-card">
+        <p class="type-card__label">🎓 경력이나 재능이 있다면</p>
+        <p class="type-card__desc">포트폴리오, 강의, 코칭, 개인 브랜드</p>
+      </div>
     </div>
   </section>
 
@@ -269,16 +331,54 @@
 
   <section class="section tight">
     <p class="section-title">자주 묻는 질문</p>
-    <div class="faq-list"><div class="faq-item"><p class="faq-q">Q. 사업자등록 없이도 시작할 수 있나요?</p><p class="faq-a">A. 네, 제휴마케팅·전자책 판매 등은 사업자등록 없이도 가능한 모델이에요.</p></div><div class="faq-item"><p class="faq-q">Q. 컴퓨터를 잘 몰라도 운영할 수 있나요?</p><p class="faq-a">A. 처음 세팅은 저희가 다 해드리고, 이후엔 글이나 사진만 올리시면 되도록 만들어드려요.</p></div><div class="faq-item"><p class="faq-q">Q. 얼마나 걸리나요?</p><p class="faq-a">A. 상품 유형에 따라 다른데, 견적 페이지에서 바로 확인 가능해요.</p></div></div>
+    <div class="faq-list"><div class="faq-item"><p class="faq-q">Q. 블로그가 있는데 왜 홈페이지가 필요하죠?</p><p class="faq-a">A. 플랫폼은 정책이 바뀌고 언젠가 사라지기도 해요. 내 홈페이지는 시간이 지나도, 수정을 해도 계속 남아있는 내 공간이에요.</p></div><div class="faq-item"><p class="faq-q">Q. AI로 직접 만들면 되지 않나요?</p><p class="faq-a">A. AI는 도구일 뿐이에요. 구조와 원리를 모르면 나중에 수정하거나 문제가 생겼을 때 대응하기 어려워요. 결국 아는 사람에게 다시 맡기게 되는 경우가 많아요.</p></div><div class="faq-item"><p class="faq-q">Q. 홍보는 결국 제가 직접 해야 하는 거 아닌가요?</p><p class="faq-a">A. 맞아요, 홍보 자체를 대신해드릴 수는 없어요. 다만 홈페이지는 SNS·블로그·유튜브 어디든 연결되고, 한번 올린 콘텐츠가 계속 쌓이는 구조가 돼요.</p></div><div class="faq-item"><p class="faq-q">Q. 사업자등록 없이도 시작할 수 있나요?</p><p class="faq-a">A. 네, 제휴마케팅·전자책 판매 등은 사업자등록 없이도 가능한 모델이에요.</p></div><div class="faq-item"><p class="faq-q">Q. 컴퓨터를 잘 몰라도 운영할 수 있나요?</p><p class="faq-a">A. 처음 세팅은 저희가 다 해드리고, 이후엔 글이나 사진만 올리시면 되도록 만들어드려요.</p></div><div class="faq-item"><p class="faq-q">Q. 얼마나 걸리나요?</p><p class="faq-a">A. 상품 유형에 따라 다른데, 견적 페이지에서 바로 확인 가능해요.</p></div></div>
   </section>
 
-  <section class="cta-section">
-  <div class="cta-text">
-    <h3>지금 바로 확정 가격을 확인해보세요</h3>
-    <p>복잡한 상담 없이, 필요한 범위와 옵션을 선택하면 바로 확인할 수 있습니다.</p>
-  </div>
-  <a href="estimate.html" class="cta-btn">가격 확인하러 가기 →</a>
-</section>
+  <section class="section tight">
+    <div class="reassure-box" style="background:#fff;border:1px solid var(--border);">
+      <p class="reassure-box__desc" style="text-align:center;">홈페이지를 만든다고 저절로 수익이 생기지는 않아요. 하지만 콘텐츠와 고객이 계속 쌓일 수 있는 내 공간이 생기면, 매번 처음부터 다시 홍보하지 않아도 되는 기반이 만들어져요.</p>
+    </div>
+  </section>
+
+  <section class="cta-section" style="display:block;">
+    <div class="quiz-intro">
+      <p class="quiz-intro__title">나한테 맞는 수익화 방식이 궁금하다면</p>
+      <p class="quiz-intro__desc" style="color:rgba(245,242,237,.7);">몇 초면 확인할 수 있어요</p>
+      <button class="quiz-btn" id="quizStartBtn">내게 맞는 수익화 방식 확인하기 →</button>
+
+      <div class="quiz-options" id="quizOptions">
+        <button class="quiz-option" data-result="know">내가 아는 정보나 경험을 판매하고 싶다</button>
+        <button class="quiz-option" data-result="affiliate">제품을 추천하고 수수료를 받고 싶다</button>
+        <button class="quiz-option" data-result="consult">상담·예약·견적 문의를 받고 싶다</button>
+        <button class="quiz-option" data-result="unsure">아직 무엇을 할지 모르겠다</button>
+      </div>
+
+      <div class="quiz-result" id="quizResult">
+        <p class="quiz-result__text" id="quizResultText"></p>
+        <a href="estimate.html" class="quiz-result__btn">가격 확인하러 가기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const RESULTS = {
+      know: '전자책, 템플릿, 온라인 강의 페이지가 잘 맞아요. 지금 갖고 계신 지식을 정리해서 콘텐츠로 만들고, 홈페이지에서 직접 판매하는 구조를 만들어드릴게요.',
+      affiliate: '제휴마케팅·큐레이션 사이트가 잘 맞아요. 관심 있는 상품을 소개하고, 구매로 이어지면 수수료를 받는 구조를 홈페이지로 만들어드릴게요.',
+      consult: '상담·예약·견적 신청 페이지가 잘 맞아요. 전화 대신 폼으로 문의를 받고, 관심 있는 고객만 먼저 연락 오는 구조를 만들어드릴게요.',
+      unsure: '괜찮아요, 아직 정하지 않으셔도 돼요. 지금까지 해오신 일이나 관심 분야를 알려주시면, 가능한 수익 구조를 함께 정리해드릴게요.'
+    };
+    document.getElementById('quizStartBtn').addEventListener('click', function() {
+      document.getElementById('quizOptions').classList.add('open');
+      this.style.display = 'none';
+    });
+    document.querySelectorAll('.quiz-option').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.getElementById('quizResultText').textContent = RESULTS[this.dataset.result];
+        document.getElementById('quizResult').classList.add('open');
+        document.getElementById('quizOptions').style.display = 'none';
+      });
+    });
+  </script>
 
 </div>
 
