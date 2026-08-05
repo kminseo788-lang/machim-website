@@ -159,30 +159,24 @@
       <h1>${payment.project_name}</h1>
       <p class="client">${payment.client_name}님</p>
       <p class="amount">${formatWon(payment.amount)}<span>원</span></p>
-      <div class="pay-options">
-        <button class="pay-option" id="payCardBtn">신용카드로 결제</button>
-        <button class="pay-option alt" id="payTransBtn">계좌이체로 결제</button>
-      </div>
+      <button id="payBtn">결제하기</button>
     `;
 
-    document.getElementById('payCardBtn').addEventListener('click', () => startPayment(payment, 'card'));
-    document.getElementById('payTransBtn').addEventListener('click', () => startPayment(payment, 'trans'));
+    document.getElementById('payBtn').addEventListener('click', () => startPayment(payment));
   }
 
-  function startPayment(payment, method) {
-    const cardBtn = document.getElementById('payCardBtn');
-    const transBtn = document.getElementById('payTransBtn');
-    cardBtn.disabled = true;
-    transBtn.disabled = true;
-    const clickedBtn = method === 'card' ? cardBtn : transBtn;
-    clickedBtn.textContent = '결제 진행 중...';
+  function startPayment(payment) {
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    btn.textContent = '결제 진행 중...';
 
     const IMP = window.IMP;
     IMP.init(PORTONE_MERCHANT_CODE);
 
     IMP.request_pay({
       channelKey: PORTONE_CHANNEL_KEY,
-      pay_method: method,
+      // pay_method를 지정하지 않으면 KCP 결제창 안에서
+      // 신용카드 / 계좌이체 탭을 고객이 직접 선택할 수 있어요.
       merchant_uid: `machim_${payment.id}_${Date.now()}`,
       name: `${payment.project_name} - ${payment.payment_type}`,
       amount: payment.amount,
@@ -191,10 +185,8 @@
       if (rsp.success) {
         await confirmPayment(rsp.imp_uid, payment.id);
       } else {
-        cardBtn.disabled = false;
-        transBtn.disabled = false;
-        cardBtn.textContent = '신용카드로 결제';
-        transBtn.textContent = '계좌이체로 결제';
+        btn.disabled = false;
+        btn.textContent = '결제하기';
         alert('결제가 취소되었거나 실패했습니다: ' + rsp.error_msg);
       }
     });
