@@ -74,7 +74,7 @@
     color: var(--muted);
     margin-left: 4px;
   }
-  button#payBtn {
+  button#payBtn, .pay-option {
     width: 100%;
     padding: 15px;
     background: var(--green);
@@ -85,7 +85,9 @@
     font-weight: 600;
     cursor: pointer;
   }
-  button#payBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .pay-options { display: flex; flex-direction: column; gap: 10px; }
+  .pay-option.alt { background: #fff; color: var(--green); border: 1.5px solid var(--green); }
+  button#payBtn:disabled, .pay-option:disabled { opacity: 0.5; cursor: not-allowed; }
   .state {
     font-size: 14px;
     color: var(--muted);
@@ -114,9 +116,8 @@
 
   // ⚠️ PortOne(포트원) V1 가맹점 식별코드 - machim.net용 PG 등록 완료 후 채워주세요
   const PORTONE_MERCHANT_CODE = "imp10806041";
-  // ⚠️ 지금은 칩북과 공유하는 테스트 채널이에요. machim.net 전용 실결제 채널이
-  // 별도로 계약되면, 그때 새 채널키로 교체하면 됩니다.
-  const PORTONE_CHANNEL_KEY = "channel-key-cd1697c8-0052-4b24-b57b-67e1df23a219";
+  // ✅ machim.net 전용 실연동 채널 (사이트코드 IP8G3, 사이트키로 인증된 독립 채널)
+  const PORTONE_CHANNEL_KEY = "channel-key-119998d5-a4f0-478d-9411-2aeb421fbfd5";
 
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const content = document.getElementById('content');
@@ -158,23 +159,30 @@
       <h1>${payment.project_name}</h1>
       <p class="client">${payment.client_name}님</p>
       <p class="amount">${formatWon(payment.amount)}<span>원</span></p>
-      <button id="payBtn">결제하기</button>
+      <div class="pay-options">
+        <button class="pay-option" id="payCardBtn">신용카드로 결제</button>
+        <button class="pay-option alt" id="payTransBtn">계좌이체로 결제</button>
+      </div>
     `;
 
-    document.getElementById('payBtn').addEventListener('click', () => startPayment(payment));
+    document.getElementById('payCardBtn').addEventListener('click', () => startPayment(payment, 'card'));
+    document.getElementById('payTransBtn').addEventListener('click', () => startPayment(payment, 'trans'));
   }
 
-  function startPayment(payment) {
-    const btn = document.getElementById('payBtn');
-    btn.disabled = true;
-    btn.textContent = '결제 진행 중...';
+  function startPayment(payment, method) {
+    const cardBtn = document.getElementById('payCardBtn');
+    const transBtn = document.getElementById('payTransBtn');
+    cardBtn.disabled = true;
+    transBtn.disabled = true;
+    const clickedBtn = method === 'card' ? cardBtn : transBtn;
+    clickedBtn.textContent = '결제 진행 중...';
 
     const IMP = window.IMP;
     IMP.init(PORTONE_MERCHANT_CODE);
 
     IMP.request_pay({
       channelKey: PORTONE_CHANNEL_KEY,
-      pay_method: "trans", // 계좌이체 (카드 승인 후 "card"로 확장 가능)
+      pay_method: method,
       merchant_uid: `machim_${payment.id}_${Date.now()}`,
       name: `${payment.project_name} - ${payment.payment_type}`,
       amount: payment.amount,
@@ -183,8 +191,10 @@
       if (rsp.success) {
         await confirmPayment(rsp.imp_uid, payment.id);
       } else {
-        btn.disabled = false;
-        btn.textContent = '결제하기';
+        cardBtn.disabled = false;
+        transBtn.disabled = false;
+        cardBtn.textContent = '신용카드로 결제';
+        transBtn.textContent = '계좌이체로 결제';
         alert('결제가 취소되었거나 실패했습니다: ' + rsp.error_msg);
       }
     });
