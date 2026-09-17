@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Excel 반복업무 자동화 | 1마침</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{--g:#1B4332;--c:#D97757;--cd:#B85F42;--i:#F1EEE6;--b:#E8E3D6;--w:#FBFAF6;--s:#4C5A68;--l:#DAD3C3}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:Pretendard,"Noto Sans KR",sans-serif;background:var(--i);color:var(--g);line-height:1.65}a{text-decoration:none;color:inherit}.wrap{width:min(1120px,calc(100% - 40px));margin:auto}section{padding:100px 0}.ey{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--c);margin-bottom:12px}h1{font-size:clamp(42px,6vw,68px);line-height:1.12;letter-spacing:-.055em;font-weight:900}h2{font-size:clamp(30px,4vw,46px);line-height:1.25;letter-spacing:-.045em;font-weight:900}.desc{color:var(--s);margin-top:17px}.btn{display:inline-flex;padding:15px 23px;border-radius:10px;background:var(--c);color:white;font-weight:800;transition:.2s}.btn:hover{background:var(--cd);transform:translateY(-2px)}.fade{opacity:0;transform:translateY(22px);transition:.7s}.fade.on{opacity:1;transform:none}
+
+header{position:sticky;top:0;z-index:60;background:rgba(241,238,230,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--l);}
+.nav{width:min(1120px,calc(100% - 40px));margin:0 auto;height:72px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-weight:900;font-size:20px;color:var(--g);}
+.logo .mark{color:var(--c);}
+.back-link{font-size:13px;color:var(--s);}
+
+.hero{background:var(--w);padding:70px 0}.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:65px;align-items:center}.hero p{color:var(--s);margin:23px 0 30px;max-width:570px}
+.flow{padding:30px;border-radius:25px;background:var(--g);position:relative}
+.files{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.file{padding:14px 9px;background:white;border-radius:9px;font-size:10px;color:var(--s);box-shadow:0 8px 20px rgba(0,0,0,.1);transition:.3s}
+.file:nth-child(2){transform:rotate(2deg)}.file:nth-child(3){transform:rotate(-2deg)}
+.xls{display:block;color:#27835e;font-size:19px;margin-bottom:5px}
+.process{text-align:center;color:white;padding:22px 0}.process strong{display:inline-flex;padding:9px 15px;background:var(--c);border-radius:999px;font-size:11px}
+.result{padding:20px;background:white;border-radius:13px}.result-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.result strong{font-size:13px}.table{display:grid;grid-template-columns:1.4fr 1fr 1fr}.cell{padding:8px;border-right:1px solid #eee;border-bottom:1px solid #eee;font-size:9px;color:var(--s)}
+.time-save{position:absolute;right:-22px;top:-25px;width:120px;height:120px;border-radius:50%;background:var(--c);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 15px 30px rgba(184,95,66,.3)}.time-save del{font-size:11px}.time-save strong{font-size:27px}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:45px}.side{padding:30px;border-radius:20px;background:var(--w);border:1px solid var(--l)}.side.after{background:var(--g);color:white}.clock{font-size:64px;font-weight:900;letter-spacing:-.06em}.side.after .clock{color:#fff}.side p{color:var(--s)}.side.after p{color:#bed0c7}.steps{margin-top:22px;display:grid;gap:9px}.step{padding:12px;border-radius:8px;background:var(--i);font-size:12px;color:var(--s)}.after .step{background:rgba(255,255,255,.1);color:white}
+
+.features{background:var(--w)}.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:40px}.feature{padding:25px;border:1px solid var(--l);border-radius:17px;background:var(--i);transition:.25s}.feature:hover{transform:translateY(-7px);box-shadow:0 18px 40px rgba(27,67,50,.08)}.icon{font-size:27px;margin-bottom:20px}.feature h3{font-size:16px}.feature p{font-size:12px;color:var(--s);margin-top:7px}
+
+.app{margin-top:40px;padding:18px;background:var(--g);border-radius:22px}.app-window{background:#f8f7f2;border-radius:14px;overflow:hidden}.top{padding:13px 18px;background:white;border-bottom:1px solid var(--l);font-size:11px;color:var(--s)}.app-body{padding:35px}.drop{padding:35px;text-align:center;border:2px dashed var(--l);border-radius:13px;background:white}.drop span{font-size:35px}.run{width:min(450px,100%);margin:25px auto 0;padding:16px;text-align:center;border-radius:9px;background:var(--c);color:white;font-weight:800}.progress{margin-top:25px;height:8px;background:#e1ddd3;border-radius:10px;overflow:hidden}.progress span{display:block;width:100%;height:100%;background:var(--g)}.done{display:flex;justify-content:space-between;margin-top:13px;font-size:11px;color:var(--s)}
+
+.targets{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:35px}.target{padding:25px;background:var(--w);border:1px solid var(--l);border-radius:15px}.target span{font-size:25px}.target strong{display:block;margin:12px 0 5px}.target p{color:var(--s);font-size:12px}.cta{text-align:center;background:var(--g);color:white}.cta p{color:#bed0c7;margin:18px 0 27px}
+@media(max-width:800px){.hero-grid,.compare{grid-template-columns:1fr}.feature-grid{grid-template-columns:1fr 1fr}.targets{grid-template-columns:1fr}.time-save{right:5px}}
+@media(max-width:520px){.feature-grid{grid-template-columns:1fr}.files{grid-template-columns:1fr 1fr}section{padding:70px 0}}
+</style>
+</head>
+<body>
+
+<header><div class="nav"><a href="index.html" class="logo">1<span class="mark">마침</span></a><a href="index.html" class="back-link">← 전체 상품 보기</a></div></header>
+
+<section class="hero"><div class="wrap hero-grid">
+<div class="fade"><div class="ey">EXCEL 반복업무 자동화</div><h1>매주 똑같은 엑셀 작업,<br>버튼 하나로<br>끝냅니다.</h1><p>파일을 하나씩 열고, 복사하고, 계산하고, 서식을 맞추는 반복 작업. 규칙이 있는 업무라면 프로그램이 대신하도록 만들 수 있습니다.</p><a href="contact.html" class="btn">내 엑셀 업무 자동화 상담하기 →</a></div>
+
+<div class="flow fade">
+ <div class="time-save"><del>3시간</del><strong>18초</strong><small>작업 완료</small></div>
+ <div class="files">
+  <div class="file"><span class="xls">▦</span>서울_매출.xlsx</div><div class="file"><span class="xls">▦</span>경기_매출.xlsx</div><div class="file"><span class="xls">▦</span>인천_매출.xlsx</div>
+  <div class="file"><span class="xls">▦</span>온라인.xlsx</div><div class="file"><span class="xls">▦</span>매장A.xlsx</div><div class="file"><span class="xls">▦</span>매장B.xlsx</div>
+ </div>
+ <div class="process">↓<br><strong>⚡ 자동 정리 실행</strong></div>
+ <div class="result"><div class="result-head"><strong>✓ 9월_통합매출.xlsx</strong><span style="color:#27835e;font-size:10px">완료</span></div><div class="table"><div class="cell">지점</div><div class="cell">매출</div><div class="cell">증감</div><div class="cell">서울</div><div class="cell">12,840,000</div><div class="cell">+8.2%</div><div class="cell">경기</div><div class="cell">9,270,000</div><div class="cell">+3.1%</div></div></div>
+</div>
+</div></section>
+
+<section><div class="wrap">
+<div class="ey fade">BEFORE → AFTER</div><h2 class="fade">사람이 반복하던 순서를<br>프로그램에게 넘깁니다.</h2>
+<div class="compare">
+ <div class="side fade"><div class="ey">BEFORE</div><div class="clock">3:00</div><h3>매주 3시간</h3><p>업무가 바뀐 건 없는데 같은 작업을 또 합니다.</p><div class="steps"><div class="step">① 파일 8개 하나씩 열기</div><div class="step">② 데이터 복사·붙여넣기</div><div class="step">③ 수식 다시 적용하기</div><div class="step">④ 서식·열 너비 정리하기</div></div></div>
+ <div class="side after fade"><div class="ey">AFTER</div><div class="clock">0:18</div><h3>파일 넣고 실행</h3><p>정해진 규칙은 프로그램이 매번 똑같이 처리합니다.</p><div class="steps"><div class="step">① 파일 선택</div><div class="step">② 실행 버튼 클릭</div><div class="step">✓ 계산 완료</div><div class="step">✓ 결과 파일 자동 생성</div></div></div>
+</div>
+</div></section>
+
+<section class="features"><div class="wrap">
+<div class="ey fade">CORE FEATURES</div><h2 class="fade">반복되는 엑셀 순서를<br>그대로 자동화합니다.</h2>
+<div class="feature-grid">
+<div class="feature fade"><div class="icon">📚</div><h3>여러 파일 합치기</h3><p>같은 형식의 여러 Excel·CSV 파일을 하나로 통합합니다.</p></div>
+<div class="feature fade"><div class="icon">🧮</div><h3>반복 계산</h3><p>매번 입력하던 수식과 집계 규칙을 자동 적용합니다.</p></div>
+<div class="feature fade"><div class="icon">✨</div><h3>서식 자동 정리</h3><p>열 순서, 날짜 형식, 색상 등 결과물 형식을 통일합니다.</p></div>
+<div class="feature fade"><div class="icon">📄</div><h3>결과 파일 생성</h3><p>작업이 끝나면 필요한 형태의 새 파일로 저장합니다.</p></div>
+</div></div></section>
+
+<section><div class="wrap">
+<div class="ey fade">ACTUAL SCREEN</div><h2 class="fade">사용법은 어렵지 않게.<br>파일 넣고, 실행하면 끝.</h2>
+<div class="app fade"><div class="app-window"><div class="top">1마침 · 월간 매출 통합 프로그램</div><div class="app-body">
+<div class="drop"><span>📂</span><h3>처리할 Excel 파일 8개</h3><p class="desc">서울.xlsx · 경기.xlsx · 인천.xlsx 외 5개</p></div>
+<div class="run">통합 파일 만들기</div><div class="progress"><span></span></div><div class="done"><span>✓ 8개 파일 · 3,842행 처리 완료</span><strong>18.4초</strong></div>
+</div></div></div>
+</div></section>
+
+<section><div class="wrap"><div class="ey fade">FOR YOU</div><h2 class="fade">이런 업무라면 한번 보여주세요.</h2>
+<div class="targets">
+<div class="target fade"><span>🗂️</span><strong>파일을 매번 합치는 분</strong><p>거래처·지점별 파일을 하나의 보고서로 반복해서 합치는 업무</p></div>
+<div class="target fade"><span>🧑‍💼</span><strong>반복 보고서가 많은 사무직</strong><p>주간·월간 보고서를 같은 방식으로 계속 만드는 업무</p></div>
+<div class="target fade"><span>🏪</span><strong>직접 정산하는 소상공인</strong><p>주문·매출·재고 데이터를 손으로 정리하고 계산하는 사업자</p></div>
+</div></div></section>
+
+<section class="cta"><div class="wrap fade"><div class="ey">1마침 AUTOMATION</div><h2>지금 쓰고 있는 파일 그대로<br>보여주셔도 됩니다.</h2><p>파일과 현재 작업 순서를 확인한 뒤 자동화 가능한 부분과 제작 범위를 안내합니다.</p><a href="contact.html" class="btn">Excel 자동화 상담하기 →</a></div></section>
+
+<script>const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add("on")}),{threshold:.12});document.querySelectorAll(".fade").forEach(e=>io.observe(e));</script>
+</body>
+</html>

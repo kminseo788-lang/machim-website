@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>상담 필터링 자동화 | 1마침</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{--g:#1B4332;--c:#D97757;--cd:#B85F42;--i:#F1EEE6;--b:#E8E3D6;--w:#FBFAF6;--s:#4C5A68;--l:#DAD3C3}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:Pretendard,"Noto Sans KR",sans-serif;background:var(--i);color:var(--g);line-height:1.65}a{text-decoration:none;color:inherit}.wrap{width:min(1120px,calc(100% - 40px));margin:auto}section{padding:100px 0}.ey{color:var(--c);font-size:12px;font-weight:800;letter-spacing:.12em;margin-bottom:12px}h1{font-size:clamp(42px,6vw,68px);font-weight:900;line-height:1.12;letter-spacing:-.055em}h2{font-size:clamp(30px,4vw,46px);font-weight:900;line-height:1.25;letter-spacing:-.045em}.btn{display:inline-flex;padding:15px 23px;background:var(--c);color:#fff;border-radius:10px;font-weight:800;transition:.2s}.btn:hover{background:var(--cd);transform:translateY(-2px)}.fade{opacity:0;transform:translateY(22px);transition:.7s}.fade.on{opacity:1;transform:none}
+
+header{position:sticky;top:0;z-index:60;background:rgba(241,238,230,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--l);}
+.nav{width:min(1120px,calc(100% - 40px));margin:0 auto;height:72px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-weight:900;font-size:20px;color:var(--g);}
+.logo .mark{color:var(--c);}
+.back-link{font-size:13px;color:var(--s);}
+
+.hero{background:var(--w);padding:70px 0}.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:65px;align-items:center}.hero p{color:var(--s);margin:23px 0 30px}
+.funnel-box{padding:32px;background:var(--g);border-radius:27px;text-align:center;color:white}
+.funnel-title{font-size:11px;color:#b9cbc3;margin-bottom:25px}
+.funnel{display:grid;justify-items:center;gap:7px}
+.layer{height:65px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-radius:10px;color:white;transition:.3s}
+.layer:hover{transform:scale(1.03)}
+.l1{width:100%;background:#D97757}.l2{width:78%;background:#B96D54}.l3{width:56%;background:#597864}.l4{width:36%;background:white;color:var(--g)}
+.layer strong{font-size:22px}.layer span{font-size:10px}
+.funnel-result{margin-top:22px;font-size:11px;color:#bdd0c7}.funnel-result strong{color:white}
+
+.compare{display:grid;grid-template-columns:1fr 70px 1fr;gap:15px;align-items:center;margin-top:45px}.box{padding:30px;border-radius:20px;background:var(--w);border:1px solid var(--l)}.box.after{background:var(--g);color:white}.arrow{text-align:center;color:var(--c);font-size:28px}.chat{padding:12px;margin:9px 0;border-radius:10px;background:var(--i);font-size:11px;color:var(--s)}.after .chat{background:rgba(255,255,255,.1);color:white}.hot{border-left:4px solid var(--c)}
+
+.features{background:var(--w)}.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:40px}.feature{padding:25px;border-radius:17px;border:1px solid var(--l);background:var(--i);transition:.25s}.feature:hover{transform:translateY(-7px);box-shadow:0 18px 40px rgba(27,67,50,.08)}.icon{width:46px;height:46px;border-radius:13px;background:var(--g);display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:20px}.feature p{font-size:12px;color:var(--s);margin-top:7px}
+
+.app{margin-top:40px;padding:18px;background:var(--g);border-radius:22px}.window{background:#f8f7f2;border-radius:14px;overflow:hidden}.top{padding:13px 18px;background:white;border-bottom:1px solid var(--l);font-size:11px;color:var(--s)}.body{display:grid;grid-template-columns:.8fr 1.2fr;min-height:430px}.form{padding:28px;background:white}.question{margin-bottom:18px}.question small{display:block;color:var(--s);margin-bottom:6px}.option{padding:10px;border:1px solid var(--l);border-radius:7px;font-size:11px;margin-bottom:5px}.option.selected{border-color:var(--c);background:#F9E8E1;color:var(--cd);font-weight:700}.leads{padding:28px}.lead{display:grid;grid-template-columns:45px 1fr 65px;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--l)}.avatar{width:38px;height:38px;border-radius:50%;background:var(--b);display:flex;align-items:center;justify-content:center}.lead p{font-size:10px;color:var(--s)}.score{padding:6px;border-radius:5px;text-align:center;background:#E1EFE8;color:var(--g);font-size:9px;font-weight:800}
+
+.targets{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:35px}.target{padding:25px;border:1px solid var(--l);border-radius:15px;background:var(--w)}.target span{font-size:26px}.target strong{display:block;margin:12px 0 5px}.target p{font-size:12px;color:var(--s)}.cta{text-align:center;background:var(--g);color:white}.cta p{color:#bed0c7;margin:18px 0 27px}
+@media(max-width:800px){.hero-grid,.compare,.body{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}.feature-grid{grid-template-columns:1fr 1fr}.targets{grid-template-columns:1fr}}
+@media(max-width:520px){.feature-grid{grid-template-columns:1fr}.layer{width:100%!important}section{padding:70px 0}}
+</style>
+</head>
+<body>
+
+<header><div class="nav"><a href="index.html" class="logo">1<span class="mark">마침</span></a><a href="index.html" class="back-link">← 전체 상품 보기</a></div></header>
+
+<section class="hero"><div class="wrap hero-grid">
+<div class="fade"><div class="ey">상담 필터링 자동화</div><h1>문의는 많은데,<br>진짜 고객은<br>몇 명 안 되나요?</h1><p>모든 문의에 똑같이 시간을 쓰지 마세요. 상담 전에 필요한 질문을 받고 조건에 따라 분류하면, 지금 먼저 이야기해야 할 고객부터 볼 수 있습니다.</p><a class="btn" href="contact.html">상담 업무 자동화 문의하기 →</a></div>
+<div class="funnel-box fade"><div class="funnel-title">오늘 들어온 문의가 자동으로 정리되고 있습니다</div><div class="funnel">
+<div class="layer l1"><span>전체 문의</span><strong>48</strong></div>
+<div class="layer l2"><span>기본 조건 일치</span><strong>36</strong></div>
+<div class="layer l3"><span>예산·일정 일치</span><strong>24</strong></div>
+<div class="layer l4"><span>우선 상담</span><strong>12</strong></div>
+</div><div class="funnel-result">48명을 전부 상담하는 대신 <strong>우선 고객 12명부터.</strong></div></div>
+</div></section>
+
+<section><div class="wrap"><div class="ey fade">BEFORE → AFTER</div><h2 class="fade">문의가 들어올 때마다 답하는 대신,<br>먼저 필요한 정보를 받습니다.</h2>
+<div class="compare">
+<div class="box fade"><div class="ey">BEFORE</div><div class="chat">"가격이 얼마예요?"</div><div class="chat">"일단 상담 받아보고 싶어요."</div><div class="chat">"다음 주 바로 가능한가요?"</div><div class="chat">"예산은 아직 모르겠어요."</div><p style="margin-top:20px;color:var(--s);font-size:12px">→ 같은 질문을 다시 하고, 상담 후에야 조건이 안 맞는 걸 알게 됩니다.</p></div>
+<div class="arrow">→</div>
+<div class="box after fade"><div class="ey">AFTER</div><div class="chat hot">🔥 김민지 · 적합도 92<br><small>예산 100만원 · 2주 내 시작</small></div><div class="chat">박서연 · 적합도 78<br><small>예산 70만원 · 다음 달 시작</small></div><div class="chat">이준호 · 적합도 41<br><small>예산 미정 · 일정 미정</small></div><p style="margin-top:20px;color:#bed0c7;font-size:12px">→ 필요한 정보가 이미 정리된 상태에서 상담을 시작합니다.</p></div>
+</div></div></section>
+
+<section class="features"><div class="wrap"><div class="ey fade">CORE FEATURES</div><h2 class="fade">상담 전에 묻고,<br>답변에 따라 자동으로 정리합니다.</h2>
+<div class="feature-grid">
+<div class="feature fade"><div class="icon">❓</div><h3>사전 질문</h3><p>예산, 일정, 원하는 서비스 등 상담 전에 꼭 필요한 정보를 받습니다.</p></div>
+<div class="feature fade"><div class="icon">🎯</div><h3>조건별 분류</h3><p>답변에 따라 우선 상담, 일반 문의 등 원하는 기준으로 분류합니다.</p></div>
+<div class="feature fade"><div class="icon">📋</div><h3>문의 자동 정리</h3><p>이름과 답변 내용을 관리자 화면에서 한눈에 확인합니다.</p></div>
+<div class="feature fade"><div class="icon">🔔</div><h3>우선 고객 알림</h3><p>중요한 조건을 만족한 문의가 들어오면 바로 확인할 수 있습니다.</p></div>
+</div></div></section>
+
+<section><div class="wrap"><div class="ey fade">ACTUAL SCREEN</div><h2 class="fade">고객은 간단히 답하고,<br>나는 정리된 결과를 봅니다.</h2>
+<div class="app fade"><div class="window"><div class="top">1마침 · 상담 문의 관리</div><div class="body">
+<div class="form"><h3>상담 전 간단히 알려주세요</h3><div class="question"><small>희망 시작 시기는 언제인가요?</small><div class="option selected">2주 이내</div><div class="option">한 달 이내</div><div class="option">아직 미정</div></div><div class="question"><small>예상 예산은 어느 정도인가요?</small><div class="option">50만원 미만</div><div class="option selected">50~100만원</div><div class="option">100만원 이상</div></div></div>
+<div class="leads"><h3>오늘의 상담 문의</h3><div class="lead"><div class="avatar">김</div><div><strong>김민지</strong><p>2주 이내 · 50~100만원 · 홈페이지 제작</p></div><div class="score">92점</div></div><div class="lead"><div class="avatar">박</div><div><strong>박서연</strong><p>한 달 이내 · 100만원 이상 · 자동화</p></div><div class="score">86점</div></div><div class="lead"><div class="avatar">이</div><div><strong>이준호</strong><p>일정 미정 · 예산 미정 · 상담 요청</p></div><div class="score">41점</div></div></div>
+</div></div></div>
+</div></section>
+
+<section><div class="wrap"><div class="ey fade">FOR YOU</div><h2 class="fade">상담이 곧 영업인 업종에<br>특히 잘 맞습니다.</h2><div class="targets">
+<div class="target fade"><span>🏫</span><strong>학원·교육업</strong><p>학년, 희망시간, 과목 등을 먼저 받아 상담 시간을 줄이고 싶은 곳</p></div>
+<div class="target fade"><span>🛠️</span><strong>시공·제작업체</strong><p>지역, 규모, 예산 등 견적에 필요한 정보를 미리 받아야 하는 업체</p></div>
+<div class="target fade"><span>🎨</span><strong>공방·상담업</strong><p>예약 전에 목적과 조건을 확인해야 상담이 효율적인 사업자</p></div>
+</div></div></section>
+
+<section class="cta"><div class="wrap fade"><div class="ey">1마침 AUTOMATION</div><h2>문의가 많아질수록<br>상담부터 정리되어야 합니다.</h2><p>지금 고객에게 반복해서 묻고 있는 질문을 알려주세요.<br>사전질문부터 분류·관리까지 업무에 맞게 설계합니다.</p><a href="contact.html" class="btn">상담 필터링 제작 문의 →</a></div></section>
+<script>const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add("on")}),{threshold:.12});document.querySelectorAll(".fade").forEach(e=>io.observe(e));</script>
+</body></html>

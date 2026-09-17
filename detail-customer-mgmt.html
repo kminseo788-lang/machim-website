@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>맞춤 고객관리 시스템 | 1마침</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{--g:#1B4332;--c:#D97757;--cd:#B85F42;--i:#F1EEE6;--b:#E8E3D6;--w:#FBFAF6;--s:#4C5A68;--l:#DAD3C3}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:Pretendard,"Noto Sans KR",sans-serif;background:var(--i);color:var(--g);line-height:1.65}a{text-decoration:none;color:inherit}.wrap{width:min(1120px,calc(100% - 40px));margin:auto}section{padding:100px 0}.ey{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--c);margin-bottom:12px}h1{font-size:clamp(42px,6vw,68px);line-height:1.12;letter-spacing:-.055em;font-weight:900}h2{font-size:clamp(30px,4vw,46px);line-height:1.25;letter-spacing:-.045em;font-weight:900}.btn{display:inline-flex;padding:15px 23px;border-radius:10px;background:var(--c);color:white;font-weight:800;transition:.2s}.btn:hover{background:var(--cd);transform:translateY(-2px)}.fade{opacity:0;transform:translateY(22px);transition:.7s}.fade.on{opacity:1;transform:none}
+
+header{position:sticky;top:0;z-index:60;background:rgba(241,238,230,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--l);}
+.nav{width:min(1120px,calc(100% - 40px));margin:0 auto;height:72px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-weight:900;font-size:20px;color:var(--g);}
+.logo .mark{color:var(--c);}
+.back-link{font-size:13px;color:var(--s);}
+
+.hero{padding:70px 0;background:var(--w)}.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:65px;align-items:center}.hero p{margin:23px 0 30px;color:var(--s)}
+.industry-board{padding:22px;border-radius:26px;background:var(--g);display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.industry{min-height:155px;padding:19px;border-radius:15px;background:white;transition:.25s}.industry:hover{transform:translateY(-5px)}.industry:nth-child(2),.industry:nth-child(3){background:var(--b)}.industry .emoji{font-size:25px}.industry strong{display:block;margin:10px 0}.chips{display:flex;flex-wrap:wrap;gap:5px}.chip{padding:5px 7px;border-radius:5px;background:var(--i);color:var(--s);font-size:8px}.industry:nth-child(2) .chip,.industry:nth-child(3) .chip{background:var(--w)}
+.center-label{grid-column:1/-1;padding:13px;text-align:center;border-radius:10px;background:var(--c);color:white;font-size:11px;font-weight:800}
+
+.compare{display:grid;grid-template-columns:1fr 70px 1fr;gap:15px;align-items:center;margin-top:45px}.box{padding:30px;border:1px solid var(--l);border-radius:20px;background:var(--w)}.box.after{background:var(--g);color:white}.arrow{text-align:center;font-size:28px;color:var(--c)}.generic{display:grid;gap:8px;margin-top:20px}.generic div{padding:12px;border-radius:8px;background:var(--i);font-size:11px;color:var(--s)}.after .generic div{background:rgba(255,255,255,.1);color:white}.cross{color:#b65b4b}.check{color:#8fc5ad}
+
+.features{background:var(--w)}.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:40px}.feature{padding:25px;border:1px solid var(--l);border-radius:17px;background:var(--i);transition:.25s}.feature:hover{transform:translateY(-7px);box-shadow:0 18px 40px rgba(27,67,50,.08)}.icon{font-size:28px;margin-bottom:20px}.feature p{font-size:12px;color:var(--s);margin-top:7px}
+
+.app{margin-top:40px;padding:18px;background:var(--g);border-radius:22px}.window{background:#f8f7f2;border-radius:14px;overflow:hidden}.top{padding:13px 18px;background:white;border-bottom:1px solid var(--l);font-size:11px;color:var(--s)}.app-body{display:grid;grid-template-columns:170px 1fr;min-height:430px}.sidebar{padding:20px;background:#e9e6dd}.side{padding:10px;border-radius:7px;font-size:10px;color:var(--s);margin-bottom:5px}.side.active{background:var(--g);color:white}.main{padding:27px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}.stat{padding:15px;border-radius:10px;background:white;border:1px solid var(--l)}.stat small{color:var(--s);font-size:9px}.stat strong{display:block;font-size:21px}.customer{display:grid;grid-template-columns:45px 1fr 1.2fr 75px;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--l)}.avatar{width:38px;height:38px;border-radius:50%;background:var(--b);display:flex;align-items:center;justify-content:center}.customer p{font-size:10px;color:var(--s)}.tag{padding:5px;border-radius:5px;background:#E1EFE8;color:var(--g);font-size:8px;text-align:center;font-weight:800}
+
+.targets{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:35px}.target{padding:23px;background:var(--w);border:1px solid var(--l);border-radius:15px}.target span{font-size:25px}.target strong{display:block;margin:12px 0 5px}.target p{font-size:11px;color:var(--s)}.cta{text-align:center;background:var(--g);color:white}.cta p{margin:18px 0 27px;color:#bed0c7}
+@media(max-width:800px){.hero-grid,.compare,.app-body{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}.feature-grid,.targets{grid-template-columns:1fr 1fr}.sidebar{display:none}.customer{grid-template-columns:45px 1fr}}
+@media(max-width:520px){.industry-board,.feature-grid,.targets{grid-template-columns:1fr}.center-label{grid-column:auto}.stats{grid-template-columns:1fr}section{padding:70px 0}}
+</style>
+</head>
+<body>
+
+<header><div class="nav"><a href="index.html" class="logo">1<span class="mark">마침</span></a><a href="index.html" class="back-link">← 전체 상품 보기</a></div></header>
+
+<section class="hero"><div class="wrap hero-grid">
+<div class="fade"><div class="ey">우리 가게만의 고객관리 시스템</div><h1>누구나 쓰는 범용 앱이<br>못 담는<br>우리 가게만의 방식.</h1><p>가게마다 기억해야 할 고객 정보가 다릅니다. 범용 프로그램에 업무를 억지로 맞추는 대신, 실제로 관리하고 싶은 항목과 흐름에 맞춰 시스템을 만듭니다.</p><a href="contact.html" class="btn">우리 가게 시스템 상담하기 →</a></div>
+<div class="industry-board fade">
+<div class="industry"><span class="emoji">🏫</span><strong>학원</strong><div class="chips"><span class="chip">등원시간</span><span class="chip">픽업</span><span class="chip">결제일</span><span class="chip">보강</span></div></div>
+<div class="industry"><span class="emoji">🍽️</span><strong>식당</strong><div class="chips"><span class="chip">단골</span><span class="chip">알레르기</span><span class="chip">선호메뉴</span><span class="chip">예약</span></div></div>
+<div class="industry"><span class="emoji">👗</span><strong>옷가게</strong><div class="chips"><span class="chip">사이즈</span><span class="chip">취향</span><span class="chip">구매이력</span><span class="chip">입고알림</span></div></div>
+<div class="industry"><span class="emoji">🎨</span><strong>공방</strong><div class="chips"><span class="chip">수강권</span><span class="chip">재료</span><span class="chip">예약</span><span class="chip">작품기록</span></div></div>
+<div class="center-label">가게가 다르면, 관리하는 정보도 달라야 합니다.</div>
+</div>
+</div></section>
+
+<section><div class="wrap"><div class="ey fade">BEFORE → AFTER</div><h2 class="fade">프로그램에 가게를 맞추지 말고,<br>가게에 프로그램을 맞춥니다.</h2>
+<div class="compare">
+<div class="box fade"><div class="ey">BEFORE · 범용 프로그램</div><h3>있는 칸에 억지로 기록</h3><div class="generic"><div><span class="cross">×</span> 픽업시간은 메모란에</div><div><span class="cross">×</span> 결제일은 따로 Excel에</div><div><span class="cross">×</span> 고객 취향은 사장님 머릿속에</div><div><span class="cross">×</span> 알림은 달력에 다시 등록</div></div></div>
+<div class="arrow">→</div>
+<div class="box after fade"><div class="ey">AFTER · 맞춤 시스템</div><h3>필요한 항목이 처음부터 있습니다.</h3><div class="generic"><div><span class="check">✓</span> 오늘 픽업 고객 자동 표시</div><div><span class="check">✓</span> 결제 예정일 한눈에 확인</div><div><span class="check">✓</span> 고객별 취향·특이사항 기록</div><div><span class="check">✓</span> 필요한 시점에 알림</div></div></div>
+</div></div></section>
+
+<section class="features"><div class="wrap"><div class="ey fade">CORE FEATURES</div><h2 class="fade">필요한 기능만 골라<br>우리 방식대로 구성합니다.</h2>
+<div class="feature-grid">
+<div class="feature fade"><div class="icon">👤</div><h3>맞춤 고객정보</h3><p>업종에 필요한 고객 항목을 원하는 방식으로 구성합니다.</p></div>
+<div class="feature fade"><div class="icon">📅</div><h3>일정·결제 관리</h3><p>예약, 픽업, 결제일 등 놓치면 안 되는 일정을 관리합니다.</p></div>
+<div class="feature fade"><div class="icon">💬</div><h3>고객 메모</h3><p>취향, 상담내용, 특이사항과 이전 기록을 고객별로 남깁니다.</p></div>
+<div class="feature fade"><div class="icon">🔔</div><h3>필요한 알림</h3><p>재구매, 결제, 예약 등 필요한 시점에 확인할 수 있게 구성합니다.</p></div>
+</div></div></section>
+
+<section><div class="wrap"><div class="ey fade">ACTUAL SCREEN</div><h2 class="fade">사장님이 오늘 볼 것부터<br>한 화면에.</h2>
+<div class="app fade"><div class="window"><div class="top">OO 영어학원 · 고객관리</div><div class="app-body">
+<div class="sidebar"><div class="side active">오늘 할 일</div><div class="side">학생 관리</div><div class="side">픽업 일정</div><div class="side">결제 관리</div><div class="side">상담 기록</div></div>
+<div class="main"><h3>오늘의 관리</h3><div class="stats"><div class="stat"><small>오늘 픽업</small><strong>12</strong></div><div class="stat"><small>결제 예정</small><strong>5</strong></div><div class="stat"><small>보강 수업</small><strong>3</strong></div></div>
+<h3 style="font-size:14px">오늘 확인할 학생</h3>
+<div class="customer"><div class="avatar">김</div><div><strong>김민준</strong><p>초3 · 월수금</p></div><div><p>17:40 엄마 픽업 · 숙제 확인 필요</p></div><div class="tag">픽업</div></div>
+<div class="customer"><div class="avatar">이</div><div><strong>이서윤</strong><p>초5 · 화목</p></div><div><p>9월 18일 수강료 결제 예정</p></div><div class="tag">결제 D-2</div></div>
+<div class="customer"><div class="avatar">박</div><div><strong>박지호</strong><p>중1 · 월수금</p></div><div><p>지난주 결석 · 토요일 보강</p></div><div class="tag">보강</div></div>
+</div></div></div></div>
+</div></section>
+
+<section><div class="wrap"><div class="ey fade">FOR YOU</div><h2 class="fade">업종보다 중요한 건<br>"우리 가게는 어떻게 일하느냐"입니다.</h2><div class="targets">
+<div class="target fade"><span>🏫</span><strong>학원</strong><p>등원·픽업·보강·결제일까지 함께 관리</p></div>
+<div class="target fade"><span>🎨</span><strong>공방</strong><p>예약·수강권·재료·작품 진행상태 관리</p></div>
+<div class="target fade"><span>🍽️</span><strong>식당</strong><p>단골 취향·예약·특이사항을 고객별로 기록</p></div>
+<div class="target fade"><span>🛍️</span><strong>소매점</strong><p>사이즈·취향·구매이력·재입고 안내 관리</p></div>
+</div></div></section>
+
+<section class="cta"><div class="wrap fade"><div class="ey">1마침 CUSTOM SYSTEM</div><h2>"이런 것까지 관리됐으면 좋겠는데."<br>그게 맞춤 시스템의 시작입니다.</h2><p>지금 엑셀, 메모장, 메신저, 머릿속에 흩어져 관리하고 있는 업무를 알려주세요.<br>우리 가게에 필요한 기능부터 정리해드립니다.</p><a href="contact.html" class="btn">맞춤 고객관리 상담하기 →</a></div></section>
+<script>const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add("on")}),{threshold:.12});document.querySelectorAll(".fade").forEach(e=>io.observe(e));</script>
+</body></html>

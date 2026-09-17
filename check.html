@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>문의·주문 조회 | 1마침</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+
+<style>
+  :root{
+    --paper:#F1EEE6; --paper-dark:#E8E3D6; --card:#FBFAF6;
+    --ink:#1B4332; --ink-soft:#4C5A68; --ink-faint:#8B9199;
+    --brick:#D97757; --brick-dark:#B85F42; --gold:#C79A45; --line:#DAD3C3; --green:#5B7A5E;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:"Noto Sans KR",sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;}
+  a{color:inherit;text-decoration:none;}
+  h1,h2{font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;}
+  .container{width:min(720px, calc(100% - 40px));margin:0 auto;}
+  header{position:sticky;top:0;background:rgba(241,238,230,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .nav{width:min(1120px, calc(100% - 48px));margin:0 auto;height:72px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;font-size:22px;}
+  .logo .mark{color:var(--brick);}
+  .back-link{font-size:14px;color:var(--ink-soft);}
+
+  .head{padding:56px 0 20px;text-align:left;}
+  .head h1{font-size:clamp(26px,3.4vw,34px);margin-bottom:12px;}
+  .head p{color:var(--ink-soft);font-size:15px;}
+
+  form{padding:20px 0 12px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+  @media(max-width:520px){.row2{grid-template-columns:1fr;}}
+  input[type=text], input[type=tel]{
+    width:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:10px;
+    background:var(--card);font:inherit;color:var(--ink);outline:none;
+  }
+  input:focus{border-color:var(--brick);}
+  .submit-btn{
+    width:100%;padding:16px;border-radius:10px;background:var(--brick);color:#fff;
+    font-size:15.5px;font-weight:700;box-shadow:0 10px 24px rgba(217,119,87,.25);
+  }
+  .submit-btn:hover{background:var(--brick-dark);}
+
+  .section-title{font-size:17px;font-weight:800;margin:34px 0 14px;font-family:"Pretendard","Noto Sans KR",sans-serif;}
+  .result-card{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:12px;}
+  .rc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .rc-top strong{font-size:15px;}
+  .badge{font-size:12px;font-weight:700;color:var(--brick);background:#F6E3DD;padding:4px 10px;border-radius:999px;}
+  .rc-meta{font-size:13px;color:var(--ink-soft);margin-bottom:6px;}
+  .rc-reply{font-size:14px;color:var(--ink);background:var(--paper);border-radius:8px;padding:12px 14px;margin-top:8px;white-space:pre-wrap;}
+  .rc-wait{font-size:13px;color:var(--ink-faint);margin-top:6px;}
+  .rc-empty{font-size:13.5px;color:var(--ink-faint);padding:14px 0;}
+  .results-wrap{display:none;padding-bottom:80px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="index.html" class="logo">1<span class="mark">마침</span></a>
+    <a href="index.html" class="back-link">← 메인으로</a>
+  </div>
+</header>
+
+<div class="container">
+  <div class="head">
+    <h1>문의·주문 조회</h1>
+    <p>접수하실 때 입력하신 이름과 연락처를 입력하면 처리 현황과 답변을 확인할 수 있습니다.</p>
+  </div>
+
+  <form id="lookupForm">
+    <div class="row2">
+      <input type="text" id="lookupName" placeholder="이름" required>
+      <input type="tel" id="lookupPhone" placeholder="연락처" required>
+    </div>
+    <button type="submit" class="submit-btn">조회하기</button>
+  </form>
+
+  <div class="results-wrap" id="resultsWrap">
+    <div class="section-title">문의 내역</div>
+    <div id="inquiryResults"></div>
+    <div class="section-title">주문 내역</div>
+    <div id="orderResults"></div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('lookupForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('lookupName').value.trim();
+    const phone = document.getElementById('lookupPhone').value.trim();
+    if(!name || !phone) return;
+
+    const submitBtn = e.target.querySelector('.submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '조회 중…';
+
+    const [inqRes, ordRes] = await Promise.all([
+      sb.rpc('get_inquiry_status', { p_name: name, p_phone: phone }),
+      sb.rpc('get_order_status', { p_name: name, p_phone: phone })
+    ]);
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = '조회하기';
+
+    document.getElementById('resultsWrap').style.display = 'block';
+    const iBox = document.getElementById('inquiryResults');
+    const oBox = document.getElementById('orderResults');
+    iBox.innerHTML = '';
+    oBox.innerHTML = '';
+
+    const inquiries = inqRes.data || [];
+    const orders = ordRes.data || [];
+
+    if(inquiries.length){
+      inquiries.forEach(q=>{
+        const div = document.createElement('div');
+        div.className = 'result-card';
+        div.innerHTML = `
+          <div class="rc-top"><strong>${q.task_type || '문의'}</strong><span class="badge">${q.status}</span></div>
+          ${q.admin_reply ? `<div class="rc-reply">${q.admin_reply}</div>` : `<div class="rc-wait">아직 답변 전입니다. 조금만 기다려주세요.</div>`}
+        `;
+        iBox.appendChild(div);
+      });
+    } else {
+      iBox.innerHTML = '<div class="rc-empty">일치하는 문의 내역이 없습니다.</div>';
+    }
+
+    if(orders.length){
+      orders.forEach(o=>{
+        const div = document.createElement('div');
+        div.className = 'result-card';
+        const amountText = (o.amount || 0).toLocaleString('ko-KR') + '원';
+        div.innerHTML = `
+          <div class="rc-top"><strong>${o.product_name}</strong><span class="badge">${o.status}</span></div>
+          <div class="rc-meta">${amountText}${o.start_date ? ' · 착수일 ' + o.start_date : ''}</div>
+          ${o.admin_note ? `<div class="rc-reply">${o.admin_note}</div>` : ''}
+        `;
+        oBox.appendChild(div);
+      });
+    } else {
+      oBox.innerHTML = '<div class="rc-empty">일치하는 주문 내역이 없습니다.</div>';
+    }
+  });
+</script>
+
+</body>
+</html>

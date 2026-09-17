@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>모모의 그림상점 | Creator Shop Demo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <style>
+    :root {
+      --cream: #fffaf3;
+      --cream-dark: #f7efe4;
+      --paper: #fffdf9;
+      --coral: #e98772;
+      --coral-dark: #d56e59;
+      --peach: #f7c9b9;
+      --pink: #f8dfd7;
+      --brown: #5f4a42;
+      --brown-soft: #8d776e;
+      --line: #eaded5;
+      --green: #83987b;
+      --yellow: #f3dfaa;
+      --shadow: 0 18px 50px rgba(95, 74, 66, 0.09);
+      --radius-lg: 32px;
+      --radius-md: 22px;
+      --radius-sm: 14px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: "Gowun Dodum", sans-serif; color: var(--brown); background: var(--cream); line-height: 1.7; overflow-x: hidden; }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    img { display: block; width: 100%; object-fit: cover; }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
+    .section { padding: 110px 0; }
+    .back-bar{position:sticky;top:0;z-index:60;background:#5f4a42;color:#fff;text-align:center;font-size:13px;padding:10px;}
+    .back-bar a{color:#f7c9b9;text-decoration:underline;}
+
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; color: var(--coral-dark); font-size: 14px; font-weight: 700; letter-spacing: 0.08em; }
+    .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--coral); }
+    .section-title { font-family: "Nanum Myeongjo", serif; font-size: clamp(32px, 4vw, 48px); line-height: 1.35; letter-spacing: -0.04em; }
+    .section-description { max-width: 620px; margin-top: 18px; color: var(--brown-soft); font-size: 17px; }
+    .btn { border: 0; border-radius: 999px; padding: 14px 22px; transition: 0.25s ease; }
+    .btn-primary { color: white; background: var(--coral); box-shadow: 0 8px 20px rgba(233, 135, 114, 0.22); }
+    .btn-primary:hover { background: var(--coral-dark); transform: translateY(-2px); }
+    .btn-outline { color: var(--brown); background: transparent; border: 1px solid var(--line); }
+    .btn-outline:hover { background: white; }
+
+    .header { position: sticky; top: 36px; z-index: 50; background: rgba(255, 250, 243, 0.88); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(234, 222, 213, 0.75); }
+    .nav { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+    .logo { font-family: "Nanum Myeongjo", serif; font-weight: 700; font-size: 21px; }
+    .nav-links { display: flex; gap: 30px; font-size: 14px; color: var(--brown-soft); }
+    .nav-links a:hover { color: var(--coral-dark); }
+
+    .hero { min-height: 680px; display: flex; align-items: center; position: relative; overflow: hidden; }
+    .hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; filter: blur(2px); z-index: -1; }
+    .hero::before { width: 420px; height: 420px; background: #f8ddd1; top: -150px; right: -100px; opacity: 0.55; }
+    .hero::after { width: 300px; height: 300px; background: #f3e7bd; bottom: -120px; left: -80px; opacity: 0.5; }
+    .hero-grid { display: grid; grid-template-columns: 0.95fr 1.05fr; align-items: center; gap: 80px; }
+    .hero-label { display: inline-block; padding: 8px 14px; margin-bottom: 24px; border-radius: 999px; background: white; color: var(--coral-dark); font-size: 13px; box-shadow: var(--shadow); }
+    .hero h1 { font-family: "Nanum Myeongjo", serif; font-size: clamp(45px, 6vw, 72px); line-height: 1.18; letter-spacing: -0.06em; }
+    .hero h1 span { color: var(--coral-dark); }
+    .hero-copy { max-width: 520px; margin: 26px 0 32px; font-size: 18px; color: var(--brown-soft); }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-image-wrap { position: relative; padding: 20px; }
+    .hero-image { height: 520px; border-radius: 48% 48% 20px 20px; box-shadow: var(--shadow); }
+    .artist-note { position: absolute; bottom: 50px; left: -20px; width: 205px; padding: 20px; border-radius: 18px; background: rgba(255, 253, 249, 0.94); box-shadow: var(--shadow); transform: rotate(-3deg); }
+    .artist-note small { color: var(--coral-dark); }
+    .artist-note strong { display: block; margin-top: 5px; font-family: "Nanum Myeongjo", serif; }
+
+    .gallery { background: var(--paper); }
+    .gallery-header { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 50px; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    .art-card { border-radius: var(--radius-md); background: white; overflow: hidden; border: 1px solid #f0e7df; transition: 0.3s ease; }
+    .art-card:hover { transform: translateY(-7px); box-shadow: var(--shadow); }
+    .art-image-wrap { position: relative; overflow: hidden; aspect-ratio: 4 / 5; }
+    .art-image-wrap img { height: 100%; transition: transform 0.45s ease; }
+    .art-card:hover img { transform: scale(1.04); }
+    .art-badge { position: absolute; top: 14px; left: 14px; padding: 6px 10px; background: rgba(255, 253, 249, 0.92); border-radius: 999px; font-size: 11px; }
+    .art-info { padding: 19px; }
+    .art-title { font-family: "Nanum Myeongjo", serif; font-size: 18px; margin-bottom: 6px; }
+    .art-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 15px; }
+    .price { font-weight: 700; color: var(--coral-dark); }
+    .buy-btn { padding: 9px 14px; border: 0; border-radius: 999px; background: var(--cream-dark); color: var(--brown); }
+    .buy-btn:hover { background: var(--peach); }
+
+    .admin-section { background: radial-gradient(circle at 10% 20%, rgba(247, 201, 185, 0.28), transparent 28%), radial-gradient(circle at 90% 70%, rgba(243, 223, 170, 0.26), transparent 26%), var(--cream); }
+    .admin-intro { text-align: center; max-width: 720px; margin: 0 auto 55px; }
+    .admin-intro .eyebrow { justify-content: center; }
+    .admin-intro .eyebrow::before { display: none; }
+    .admin-shell { overflow: hidden; border: 1px solid var(--line); border-radius: 28px; background: white; box-shadow: 0 30px 80px rgba(95, 74, 66, 0.12); }
+    .admin-topbar { display: flex; align-items: center; justify-content: space-between; padding: 17px 24px; border-bottom: 1px solid var(--line); background: #fffdf9; }
+    .window-dots { display: flex; gap: 7px; }
+    .window-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--peach); }
+    .window-dot:nth-child(2) { background: var(--yellow); }
+    .window-dot:nth-child(3) { background: #b9c8b3; }
+    .admin-user { font-size: 13px; color: var(--brown-soft); }
+    .admin-layout { display: grid; grid-template-columns: 190px 1fr; min-height: 640px; }
+    .admin-sidebar { padding: 25px 15px; background: #fbf6ef; border-right: 1px solid var(--line); }
+    .admin-brand { padding: 0 10px 22px; font-family: "Nanum Myeongjo", serif; font-weight: 700; }
+    .admin-menu { display: grid; gap: 7px; }
+    .admin-menu button { width: 100%; padding: 11px 13px; text-align: left; border: 0; border-radius: 10px; background: transparent; color: var(--brown-soft); }
+    .admin-menu button.active, .admin-menu button:hover { color: var(--coral-dark); background: white; }
+    .admin-main { padding: 30px; background: #fff; }
+    .admin-title-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+    .admin-title-row h3 { font-size: 22px; }
+    .admin-save { padding: 10px 17px; border: 0; border-radius: 10px; color: white; background: var(--coral); }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+    .stat-card { padding: 20px; border-radius: 16px; background: #fcf8f3; border: 1px solid #f0e5dc; }
+    .stat-card span { display: block; margin-bottom: 8px; font-size: 12px; color: var(--brown-soft); }
+    .stat-card strong { font-size: 23px; }
+    .admin-content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .admin-panel { padding: 21px; border: 1px solid var(--line); border-radius: 17px; }
+    .admin-panel h4 { margin-bottom: 5px; }
+    .admin-panel-desc { margin-bottom: 16px; color: var(--brown-soft); font-size: 12px; }
+    .field { margin-top: 13px; }
+    .field label { display: block; margin-bottom: 6px; font-size: 12px; color: var(--brown-soft); }
+    .field input, .field textarea { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 9px; outline: none; color: var(--brown); background: white; }
+    .field input:focus, .field textarea:focus { border-color: var(--coral); }
+    .editor-toolbar { display: flex; flex-wrap: wrap; gap: 5px; padding: 8px; border: 1px solid var(--line); border-bottom: 0; border-radius: 9px 9px 0 0; background: #faf7f3; }
+    .editor-toolbar button { min-width: 30px; height: 29px; border: 1px solid var(--line); border-radius: 6px; background: white; color: var(--brown); }
+    .editor-box { min-height: 110px; padding: 13px; border: 1px solid var(--line); border-radius: 0 0 9px 9px; font-size: 13px; outline: none; }
+    .affiliate-preview { display: flex; align-items: center; gap: 10px; padding: 11px; margin-top: 10px; border-radius: 9px; background: #fff6f1; font-size: 12px; }
+    .affiliate-preview span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sales-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1e9e3; font-size: 13px; }
+    .sales-row:last-child { border: 0; }
+    .easy-points { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 35px; }
+    .easy-point { padding: 22px; border-radius: 18px; background: rgba(255, 255, 255, 0.7); border: 1px solid var(--line); }
+    .easy-number { display: flex; align-items: center; justify-content: center; width: 35px; height: 35px; margin-bottom: 15px; border-radius: 50%; background: var(--pink); color: var(--coral-dark); font-weight: 700; }
+
+    .cta { padding: 120px 0; text-align: center; background: var(--coral); color: white; }
+    .cta-inner { max-width: 730px; margin: 0 auto; }
+    .cta h2 { font-family: "Nanum Myeongjo", serif; font-size: clamp(35px, 5vw, 54px); line-height: 1.35; }
+    .cta p { margin: 22px auto 30px; max-width: 580px; color: rgba(255, 255, 255, 0.85); }
+    .cta .btn { color: var(--coral-dark); background: white; font-weight: 700; }
+
+    footer { padding: 35px 0; background: #57453f; color: rgba(255,255,255,.65); font-size: 13px; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 20px; }
+
+    .modal { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(65, 49, 44, 0.58); backdrop-filter: blur(7px); }
+    .modal.open { display: flex; }
+    .modal-card { position: relative; display: grid; grid-template-columns: 1fr 1fr; width: min(880px, 100%); max-height: 90vh; overflow: auto; border-radius: 26px; background: var(--paper); box-shadow: 0 30px 90px rgba(0,0,0,.18); }
+    .modal-image { min-height: 530px; height: 100%; }
+    .modal-content { display: flex; flex-direction: column; justify-content: center; padding: 45px; }
+    .modal-content h2 { margin: 10px 0 18px; font-family: "Nanum Myeongjo", serif; font-size: 32px; }
+    .modal-price { margin: 23px 0; color: var(--coral-dark); font-size: 24px; font-weight: 700; }
+    .modal-close { position: absolute; top: 15px; right: 15px; z-index: 3; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(255,255,255,.9); font-size: 18px; }
+
+    .toast { position: fixed; right: 24px; bottom: 24px; z-index: 200; padding: 15px 20px; border-radius: 12px; color: white; background: #57453f; box-shadow: var(--shadow); opacity: 0; transform: translateY(15px); pointer-events: none; transition: .3s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .fade-up { opacity: 0; transform: translateY(25px); transition: opacity .7s ease, transform .7s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 45px; padding: 70px 0; }
+      .hero-image { height: 460px; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .admin-layout { grid-template-columns: 1fr; }
+      .admin-sidebar { border-right: 0; border-bottom: 1px solid var(--line); }
+      .admin-menu { grid-template-columns: repeat(4, 1fr); }
+      .admin-brand { display: none; }
+    }
+    @media (max-width: 700px) {
+      .container { width: min(100% - 28px, 1160px); }
+      .section { padding: 75px 0; }
+      .nav-links { display: none; }
+      .hero { min-height: auto; }
+      .hero h1 { font-size: 43px; }
+      .hero-image-wrap { padding: 0; }
+      .hero-image { height: 400px; border-radius: 120px 120px 20px 20px; }
+      .artist-note { left: 10px; bottom: 20px; }
+      .gallery-header { display: block; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .stats-grid, .admin-content-grid, .easy-points { grid-template-columns: 1fr; }
+      .admin-main { padding: 18px; }
+      .admin-menu { display: flex; overflow-x: auto; }
+      .admin-menu button { white-space: nowrap; }
+      .modal-card { grid-template-columns: 1fr; }
+      .modal-image { min-height: 320px; height: 320px; }
+      .modal-content { padding: 28px; }
+      .footer-inner { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="back-bar">이 페이지는 1마침의 제작 범위를 보여주는 데모입니다 · <a href="index.html">1마침으로 돌아가기</a></div>
+
+<header class="header">
+  <div class="container nav">
+    <a href="#" class="logo">모모의 그림상점</a>
+    <nav class="nav-links">
+      <a href="#works">그림 구경하기</a>
+      <a href="#about">작가 이야기</a>
+      <a href="#admin">상점 관리</a>
+    </nav>
+    <a href="#works" class="btn btn-outline">작품 보기</a>
+  </div>
+</header>
+
+<section class="hero" id="about">
+  <div class="container hero-grid">
+    <div class="fade-up">
+      <span class="hero-label">ILLUSTRATOR MOMO'S LITTLE SHOP</span>
+      <h1>일상의 작은 순간을<br><span>그림으로 남깁니다.</span></h1>
+      <p class="hero-copy">
+        햇살이 들어오는 오후, 창가의 고양이, 여행 중 우연히 마주친 풍경처럼
+        오래 기억하고 싶은 순간들을 그립니다. 마음에 드는 그림 한 점을 천천히 골라보세요.
+      </p>
+      <div class="hero-actions">
+        <a href="#works" class="btn btn-primary">그림 구경하기</a>
+        <a href="#admin" class="btn btn-outline">상점은 어떻게 운영할까?</a>
+      </div>
+    </div>
+    <div class="hero-image-wrap fade-up">
+      <img class="hero-image" src="https://picsum.photos/seed/momo-hero/900/1100" alt="대표 작품 이미지">
+      <div class="artist-note">
+        <small>오늘의 작가 메모</small>
+        <strong>“조금 느리더라도<br>좋아하는 것을 오래 그려요.”</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section gallery" id="works">
+  <div class="container">
+    <div class="gallery-header fade-up">
+      <div>
+        <span class="eyebrow">ART SHOP</span>
+        <h2 class="section-title">오늘의 그림들</h2>
+        <p class="section-description">모모가 직접 그린 일러스트 작품입니다. 그림을 클릭하면 작품 이야기를 자세히 볼 수 있어요.</p>
+      </div>
+    </div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</section>
+
+<section class="section admin-section" id="admin">
+  <div class="container">
+    <div class="admin-intro fade-up">
+      <span class="eyebrow">MY OWN SHOP</span>
+      <h2 class="section-title">그림만 그리세요.<br>상점 관리는 어렵지 않게.</h2>
+      <p class="section-description" style="margin-inline:auto;">
+        코딩을 몰라도 가격을 바꾸고, 작품 이야기를 쓰고, 추천 링크를 넣고,
+        오늘 얼마나 판매됐는지 내 관리자 화면에서 직접 확인할 수 있습니다.
+      </p>
+    </div>
+
+    <div class="admin-shell fade-up">
+      <div class="admin-topbar">
+        <div class="window-dots"><span class="window-dot"></span><span class="window-dot"></span><span class="window-dot"></span></div>
+        <div class="admin-user">모모 작가님 · 관리자</div>
+      </div>
+      <div class="admin-layout">
+        <aside class="admin-sidebar">
+          <div class="admin-brand">모모의 관리실</div>
+          <div class="admin-menu">
+            <button class="active">대시보드</button>
+            <button>작품 관리</button>
+            <button>콘텐츠 작성</button>
+            <button>판매 내역</button>
+          </div>
+        </aside>
+        <main class="admin-main">
+          <div class="admin-title-row">
+            <div><small style="color:var(--brown-soft)">2026. 09. 16</small><h3>안녕하세요, 모모 작가님.</h3></div>
+            <button class="admin-save" id="saveDemo">변경사항 저장</button>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card"><span>오늘 판매액</span><strong>84,000원</strong></div>
+            <div class="stat-card"><span>이번 달 누적</span><strong>1,284,000원</strong></div>
+            <div class="stat-card"><span>이번 달 주문</span><strong>43건</strong></div>
+          </div>
+          <div class="admin-content-grid">
+            <div class="admin-panel">
+              <h4>① 작품 가격 수정</h4>
+              <p class="admin-panel-desc">개발자에게 요청하지 않고 직접 바꿔보세요.</p>
+              <div class="field"><label>작품명</label><input value="햇살 아래 작은 집"></div>
+              <div class="field"><label>판매 가격</label><input type="number" value="28000"></div>
+              <div class="field"><label>판매 상태</label><input value="판매중"></div>
+            </div>
+            <div class="admin-panel">
+              <h4>② 웹에서 바로 글쓰기</h4>
+              <p class="admin-panel-desc">PDF를 다시 만들어 올리지 않아도 바로 수정할 수 있어요.</p>
+              <div class="editor-toolbar">
+                <button type="button"><b>B</b></button>
+                <button type="button"><i>I</i></button>
+                <button type="button">H1</button>
+                <button type="button">•</button>
+                <button type="button">🔗</button>
+              </div>
+              <div class="editor-box" contenteditable="true">
+                이 그림은 늦은 봄날, 여행 중 만난 작은 집에서 시작됐어요. 창문으로 들어오는 빛이 예뻐서 한참을 바라보다가 그림으로 남겼습니다.
+              </div>
+            </div>
+            <div class="admin-panel">
+              <h4>③ 콘텐츠 안에 제휴링크 넣기</h4>
+              <p class="admin-panel-desc">작품 이야기나 콘텐츠 속에 추천 상품 링크를 직접 추가합니다.</p>
+              <div class="field"><label>버튼 문구</label><input id="affiliateText" value="제가 사용하는 드로잉 펜 보기"></div>
+              <div class="field"><label>제휴 링크</label><input id="affiliateUrl" value="https://example.com/affiliate"></div>
+              <div class="affiliate-preview"><span id="affiliatePreview">제가 사용하는 드로잉 펜 보기</span><strong>→</strong></div>
+            </div>
+            <div class="admin-panel">
+              <h4>④ 판매 현황 한눈에 보기</h4>
+              <p class="admin-panel-desc">어떤 작품이 잘 팔리는지 바로 확인할 수 있어요.</p>
+              <div class="sales-row"><span>햇살 아래 작은 집</span><strong>8건</strong></div>
+              <div class="sales-row"><span>고양이의 오후</span><strong>6건</strong></div>
+              <div class="sales-row"><span>우리 동네 꽃집</span><strong>5건</strong></div>
+              <div class="sales-row"><span>비 오는 날의 창문</span><strong>4건</strong></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div class="easy-points">
+      <div class="easy-point fade-up"><div class="easy-number">1</div><strong>가격도 내가 직접</strong><p>작품 가격이 바뀌어도 제작자에게 수정 요청할 필요가 없습니다.</p></div>
+      <div class="easy-point fade-up"><div class="easy-number">2</div><strong>글도 웹에서 바로</strong><p>파일을 새로 만들고 업로드하지 않고 관리자에서 바로 작성하고 수정합니다.</p></div>
+      <div class="easy-point fade-up"><div class="easy-number">3</div><strong>판매도 한눈에</strong><p>주문과 매출을 확인하면서 내 상점을 직접 운영할 수 있습니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container cta-inner fade-up">
+    <h2>당신의 그림도,<br>당신만의 상점에서.</h2>
+    <p>플랫폼 안의 판매자가 아니라 내 이름과 취향을 담은 독립적인 공간을 만들어보세요. 작품 판매부터 콘텐츠 관리까지 필요한 기능에 맞춰 제작합니다.</p>
+    <a href="contact.html" class="btn">이런 사이트 제작 문의하기 →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <span>© 2026 모모의 그림상점 · 1마침 Portfolio Demo</span>
+    <span>본 페이지는 웹 제작 포트폴리오를 위한 가상 데모입니다.</span>
+  </div>
+</footer>
+
+<div class="modal" id="artModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose" aria-label="닫기">×</button>
+    <img id="modalImage" class="modal-image" src="" alt="">
+    <div class="modal-content">
+      <span class="eyebrow">ORIGINAL ART</span>
+      <h2 id="modalTitle">작품명</h2>
+      <p id="modalDescription">작품 설명</p>
+      <div class="modal-price" id="modalPrice">28,000원</div>
+      <button class="btn btn-primary" id="modalBuy">이 작품 구매하기</button>
+      <small style="display:block;margin-top:14px;color:var(--brown-soft);">데모 페이지이므로 실제 결제는 진행되지 않습니다.</small>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" aria-live="polite">장바구니에 작품을 담았어요 :)</div>
+
+<script>
+  const artworks = [
+    { title: "햇살 아래 작은 집", price: 28000, seed: "momo-art-1", badge: "BEST", description: "늦은 봄날 여행에서 만난 작은 집을 그렸어요. 오후 햇살이 창가에 머무는 조용한 순간을 담은 작품입니다." },
+    { title: "고양이의 오후", price: 24000, seed: "momo-art-2", badge: "NEW", description: "아무것도 하지 않는 오후의 여유를 고양이의 모습으로 표현한 따뜻한 일러스트입니다." },
+    { title: "우리 동네 꽃집", price: 32000, seed: "momo-art-3", badge: "", description: "집으로 돌아오는 길마다 눈길이 가던 작은 꽃집의 풍경을 담았습니다." },
+    { title: "비 오는 날의 창문", price: 26000, seed: "momo-art-4", badge: "", description: "빗소리를 들으며 창밖을 바라보던 어느 오후의 기억을 그린 작품입니다." },
+    { title: "여름의 테이블", price: 29000, seed: "momo-art-5", badge: "NEW", description: "과일과 차가 놓인 여름날의 테이블을 산뜻하고 부드러운 색감으로 표현했습니다." },
+    { title: "조용한 산책", price: 23000, seed: "momo-art-6", badge: "", description: "해가 지기 전 동네를 천천히 걷던 순간에서 시작된 작은 풍경화입니다." },
+    { title: "작은 여행", price: 34000, seed: "momo-art-7", badge: "BEST", description: "낯선 도시에서 발견한 골목과 가게, 작은 표지판들을 모아 그린 여행 일러스트입니다." },
+    { title: "오늘도 안녕", price: 21000, seed: "momo-art-8", badge: "", description: "하루의 끝에서 건네는 작은 인사를 포근한 색감으로 표현했습니다." }
+  ];
+
+  const galleryGrid = document.getElementById("galleryGrid");
+  artworks.forEach((art, index) => {
+    const card = document.createElement("article");
+    card.className = "art-card fade-up";
+    card.innerHTML = `
+      <div class="art-image-wrap">
+        <img src="https://picsum.photos/seed/${art.seed}/600/750" alt="${art.title}" loading="lazy">
+        ${art.badge ? `<span class="art-badge">${art.badge}</span>` : ""}
+      </div>
+      <div class="art-info">
+        <h3 class="art-title">${art.title}</h3>
+        <div class="art-bottom">
+          <span class="price">${art.price.toLocaleString("ko-KR")}원</span>
+          <button class="buy-btn" data-index="${index}" type="button">구매하기</button>
+        </div>
+      </div>`;
+    galleryGrid.appendChild(card);
+  });
+
+  const modal = document.getElementById("artModal");
+  const modalClose = document.getElementById("modalClose");
+  const modalImage = document.getElementById("modalImage");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalDescription = document.getElementById("modalDescription");
+  const modalPrice = document.getElementById("modalPrice");
+  const modalBuy = document.getElementById("modalBuy");
+
+  function openModal(index) {
+    const art = artworks[index];
+    modalImage.src = `https://picsum.photos/seed/${art.seed}/800/1000`;
+    modalImage.alt = art.title;
+    modalTitle.textContent = art.title;
+    modalDescription.textContent = art.description;
+    modalPrice.textContent = `${art.price.toLocaleString("ko-KR")}원`;
+    modal.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal() { modal.classList.remove("open"); document.body.style.overflow = ""; }
+
+  galleryGrid.addEventListener("click", (event) => {
+    const button = event.target.closest(".buy-btn");
+    if (!button) return;
+    openModal(Number(button.dataset.index));
+  });
+  modalClose.addEventListener("click", closeModal);
+  modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeModal(); });
+
+  const toast = document.getElementById("toast");
+  let toastTimer;
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 2500);
+  }
+  modalBuy.addEventListener("click", () => { showToast("장바구니에 작품을 담았어요 :)"); closeModal(); });
+
+  const affiliateText = document.getElementById("affiliateText");
+  const affiliatePreview = document.getElementById("affiliatePreview");
+  affiliateText.addEventListener("input", () => { affiliatePreview.textContent = affiliateText.value || "추천 링크"; });
+  document.getElementById("saveDemo").addEventListener("click", () => showToast("변경사항이 저장되었습니다."));
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll(".fade-up").forEach((element) => observer.observe(element));
+</script>
+
+</body>
+</html>

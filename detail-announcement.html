@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공고·지원사업 자동 알림 | 1마침</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{
+  --green:#1B4332;--coral:#D97757;--coral-dark:#B85F42;
+  --ivory:#F1EEE6;--beige:#E8E3D6;--white:#FBFAF6;
+  --soft:#4C5A68;--line:#DAD3C3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Pretendard,"Noto Sans KR",sans-serif;background:var(--ivory);color:var(--green);line-height:1.65}
+a{text-decoration:none;color:inherit}
+.wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+section{padding:100px 0}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--coral);margin-bottom:12px}
+h1{font-size:clamp(42px,6vw,68px);line-height:1.12;letter-spacing:-.055em;font-weight:900}
+h2{font-size:clamp(30px,4vw,46px);line-height:1.25;letter-spacing:-.045em;font-weight:900}
+.desc{color:var(--soft);margin-top:18px;max-width:650px}
+.btn{display:inline-flex;padding:15px 23px;border-radius:10px;background:var(--coral);color:white;font-weight:800;transition:.2s}
+.btn:hover{background:var(--coral-dark);transform:translateY(-2px)}
+.fade{opacity:0;transform:translateY(22px);transition:.7s}
+.fade.on{opacity:1;transform:none}
+
+header{position:sticky;top:0;z-index:60;background:rgba(241,238,230,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.nav{width:min(1120px,calc(100% - 40px));margin:0 auto;height:72px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-weight:900;font-size:20px;color:var(--green);}
+.logo .mark{color:var(--coral);}
+.back-link{font-size:13px;color:var(--soft);}
+
+.hero{padding:70px 0;background:var(--white);overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
+.hero p{margin:24px 0 30px;color:var(--soft);max-width:560px}
+.hero-visual{position:relative;padding:35px;border-radius:28px;background:var(--green);box-shadow:0 25px 70px rgba(27,67,50,.17)}
+.search-row{display:flex;gap:8px;margin-bottom:24px}
+.search-box{flex:1;padding:12px 15px;background:white;border-radius:9px;color:#87908b;font-size:12px}
+.search-btn{padding:12px;background:var(--coral);color:white;border-radius:9px;font-size:11px;font-weight:800}
+.timeline{position:relative;padding-left:30px}
+.timeline:before{content:"";position:absolute;left:8px;top:5px;bottom:5px;width:2px;background:rgba(255,255,255,.15)}
+.time-item{position:relative;margin:17px 0;color:white}
+.time-item:before{content:"";position:absolute;left:-27px;top:6px;width:10px;height:10px;border-radius:50%;background:#82998f}
+.time-item.active:before{background:var(--coral);box-shadow:0 0 0 6px rgba(217,119,87,.17)}
+.time-item small{display:block;color:#a9b9b2;font-size:10px}
+.time-item strong{font-size:13px}
+.notification{margin-top:24px;padding:18px;border-radius:14px;background:white;transform:translateX(20px)}
+.notification .top{display:flex;justify-content:space-between;color:#89928e;font-size:10px}
+.notification strong{display:block;margin:9px 0 4px;color:var(--green)}
+.notification p{margin:0;color:var(--soft);font-size:11px}
+.badge{display:inline-flex;padding:5px 8px;background:#F8E6DF;color:var(--coral-dark);border-radius:5px;font-size:9px;font-weight:800}
+
+.compare{display:grid;grid-template-columns:1fr 70px 1fr;gap:18px;align-items:center;margin-top:45px}
+.compare-card{min-height:330px;padding:30px;border-radius:22px;background:var(--white);border:1px solid var(--line)}
+.compare-card.after{background:var(--green);color:white}
+.compare-title{font-size:12px;font-weight:800;color:var(--coral);margin-bottom:25px}
+.old-list{display:grid;gap:12px}
+.old{padding:13px;background:var(--ivory);border-radius:9px;color:var(--soft);font-size:12px;text-decoration:line-through}
+.arrow{text-align:center;font-size:28px;color:var(--coral)}
+.morning{font-size:54px;font-weight:900;letter-spacing:-.06em}
+.after p{color:#c5d2cc}
+.result-box{margin-top:20px;padding:17px;background:rgba(255,255,255,.1);border-radius:12px}
+
+.features{background:var(--white)}
+.feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:42px}
+.feature{position:relative;padding:27px 22px;border:1px solid var(--line);border-radius:17px;background:var(--ivory);transition:.25s}
+.feature:hover{transform:translateY(-7px);box-shadow:0 18px 40px rgba(27,67,50,.08)}
+.icon{width:47px;height:47px;display:flex;align-items:center;justify-content:center;border-radius:13px;background:var(--green);font-size:21px;margin-bottom:24px}
+.feature h3{font-size:17px;margin-bottom:8px}
+.feature p{color:var(--soft);font-size:12px}
+
+.mockup{margin-top:42px;padding:18px;border-radius:23px;background:var(--green)}
+.window{background:#F8F7F2;border-radius:14px;overflow:hidden}
+.window-top{padding:12px 18px;background:white;border-bottom:1px solid var(--line);font-size:11px;color:var(--soft)}
+.window-body{display:grid;grid-template-columns:190px 1fr;min-height:430px}
+.sidebar{padding:22px;background:#E9E6DD}
+.side-item{padding:10px;border-radius:7px;font-size:11px;color:var(--soft);margin-bottom:5px}
+.side-item.active{background:var(--green);color:white}
+.content{padding:27px}
+.alert-row{display:grid;grid-template-columns:90px 1fr 90px;gap:15px;align-items:center;padding:17px 0;border-bottom:1px solid var(--line)}
+.alert-row p{font-size:11px;color:var(--soft)}
+.status{padding:6px;text-align:center;border-radius:5px;background:#E2EFE9;color:var(--green);font-size:9px;font-weight:800}
+
+.targets{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:35px}
+.target{padding:25px;background:var(--white);border:1px solid var(--line);border-radius:15px}
+.target span{font-size:25px}
+.target strong{display:block;margin:13px 0 5px}
+.target p{font-size:12px;color:var(--soft)}
+
+.cta{text-align:center;background:var(--green);color:white}
+.cta p{margin:17px auto 27px;color:#c5d2cc}
+@media(max-width:800px){
+ .hero-grid,.compare,.window-body{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}
+ .feature-grid{grid-template-columns:1fr 1fr}.targets{grid-template-columns:1fr}
+ .sidebar{display:none}.alert-row{grid-template-columns:1fr}
+}
+@media(max-width:520px){.feature-grid{grid-template-columns:1fr}section{padding:70px 0}}
+</style>
+</head>
+<body>
+
+<header><div class="nav"><a href="index.html" class="logo">1<span class="mark">마침</span></a><a href="index.html" class="back-link">← 전체 상품 보기</a></div></header>
+
+<section class="hero">
+<div class="wrap hero-grid">
+ <div class="fade">
+  <div class="eyebrow">공고 · 지원사업 자동 알림</div>
+  <h1>지원사업 공고,<br>놓치고 나서 알게 되지<br>않으셨나요?</h1>
+  <p>매일 여러 사이트를 돌아다니지 않아도 됩니다. 원하는 지역·업종·키워드를 설정하면 조건에 맞는 공고만 찾아 아침에 알려드립니다.</p>
+  <a href="contact.html" class="btn">내 업무에 적용 가능한지 상담하기 →</a>
+ </div>
+
+ <div class="hero-visual fade">
+  <div class="search-row">
+   <div class="search-box">김포 · 소상공인 · 마케팅 지원</div>
+   <div class="search-btn">자동 검색 중</div>
+  </div>
+  <div class="timeline">
+   <div class="time-item"><small>06:00</small><strong>지원사업 사이트 12곳 확인</strong></div>
+   <div class="time-item"><small>06:03</small><strong>신규 공고 47건 수집</strong></div>
+   <div class="time-item"><small>06:04</small><strong>내 조건과 맞지 않는 42건 제외</strong></div>
+   <div class="time-item active"><small>08:00</small><strong>조건 일치 공고 5건 알림 발송</strong></div>
+  </div>
+  <div class="notification">
+   <div class="top"><span>🔔 오늘의 맞춤 공고</span><span>오전 8:00</span></div>
+   <strong>2026 소상공인 온라인 판로지원 사업</strong>
+   <p>신청마감 09.28 · 최대 300만원 지원</p>
+   <span class="badge">내 조건과 일치</span>
+  </div>
+ </div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+ <div class="eyebrow fade">BEFORE → AFTER</div>
+ <h2 class="fade">공고를 찾는 일이 아니라,<br>공고가 나를 찾아오게.</h2>
+ <div class="compare">
+  <div class="compare-card fade">
+   <div class="compare-title">BEFORE · 직접 찾을 때</div>
+   <div class="old-list">
+    <div class="old">기업마당 접속해서 검색</div>
+    <div class="old">지자체 홈페이지 다시 검색</div>
+    <div class="old">나라장터 공고 확인</div>
+    <div class="old">지난번 본 공고인지 다시 확인</div>
+    <div class="old">결국 바빠서 며칠 건너뜀</div>
+   </div>
+  </div>
+  <div class="arrow">→</div>
+  <div class="compare-card after fade">
+   <div class="compare-title">AFTER · 자동화 후</div>
+   <div class="morning">08:00</div>
+   <h3>오늘 볼 공고만 도착.</h3>
+   <p>프로그램은 내가 일하지 않는 시간에도 조건에 맞는 공고를 확인합니다.</p>
+   <div class="result-box"><strong>47개 신규 공고 → 필요한 5개만</strong></div>
+  </div>
+ </div>
+</div>
+</section>
+
+<section class="features">
+<div class="wrap">
+ <div class="eyebrow fade">CORE FEATURES</div>
+ <h2 class="fade">검색부터 선별, 알림까지<br>자동으로 이어집니다.</h2>
+ <div class="feature-grid">
+  <div class="feature fade"><div class="icon">🔎</div><h3>자동 수집</h3><p>지정한 사이트의 신규 공고를 정해진 시간마다 확인합니다.</p></div>
+  <div class="feature fade"><div class="icon">⚙️</div><h3>조건 필터링</h3><p>지역, 업종, 키워드 등 필요한 기준으로 공고를 걸러냅니다.</p></div>
+  <div class="feature fade"><div class="icon">🔔</div><h3>맞춤 알림</h3><p>조건에 맞는 신규 공고가 발견되면 정리해서 알려드립니다.</p></div>
+  <div class="feature fade"><div class="icon">📚</div><h3>공고 기록</h3><p>찾은 공고를 모아두고 마감일과 확인 여부를 관리할 수 있습니다.</p></div>
+ </div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+ <div class="eyebrow fade">ACTUAL SCREEN</div>
+ <h2 class="fade">오늘 확인할 공고가<br>한 화면에 정리됩니다.</h2>
+ <div class="mockup fade">
+  <div class="window">
+   <div class="window-top">1마침 · 맞춤 공고 모니터링</div>
+   <div class="window-body">
+    <div class="sidebar">
+     <div class="side-item active">오늘의 신규 공고 5</div>
+     <div class="side-item">관심 공고</div><div class="side-item">마감 임박</div><div class="side-item">검색 조건</div>
+    </div>
+    <div class="content">
+     <h3>오늘의 맞춤 공고</h3>
+     <p style="color:var(--soft);font-size:11px;margin-bottom:15px">2026년 9월 16일 · 신규 5건</p>
+     <div class="alert-row"><span class="badge">지원사업</span><div><strong>소상공인 온라인 판로지원</strong><p>온라인 판매 · 마케팅 비용 지원</p></div><span class="status">D-12</span></div>
+     <div class="alert-row"><span class="badge">용역공고</span><div><strong>지역축제 홈페이지 제작 용역</strong><p>웹사이트 구축 및 유지관리</p></div><span class="status">D-7</span></div>
+     <div class="alert-row"><span class="badge">지원사업</span><div><strong>디지털 전환 지원사업</strong><p>업무 자동화 및 온라인 시스템 구축</p></div><span class="status">D-18</span></div>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+ <div class="eyebrow fade">FOR YOU</div><h2 class="fade">이런 분께 특히 잘 맞습니다.</h2>
+ <div class="targets">
+  <div class="target fade"><span>🏢</span><strong>납품·용역업체</strong><p>새 입찰이나 용역 공고를 지속적으로 확인해야 하는 업체</p></div>
+  <div class="target fade"><span>🏪</span><strong>소상공인</strong><p>지원사업은 필요하지만 매일 찾아볼 시간이 없는 사업자</p></div>
+  <div class="target fade"><span>⏰</span><strong>검색에 지친 담당자</strong><p>매일 같은 사이트를 돌아다니며 새 글을 확인하는 분</p></div>
+ </div>
+</div>
+</section>
+
+<section class="cta">
+<div class="wrap fade">
+ <div class="eyebrow">1마침 AUTOMATION</div>
+ <h2>매일 찾는 정보가 있다면,<br>찾는 일부터 자동화할 수 있습니다.</h2>
+ <p>어떤 사이트를 어떻게 확인하고 있는지 알려주세요.<br>자동화 가능한 구조인지 먼저 확인해드립니다.</p>
+ <a href="contact.html" class="btn">자동화 상담 신청하기 →</a>
+</div>
+</section>
+
+<script>
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add("on")}),{threshold:.12});
+document.querySelectorAll(".fade").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
