@@ -8,20 +8,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="css/common.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
 
 <style>
-  :root{
-    --paper:#F1EEE6; --paper-dark:#E8E3D6; --card:#FBFAF6;
-    --ink:#1B4332; --ink-soft:#4C5A68; --ink-faint:#8B9199;
-    --brick:#D97757; --gold:#C79A45; --line:#DAD3C3; --green:#5B7A5E;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:"Noto Sans KR",sans-serif;background:var(--paper-dark);color:var(--ink);}
-  a{color:inherit;text-decoration:none;}
-  h1,h2{font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;}
-  button{font:inherit;cursor:pointer;border:none;}
+  /* 이 페이지 전용 스타일 (공통 스타일은 css/common.css 참고) */
+  body{font-family:"Noto Sans KR",sans-serif;background:var(--paper-dark);}
 
   .shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
   @media(max-width:800px){.shell{grid-template-columns:1fr;}}

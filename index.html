@@ -8,70 +8,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="css/common.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
 
 <style>
-  :root{
-    --paper:#F1EEE6;
-    --paper-dark:#E8E3D6;
-    --card:#FBFAF6;
-    --ink:#1B4332;
-    --ink-soft:#4C5A68;
-    --ink-faint:#8B9199;
-    --brick:#D97757;
-    --brick-dark:#B85F42;
-    --gold:#C79A45;
-    --line:#DAD3C3;
-    --green:#5B7A5E;
-    --radius:18px;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    font-family:"Pretendard","Noto Sans KR",sans-serif;
-    background:var(--paper);
-    color:var(--ink);
-    line-height:1.7;
-    overflow-x:hidden;
-  }
-  a{color:inherit;text-decoration:none;}
-  button{font:inherit;cursor:pointer;border:none;background:none;}
-  img{max-width:100%;display:block;}
+  /* index.html 전용 스타일 (공통 스타일은 css/common.css 참고) */
+  body{ overflow-x:hidden; }
   .serif{font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;}
-  .container{width:min(1120px, calc(100% - 48px));margin:0 auto;}
-  .section{padding:104px 0;}
-  .section-tight{padding:64px 0;}
 
-  h1,h2,h3{font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;letter-spacing:-0.01em;}
-
-  .tag{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:6px 14px;border:1px solid var(--line);border-radius:999px;
-    font-size:13px;color:var(--ink-soft);background:var(--card);
-  }
-  .tag .dot{width:6px;height:6px;border-radius:50%;background:var(--brick);}
-
-  .btn{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:15px 26px;border-radius:10px;font-size:15.5px;font-weight:600;
-    transition:.2s ease;
-  }
-  .btn-primary{background:var(--brick);color:#fff;box-shadow:0 10px 24px rgba(217,119,87,.28);}
-  .btn-primary:hover{background:var(--brick-dark);transform:translateY(-1px);}
-  .btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink);}
-  .btn-outline:hover{background:var(--ink);color:var(--paper);}
-  .btn-ghost{color:var(--ink-soft);border-bottom:1px solid var(--ink-faint);border-radius:0;padding:4px 0;}
-
-  /* ===== HEADER ===== */
-  header{
-    position:sticky;top:0;z-index:60;
-    background:rgba(241,238,230,.92);backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);
-  }
-  .nav{height:72px;display:flex;align-items:center;justify-content:space-between;}
-  .logo{font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;font-size:22px;display:flex;align-items:baseline;gap:2px;}
-  .logo .mark{color:var(--brick);}
+  /* ===== HEADER (인덱스 전용 nav-links / nav-cta) ===== */
   .nav-links{display:flex;gap:30px;font-size:14.5px;color:var(--ink-soft);}
   .nav-links a:hover{color:var(--ink);}
   .nav-cta{display:none;}
@@ -292,26 +238,7 @@
   .cta-strip h2{font-size:clamp(24px,3vw,32px);max-width:520px;line-height:1.4;}
   .cta-strip p{color:rgba(241,238,230,.7);margin-top:10px;font-size:14.5px;}
 
-  /* ===== FAQ ===== */
-  .faq-item{border-bottom:1px solid var(--line);}
-  .faq-q{
-    width:100%;text-align:left;padding:20px 4px;display:flex;justify-content:space-between;
-    align-items:center;font-size:15.5px;font-weight:600;
-  }
-  .faq-q .plus{font-size:20px;color:var(--brick);transition:.2s ease;font-weight:400;}
-  .faq-item.open .plus{transform:rotate(45deg);}
-  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;}
-  .faq-a p{padding:0 4px 20px;color:var(--ink-soft);font-size:14.5px;max-width:640px;}
-
-  /* ===== FOOTER ===== */
-  footer{background:var(--paper-dark);border-top:1px solid var(--line);padding:48px 0 30px;}
-  .footer-top{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;margin-bottom:28px;}
-  .footer-logo{font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;font-size:19px;margin-bottom:10px;}
-  .footer-links{display:flex;gap:20px;font-size:13.5px;color:var(--ink-soft);flex-wrap:wrap;}
-  .footer-fine{font-size:12.3px;color:var(--ink-faint);line-height:1.9;border-top:1px solid var(--line);padding-top:20px;}
-
-  .fade{opacity:0;transform:translateY(16px);transition:opacity .6s ease, transform .6s ease;}
-  .fade.visible{opacity:1;transform:translateY(0);}
+  /* FAQ, 푸터, 스크롤 페이드인 공통 스타일은 css/common.css에 있음 */
 </style>
 </head>
 <body>
@@ -347,7 +274,7 @@
       </p>
       <div class="hero-actions">
         <a href="contact.html" class="btn btn-primary">내 업무 자동화 상담하기</a>
-        <a href="#services" class="btn btn-outline">만들 수 있는 것 보기</a>
+        <a href="writer-campaign.html" class="btn btn-outline">나도 작가도전하기</a>
       </div>
     </div>
 
@@ -368,35 +295,6 @@
     </div>
   </div>
 </section>
-
-<!-- 나도 작가도전 (TEASER) -->
-<section class="section wc-teaser" id="writerChallenge">
-  <div class="container">
-    <span class="tag"><span class="dot"></span>요즘 1마침이 가장 먼저 만들고 싶은 것</span>
-    <h2 class="fade" style="font-size:clamp(28px,4vw,40px);margin-top:20px;line-height:1.4;">
-      맨날 공짜로 알려주던 그 이야기,<br>이번엔 돈 받고 알려주세요.
-    </h2>
-    <p class="fade" style="color:rgba(241,238,230,.75);font-size:15px;margin-top:16px;max-width:520px;margin-left:auto;margin-right:auto;">
-      친구에게 알려주고, 카톡으로 설명해주고, 블로그에 공짜로 써주던 당신의 경험.<br>
-      필요한 사람에게 하나씩 파는 내 책으로 만들 수 있습니다.
-    </p>
-
-    <div class="wc-examples fade">
-      <span>이혼하면서 직접 알아낸 것</span>
-      <span>아이 키우며 터득한 것</span>
-      <span>내 일 하면서 배운 것</span>
-    </div>
-    <p class="fade" style="color:var(--gold);font-size:14px;font-weight:700;margin-top:12px;">→ 누군가는 지금 그걸 검색하고 있습니다.</p>
-
-    <div class="wc-teaser-box fade">
-      <h3>나도 작가도전</h3>
-      <p>글만 쓰세요. 책이 되고, 가격을 붙이면 바로 판매할 수 있는<br>나만의 온라인 도서관을 만들어드립니다.</p>
-      <div class="wc-teaser-price">777,777원 · 선착순 50명 · 칩북 1년 무료</div>
-      <a href="writer-campaign.html" class="btn btn-primary">내가 가진 경험, 팔아보기 →</a>
-    </div>
-  </div>
-</section>
-<!-- /나도 작가도전 -->
 
 <!-- PAIN -->
 <section class="pain">
@@ -477,6 +375,35 @@
     </div>
   </div>
 </section>
+
+<!-- 나도 작가도전 (TEASER) -->
+<section class="section wc-teaser" id="writerChallenge">
+  <div class="container">
+    <span class="tag"><span class="dot"></span>창작자를 위한 서비스</span>
+    <h2 class="fade" style="font-size:clamp(28px,4vw,40px);margin-top:20px;line-height:1.4;">
+      맨날 공짜로 알려주던 그 이야기,<br>이번엔 돈 받고 알려주세요.
+    </h2>
+    <p class="fade" style="color:rgba(241,238,230,.75);font-size:15px;margin-top:16px;max-width:520px;margin-left:auto;margin-right:auto;">
+      친구에게 알려주고, 카톡으로 설명해주고, 블로그에 공짜로 써주던 당신의 경험.<br>
+      필요한 사람에게 하나씩 파는 내 책으로 만들 수 있습니다.
+    </p>
+
+    <div class="wc-examples fade">
+      <span>이혼하면서 직접 알아낸 것</span>
+      <span>아이 키우며 터득한 것</span>
+      <span>내 일 하면서 배운 것</span>
+    </div>
+    <p class="fade" style="color:var(--gold);font-size:14px;font-weight:700;margin-top:12px;">별거 아닌 것 같은 지식이, 누군가에게는 간절히 찾고 있는 정보가 될 수 있습니다.</p>
+
+    <div class="wc-teaser-box fade">
+      <h3>나도 작가도전</h3>
+      <p>글만 쓰세요. 책이 되고, 가격을 붙이면 바로 판매할 수 있는<br>나만의 온라인 도서관을 만들어드립니다.</p>
+      <div class="wc-teaser-price">777,777원 · 선착순 50명 · 칩북 1년 무료</div>
+      <a href="writer-campaign.html" class="btn btn-primary">내가 가진 경험, 팔아보기 →</a>
+    </div>
+  </div>
+</section>
+<!-- /나도 작가도전 -->
 
 <!-- CATALOG -->
 <section class="section" id="catalog" style="padding-top:0;">
@@ -769,31 +696,6 @@
   runChecklist();
   setInterval(runChecklist, 500 + rows.length*550 + 3200);
 
-  // fade-in on scroll
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }
-    });
-  }, {threshold:.12});
-  document.querySelectorAll('.fade').forEach(el=>io.observe(el));
-
-  // FAQ accordion
-  document.querySelectorAll('.faq-item').forEach(item=>{
-    const q = item.querySelector('.faq-q');
-    const a = item.querySelector('.faq-a');
-    q.addEventListener('click', ()=>{
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(o=>{
-        o.classList.remove('open');
-        o.querySelector('.faq-a').style.maxHeight = null;
-      });
-      if(!isOpen){
-        item.classList.add('open');
-        a.style.maxHeight = a.scrollHeight + 'px';
-      }
-    });
-  });
-
   // 카드에 가장 빠른 착수일 표시 (관리자 페이지에서 설정한 값을 실시간으로 불러옴)
   document.querySelectorAll('.cat-start').forEach(async el=>{
     const key = el.dataset.startFor;
@@ -801,6 +703,8 @@
     el.textContent = '가장 빠른 착수일 ' + (data ? data.value : '2026년 9월 28일');
   });
 </script>
+<!-- 스크롤 페이드인 + FAQ 아코디언 공통 스크립트 -->
+<script src="js/common.js"></script>
 
 </body>
 </html>
