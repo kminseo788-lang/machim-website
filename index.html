@@ -151,6 +151,29 @@
   .ba-item-after{border-bottom-color:rgba(241,238,230,.15);}
   .ba-item-after::before{content:"✓";color:var(--gold);flex:0 0 auto;font-weight:700;}
 
+  /* ===== 나도 작가도전 ===== */
+  .wc-quote-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:32px 0 22px;}
+  @media(max-width:760px){.wc-quote-grid{grid-template-columns:1fr;}}
+  .wc-quote-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center;}
+  .wc-quote-card .bubble{font-size:14px;color:var(--ink);margin-bottom:10px;line-height:1.5;}
+  .wc-quote-card .who{font-size:12.5px;color:var(--ink-faint);font-weight:600;}
+  .wc-callout{background:#E4EBE2;border-left:4px solid var(--green);padding:16px 20px;border-radius:0 12px 12px 0;font-size:14.5px;font-weight:700;color:var(--green);margin-bottom:36px;}
+
+  .wc-feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:40px;}
+  @media(max-width:860px){.wc-feat-grid{grid-template-columns:1fr 1fr;}}
+  @media(max-width:520px){.wc-feat-grid{grid-template-columns:1fr;}}
+  .wc-feat-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;}
+  .wc-feat-item .ic{width:36px;height:36px;border-radius:10px;background:#F6E3DD;color:var(--brick-dark);display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px;font-weight:800;}
+  .wc-feat-item .t{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .wc-feat-item .d{font-size:12.5px;color:var(--ink-soft);}
+
+  .wc-price-box{background:var(--card);border:1.6px solid var(--brick);border-radius:20px;padding:34px 30px;text-align:center;}
+  .wc-badge{display:inline-block;background:var(--brick);color:#fff;font-size:12.5px;font-weight:700;padding:6px 14px;border-radius:999px;margin-bottom:16px;}
+  .wc-price-row{display:flex;align-items:baseline;justify-content:center;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
+  .wc-original{font-size:15px;color:var(--ink-faint);text-decoration:line-through;}
+  .wc-final{font-size:36px;font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;color:var(--brick);}
+  .wc-sub{font-size:13.5px;color:var(--ink-soft);margin-bottom:22px;}
+
   /* ===== SERVICES ===== */
   .svc-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:18px;margin-top:44px;}
   @media(max-width:860px){.svc-grid{grid-template-columns:1fr;}}
@@ -361,7 +384,7 @@
     <div class="pain-grid">
       <div class="pain-item fade"><div class="box"></div>그 서류, 어디 뒀는지 또 찾고 계신가요?</div>
       <div class="pain-item fade"><div class="box"></div>관심 없는 고객 붙들고 한 시간씩 상담하고 계신가요?</div>
-      <div class="pain-item fade"><div class="box"></div>매일 아침 경쟁사 사이트 들어가서 가격 확인하기</div>
+      <div class="pain-item fade"><div class="box"></div>그거 기억하느라, 정작 중요한 건 놓치고 계시지 않나요?</div>
       <div class="pain-item fade"><div class="box"></div>예약·주문 들어올 때마다 손으로 엑셀에 옮겨 적기</div>
       <div class="pain-item fade"><div class="box"></div>결제일 놓쳐서 나중에 곤란해지신 적 있나요?</div>
       <div class="pain-item fade"><div class="box"></div>고객마다 다른 일정·취향·결제일 손으로 관리하기</div>
@@ -384,7 +407,7 @@
         <div class="ba-item ba-item-before">그 서류, 어디 뒀는지 또 찾고 계신가요?</div>
         <div class="ba-item ba-item-before">관심 없는 고객 붙들고 한 시간씩 상담하고 계신가요?</div>
         <div class="ba-item ba-item-before">결제일 놓쳐서 나중에 곤란해지신 적 있나요?</div>
-        <div class="ba-item ba-item-before">매일 아침 경쟁사 사이트부터 확인하고 하루를 시작하시나요?</div>
+        <div class="ba-item ba-item-before">머릿속이 복잡해서, 정작 중요한 생각은 못 하고 계신가요?</div>
         <div class="ba-item ba-item-before">문의 내용을 엑셀로 옮기다 실수한 적 있나요?</div>
         <div class="ba-item ba-item-before">"이거 언제 했더라?" 기억을 더듬으며 일하고 계신가요?</div>
       </div>
@@ -394,13 +417,14 @@
         <div class="ba-item ba-item-after">관리자 페이지 열어서 오늘 할 일만 확인합니다</div>
         <div class="ba-item ba-item-after">진짜 살 고객만 우선상담 목록에 자동으로 정리됩니다</div>
         <div class="ba-item ba-item-after">결제일·일정은 알아서 알림이 옵니다</div>
-        <div class="ba-item ba-item-after">경쟁사 가격은 매일 아침 요약으로 받아봅니다</div>
+        <div class="ba-item ba-item-after">머리는 비우고, 중요한 결정에만 씁니다</div>
         <div class="ba-item ba-item-after">문의 데이터는 자동으로 정리되어 쌓입니다</div>
         <div class="ba-item ba-item-after">고객은 필요한 정보를, 필요한 시점에 받아서 만족합니다</div>
       </div>
     </div>
 
     <p class="fade" style="text-align:center;color:var(--ink-soft);font-size:14.5px;margin-top:32px;">
+      머릿속이 복잡하면 좋은 생각도 떠오르지 않습니다.<br>
       사장님은 찾고 기억하고 정리하는 일 대신, 판단하고 결정하는 일에만 집중하시면 됩니다.
     </p>
   </div>
@@ -484,6 +508,13 @@
         <p>기본형 5페이지 반응형 홈페이지부터 풀커머스 쇼핑몰까지 제작합니다.</p>
         <div class="cat-price">29만원부터</div>
         <div class="cat-start" data-start-for="homepage">가장 빠른 착수일 확인 중…</div>
+      </a>
+      <a href="detail-writer-profile.html" class="cat-card fade" style="--icon-color:#C79A45;--icon-bg:#F3EAD4;">
+        <div class="cat-icon">✍️</div>
+        <h4>작가 프로필 페이지</h4>
+        <p>프로필, 소개, 책 목록만 담은 1페이지 소개 사이트. 칩북 등에서 활동하는 작가·창작자에게 적합합니다.</p>
+        <div class="cat-price">9.9만원</div>
+        <div class="cat-start" data-start-for="writerProfile">가장 빠른 착수일 확인 중…</div>
       </a>
     </div>
 
@@ -623,6 +654,50 @@
           <p>회원 전용 콘텐츠를 발행하고 검색 가능한 아카이브로 운영합니다.</p>
         </div>
       </a>
+    </div>
+  </div>
+</section>
+
+<!-- 나도 작가도전 -->
+<section class="section" id="writerChallenge" style="background:var(--paper-dark);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="container">
+    <span class="tag"><span class="dot"></span>나도 작가도전</span>
+    <h2 class="fade" style="font-size:clamp(26px,3vw,34px);margin-top:16px;">당신의 경험도,<br>누군가에겐 꼭 필요한 책입니다.</h2>
+    <p class="fade" style="color:var(--ink-soft);font-size:14.5px;margin-top:10px;max-width:560px;">
+      거창한 주제가 아니어도 괜찮습니다. 나와 비슷한 상황을 먼저 겪은 사람의 경험이, 전문가의 정리된 지식보다 훨씬 바로 쓸 수 있는 답이 됩니다.
+    </p>
+
+    <div class="wc-quote-grid">
+      <div class="wc-quote-card fade">
+        <div class="bubble">"승급 앞두고, 이걸 어떻게 준비하지?"</div>
+        <div class="who">승급을 앞둔 사람의 고민</div>
+      </div>
+      <div class="wc-quote-card fade">
+        <div class="bubble">"이런 결정, 나 같은 사람도 있을까?"</div>
+        <div class="who">1인가구의 고민</div>
+      </div>
+      <div class="wc-quote-card fade">
+        <div class="bubble">"이걸 진작 알았더라면…"</div>
+        <div class="who">이직을 준비하는 사람의 고민</div>
+      </div>
+    </div>
+    <div class="wc-callout fade">중요한 건 누가 썼는가가 아니라, 나와 얼마나 비슷한 상황인가입니다.</div>
+
+    <div class="wc-feat-grid">
+      <div class="wc-feat-item fade"><div class="ic">✎</div><div class="t">웹에서 바로 쓰고</div><div class="d">바로 판매</div></div>
+      <div class="wc-feat-item fade"><div class="ic">⟳</div><div class="t">수정은 언제든지</div><div class="d">페널티 없이</div></div>
+      <div class="wc-feat-item fade"><div class="ic">🖼</div><div class="t">가격도, 표지도</div><div class="d">내 맘대로 설정</div></div>
+      <div class="wc-feat-item fade"><div class="ic">🔗</div><div class="t">제휴링크로</div><div class="d">부수익까지</div></div>
+    </div>
+
+    <div class="wc-price-box fade">
+      <span class="wc-badge">얼리버드 · 선착순 50명</span>
+      <div class="wc-price-row">
+        <span class="wc-original">정가 1,900,000원</span>
+        <span class="wc-final">777,777원</span>
+      </div>
+      <div class="wc-sub">칩북 1년 무료 입점 혜택 포함 (월 15,000원 × 12개월 상당)</div>
+      <a href="contact.html" class="btn btn-primary">나도 작가도전하기 →</a>
     </div>
   </div>
 </section>

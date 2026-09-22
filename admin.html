@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>관리자 | 1마침</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+
+<style>
+  :root{
+    --paper:#F1EEE6; --paper-dark:#E8E3D6; --card:#FBFAF6;
+    --ink:#1B4332; --ink-soft:#4C5A68; --ink-faint:#8B9199;
+    --brick:#D97757; --gold:#C79A45; --line:#DAD3C3; --green:#5B7A5E;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:"Noto Sans KR",sans-serif;background:var(--paper-dark);color:var(--ink);}
+  a{color:inherit;text-decoration:none;}
+  h1,h2{font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;}
+  button{font:inherit;cursor:pointer;border:none;}
+
+  .shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+  @media(max-width:800px){.shell{grid-template-columns:1fr;}}
+
+  .sidebar{background:var(--ink);color:var(--paper);padding:26px 18px;}
+  .sidebar .logo{font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;font-size:20px;margin-bottom:34px;}
+  .sidebar .logo .mark{color:var(--gold);}
+  .menu{display:grid;gap:4px;}
+  .menu button{
+    text-align:left;padding:11px 13px;border-radius:9px;background:transparent;
+    color:rgba(241,238,230,.75);font-size:14.5px;
+  }
+  .menu button.active, .menu button:hover{background:rgba(255,255,255,.08);color:#fff;}
+
+  .main{padding:34px 36px;}
+  @media(max-width:600px){.main{padding:24px 18px;}}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:14px;}
+  .topbar h1{font-size:24px;}
+  .topbar .today{font-size:13px;color:var(--ink-faint);}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* dashboard */
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+  @media(max-width:700px){.stat-grid{grid-template-columns:1fr;}}
+  .stat-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;}
+  .stat-card .label{font-size:12.5px;color:var(--ink-faint);margin-bottom:8px;}
+  .stat-card .value{font-size:26px;font-weight:900;font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;}
+  .stat-card .value.brick{color:var(--brick);}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;margin-bottom:20px;}
+  .panel h3{font-size:17px;font-family:"Noto Sans KR";font-weight:700;margin-bottom:6px;}
+  .panel .desc{font-size:13px;color:var(--ink-soft);margin-bottom:18px;}
+
+  /* schedule groups */
+  .group-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .group-tab{padding:9px 16px;border-radius:999px;border:1.5px solid var(--line);font-size:13.5px;background:var(--paper);}
+  .group-tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px;}
+  .cal-cell{
+    aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-size:12.5px;background:var(--paper);border:1px solid var(--line);color:var(--ink-faint);cursor:pointer;
+  }
+  .cal-cell.available{background:#EAF2EA;border-color:var(--green);color:var(--green);font-weight:700;}
+  .cal-cell.blocked{background:#F6E8E4;border-color:var(--brick);color:var(--brick);text-decoration:line-through;}
+  .cal-cell.empty{background:transparent;border:none;cursor:default;}
+  .legend{display:flex;gap:16px;font-size:12.5px;color:var(--ink-soft);margin-bottom:10px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block;}
+
+  .field-row{display:flex;gap:12px;align-items:center;margin-top:14px;flex-wrap:wrap;}
+  .field-row label{font-size:13.5px;color:var(--ink-soft);}
+  .field-row input{padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;font:inherit;width:120px;}
+  .save-btn{padding:9px 18px;border-radius:8px;background:var(--brick);color:#fff;font-size:13.5px;font-weight:600;}
+
+  /* orders table */
+  table{width:100%;border-collapse:collapse;font-size:13.8px;}
+  th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);}
+  th{color:var(--ink-faint);font-weight:600;font-size:12.5px;}
+  .status-badge{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;}
+  .status-결제완료{background:#EAF2EA;color:var(--green);}
+  .status-착수대기{background:#F3ECD8;color:var(--gold);}
+  .status-제작중{background:#E4EAF6;color:#3A5A9C;}
+  .status-완료{background:#E9E5DC;color:var(--ink-soft);}
+  select.status-select{border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;background:var(--paper);}
+
+  /* products */
+  .product-row{display:flex;justify-content:space-between;align-items:center;padding:14px 4px;border-bottom:1px solid var(--line);font-size:14.5px;}
+  .product-row input{width:80px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;font:inherit;}
+
+  /* 로그인 게이트 */
+  #loginGate{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--paper-dark);}
+  #loginGate .login-card{width:min(360px, calc(100% - 40px));background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:40px 32px;text-align:center;}
+  #loginGate .logo{font-family:"Pretendard","Noto Sans KR",sans-serif;font-weight:800;font-size:24px;margin-bottom:6px;}
+  #loginGate .logo .mark{color:var(--brick);}
+  #loginGate p.sub{color:var(--ink-soft);font-size:13.5px;margin-bottom:24px;}
+  #loginGate input{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:10px;font:inherit;margin-bottom:12px;background:var(--paper);}
+  #loginGate button{width:100%;padding:13px;border-radius:10px;background:var(--brick);color:#fff;font-weight:700;font-size:15px;}
+  #loginGate .err{color:#c0392b;font-size:13px;margin-top:10px;display:none;}
+  #adminShell{display:none;}
+  .logout-btn{margin-top:16px;font-size:12.5px;color:var(--ink-faint);text-decoration:underline;cursor:pointer;background:none;border:none;padding:0;}
+</style>
+</head>
+<body>
+
+<div id="loginGate">
+  <div class="login-card">
+    <div class="logo">1<span class="mark">마침</span> 관리자</div>
+    <p class="sub">관리자 계정으로 로그인하세요.</p>
+    <form id="loginForm">
+      <input type="email" id="loginEmail" placeholder="이메일" required>
+      <input type="password" id="loginPassword" placeholder="비밀번호" required>
+      <button type="submit">로그인</button>
+      <div class="err" id="loginErr">이메일 또는 비밀번호가 올바르지 않습니다.</div>
+    </form>
+  </div>
+</div>
+
+<div class="shell" id="adminShell">
+  <aside class="sidebar">
+    <div class="logo">1<span class="mark">마침</span> 관리자</div>
+    <div class="menu">
+      <button class="active" data-view="dashboard">대시보드</button>
+      <button data-view="schedule">제작 일정</button>
+      <button data-view="orders">주문 관리</button>
+      <button data-view="inquiries">문의 관리</button>
+      <button data-view="products">상품 설정</button>
+    </div>
+    <button class="logout-btn" onclick="sb.auth.signOut().then(()=>location.reload())">로그아웃</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1 id="viewTitle">대시보드</h1>
+      <span class="today">2026년 9월 16일</span>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section class="view active" data-view="dashboard">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">진행 중</div><div class="value" id="statInProgress">-</div></div>
+        <div class="stat-card"><div class="label">대기 중</div><div class="value" id="statWaiting">-</div></div>
+        <div class="stat-card"><div class="label">신규 문의</div><div class="value brick" id="statNewInquiries">-</div></div>
+      </div>
+      <div class="panel">
+        <h3>최근 주문</h3>
+        <div class="desc">최근 접수된 주문입니다.</div>
+        <table>
+          <thead><tr><th>고객</th><th>상품</th><th>금액</th><th>상태</th></tr></thead>
+          <tbody id="recentOrderTable"><tr><td colspan="4">불러오는 중…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SCHEDULE -->
+    <section class="view" data-view="schedule">
+      <div class="panel">
+        <h3>제작 일정 — 하루 가용시간 기반 자동 계산</h3>
+        <div class="desc">진행 중인 주문들의 예상 소요시간을 하루 가용시간으로 나눠서 다음 착수 가능일을 추천해드립니다. 실제 고객에게 보여줄 날짜는 "상품 설정" 탭에서 이 추천값을 참고해 직접 확인 후 저장하세요 (자동으로 덮어쓰지 않습니다).</div>
+
+        <div class="field-row">
+          <label>하루 가용 시간</label>
+          <input type="number" id="dailyCapacityInput" style="width:90px;" min="1" max="16">시간
+          <button class="save-btn" onclick="saveDailyCapacity()">저장</button>
+        </div>
+        <div class="desc" style="margin-top:2px;">처음엔 하루 5시간 정도로 시작하고, 일감이 밀리면 늘리거나(전업 전환), 감당 안 되면 협업을 고려하는 식으로 언제든 바꿀 수 있어요.</div>
+
+        <div class="stat-grid" style="margin-top:22px;">
+          <div class="stat-card"><div class="label">현재 밀린 작업</div><div class="value" id="statPendingHours">-</div></div>
+          <div class="stat-card"><div class="label">예상 소요 일수</div><div class="value" id="statPendingDays">-</div></div>
+          <div class="stat-card"><div class="label">추천 다음 착수일</div><div class="value brick" id="statSuggestedDate">-</div></div>
+        </div>
+
+        <h3 style="font-size:15px;margin-top:26px;">진행 중 주문별 예상 소요시간</h3>
+        <table>
+          <thead><tr><th>고객</th><th>상품</th><th>상태</th><th>예상 소요시간</th></tr></thead>
+          <tbody id="capacityOrderTable"><tr><td colspan="4">불러오는 중…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section class="view" data-view="orders">
+      <div class="panel">
+        <h3>주문 관리</h3>
+        <div class="desc">상태를 바꾸면 바로 저장됩니다. "완료"로 바꾸면 이후 고객 알림 자동화가 연결될 예정입니다.</div>
+        <table>
+          <thead><tr><th>고객</th><th>상품</th><th>금액</th><th>연락처</th><th>착수일</th><th>상태 / 고객에게 보여줄 메모</th></tr></thead>
+          <tbody id="orderTable"><tr><td colspan="6">불러오는 중…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- INQUIRIES -->
+    <section class="view" data-view="inquiries">
+      <div class="panel">
+        <h3>문의 관리</h3>
+        <div class="desc">contact.html을 통해 접수된 상담 문의입니다.</div>
+        <table>
+          <thead><tr><th>이름</th><th>연락처</th><th>업무</th><th>빈도</th><th>내용</th><th>상태 / 고객에게 보여줄 답변</th></tr></thead>
+          <tbody id="inquiryTable"><tr><td colspan="6">불러오는 중…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="view" data-view="products">
+      <div class="panel">
+        <h3>상품별 예상 소요시간 설정</h3>
+        <div class="desc">이 값을 기준으로 "제작 일정" 탭에서 다음 착수 가능일을 자동 추천합니다. 새 주문이 들어올 때 이 값이 기본으로 적용돼요.</div>
+        <div class="product-row">
+          <span>경쟁사 가격·재고 모니터링</span>
+          <div><input type="number" id="hoursInput_priceMonitoring" style="width:80px;"> 시간</div>
+        </div>
+        <div class="product-row">
+          <span>홈페이지 기본형 (페이지 추가 없음 기준)</span>
+          <div><input type="number" id="hoursInput_homepageBase" style="width:80px;"> 시간</div>
+        </div>
+        <div class="product-row">
+          <span>홈페이지 — 추가 페이지 1개당</span>
+          <div><input type="number" id="hoursInput_homepagePerPage" style="width:80px;"> 시간</div>
+        </div>
+        <div class="product-row">
+          <span>작가 프로필 페이지 (칩북 등 창작자용)</span>
+          <div><input type="number" id="hoursInput_writerProfile" style="width:80px;"> 시간</div>
+        </div>
+        <button class="save-btn" style="margin-top:16px;" onclick="saveProductHours()">변경사항 저장</button>
+        <div id="productSaveMsg" style="font-size:12.5px;color:var(--green);margin-top:10px;display:none;">저장되었습니다.</div>
+      </div>
+
+      <div class="panel">
+        <h3>현재 가장 빠른 착수 가능일 (고객에게 표시)</h3>
+        <div class="desc">여기서 저장하면 고객이 보는 상품 상세페이지에 바로 반영됩니다. "제작 일정" 탭의 추천값을 참고해서 입력하세요.</div>
+        <div class="product-row">
+          <span>경쟁사 가격·재고 모니터링</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="startDateInput_priceMonitoring" style="width:180px;" placeholder="예: 2026년 9월 28일">
+            <button class="save-btn" onclick="saveStartDate('priceMonitoring')">저장</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--ink-faint);margin:-4px 0 14px;" id="suggestHint_priceMonitoring"></div>
+        <div class="product-row">
+          <span>홈페이지 기본형</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="startDateInput_homepage" style="width:180px;" placeholder="예: 2026년 9월 28일">
+            <button class="save-btn" onclick="saveStartDate('homepage')">저장</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--ink-faint);margin:-4px 0 14px;" id="suggestHint_homepage"></div>
+        <div class="product-row">
+          <span>작가 프로필 페이지</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="startDateInput_writerProfile" style="width:180px;" placeholder="예: 2026년 9월 28일">
+            <button class="save-btn" onclick="saveStartDate('writerProfile')">저장</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--ink-faint);margin:-4px 0 14px;" id="suggestHint_writerProfile"></div>
+        <div id="saveMsg" style="font-size:12.5px;color:var(--green);margin-top:10px;display:none;">저장되었습니다. 상세페이지에 반영됩니다.</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // menu nav
+  document.querySelectorAll('.menu button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.menu button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const v = btn.dataset.view;
+      document.querySelectorAll('.view').forEach(sec=>sec.classList.remove('active'));
+      document.querySelector(`.view[data-view="${v}"]`).classList.add('active');
+      document.getElementById('viewTitle').textContent = btn.textContent;
+    });
+  });
+
+  // orders — 실제 Supabase 데이터 로드
+  const orderTable = document.getElementById('orderTable');
+  const recentOrderTable = document.getElementById('recentOrderTable');
+  const STATUS_OPTIONS = ['결제확인중','결제완료','착수대기','제작중','검수중','완료'];
+
+  async function loadOrders(){
+    const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+    if(error){ console.error(error); orderTable.innerHTML = '<tr><td colspan="6">불러오기 실패</td></tr>'; return; }
+
+    orderTable.innerHTML = '';
+    if(!data.length){ orderTable.innerHTML = '<tr><td colspan="6">아직 접수된 주문이 없습니다.</td></tr>'; }
+    data.forEach(o=>{
+      const tr = document.createElement('tr');
+      const amountText = (o.amount || 0).toLocaleString('ko-KR') + '원';
+      const startText = o.start_date || (o.options && o.options.picked_start_date_label) || '-';
+      tr.innerHTML = `
+        <td>${o.customer_name || '-'}</td><td>${o.product_name}</td><td>${amountText}</td>
+        <td>${o.customer_phone || '-'}</td><td>${startText}</td>
+        <td>
+          <select class="status-select" data-id="${o.id}">
+            ${STATUS_OPTIONS.map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+          <div style="margin-top:8px;">
+            <textarea class="note-input" data-id="${o.id}" placeholder="고객에게 보여줄 메모 (예: 자재 발주 완료, 9/25 전달 예정)" style="width:100%;min-height:44px;font:inherit;font-size:12.5px;padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;">${o.admin_note || ''}</textarea>
+            <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;" data-note-save="${o.id}">메모 저장</button>
+          </div>
+        </td>`;
+      orderTable.appendChild(tr);
+    });
+
+    orderTable.querySelectorAll('.status-select').forEach(sel=>{
+      sel.addEventListener('change', async ()=>{
+        const id = sel.dataset.id;
+        const newStatus = sel.value;
+        const { error } = await sb.from('orders').update({
+          status: newStatus,
+          completed_at: newStatus === '완료' ? new Date().toISOString() : null
+        }).eq('id', id);
+        if(error){ alert('상태 변경 실패: ' + error.message); return; }
+        // TODO: 여기서 카카오 알림톡/문자 발송 트리거 연결 예정
+        refreshDashboardStats();
+        refreshCapacityPlanner();
+      });
+    });
+
+    orderTable.querySelectorAll('[data-note-save]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const id = btn.dataset.noteSave;
+        const val = orderTable.querySelector(`textarea[data-id="${id}"]`).value;
+        const { error } = await sb.from('orders').update({ admin_note: val }).eq('id', id);
+        if(error){ alert('저장 실패: ' + error.message); return; }
+        btn.textContent = '저장됨';
+        setTimeout(()=>{ btn.textContent = '메모 저장'; }, 1500);
+      });
+    });
+
+    // 대시보드 최근 주문 3건
+    recentOrderTable.innerHTML = '';
+    data.slice(0,3).forEach(o=>{
+      const tr = document.createElement('tr');
+      const amountText = (o.amount || 0).toLocaleString('ko-KR') + '원';
+      tr.innerHTML = `<td>${o.customer_name || '-'}</td><td>${o.product_name}</td><td>${amountText}</td><td>${o.status}</td>`;
+      recentOrderTable.appendChild(tr);
+    });
+    if(!data.length) recentOrderTable.innerHTML = '<tr><td colspan="4">아직 주문이 없습니다.</td></tr>';
+
+    refreshDashboardStats(data);
+    refreshCapacityPlanner(data);
+  }
+
+  async function refreshDashboardStats(cachedOrders){
+    const { data: orders } = cachedOrders ? { data: cachedOrders } : await sb.from('orders').select('status');
+    const inProgress = (orders || []).filter(o=>o.status==='제작중' || o.status==='검수중').length;
+    const waiting = (orders || []).filter(o=>o.status==='결제확인중' || o.status==='결제완료' || o.status==='착수대기').length;
+    document.getElementById('statInProgress').textContent = inProgress + '건';
+    document.getElementById('statWaiting').textContent = waiting + '건';
+
+    const { count } = await sb.from('inquiries').select('*', { count: 'exact', head: true }).eq('status','신규');
+    document.getElementById('statNewInquiries').textContent = (count ?? 0) + '건';
+  }
+
+  // inquiries
+  const inquiryTable = document.getElementById('inquiryTable');
+  async function loadInquiries(){
+    const { data, error } = await sb.from('inquiries').select('*').order('created_at', { ascending: false });
+    if(error){ console.error(error); inquiryTable.innerHTML = '<tr><td colspan="6">불러오기 실패</td></tr>'; return; }
+    inquiryTable.innerHTML = '';
+    if(!data.length){ inquiryTable.innerHTML = '<tr><td colspan="6">아직 접수된 문의가 없습니다.</td></tr>'; }
+    data.forEach(q=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${q.name || '-'}</td><td>${q.phone || '-'}</td><td>${q.task_type || '-'}</td>
+        <td>${q.frequency || '-'}</td><td style="max-width:220px;">${q.scope || '-'}</td>
+        <td>
+          <select class="status-select" data-id="${q.id}">
+            <option ${q.status==='신규'?'selected':''}>신규</option>
+            <option ${q.status==='검토중'?'selected':''}>검토중</option>
+            <option ${q.status==='답변완료'?'selected':''}>답변완료</option>
+          </select>
+          <div style="margin-top:8px;">
+            <textarea class="reply-input" data-id="${q.id}" placeholder="고객에게 보여줄 답변" style="width:100%;min-height:50px;font:inherit;font-size:12.5px;padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;">${q.admin_reply || ''}</textarea>
+            <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;" data-reply-save="${q.id}">답변 저장</button>
+          </div>
+        </td>`;
+      inquiryTable.appendChild(tr);
+    });
+    inquiryTable.querySelectorAll('.status-select').forEach(sel=>{
+      sel.addEventListener('change', async ()=>{
+        const { error } = await sb.from('inquiries').update({ status: sel.value }).eq('id', sel.dataset.id);
+        if(error){ alert('상태 변경 실패: ' + error.message); return; }
+        refreshDashboardStats();
+      });
+    });
+    inquiryTable.querySelectorAll('[data-reply-save]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const id = btn.dataset.replySave;
+        const val = inquiryTable.querySelector(`textarea[data-id="${id}"]`).value;
+        const { error } = await sb.from('inquiries').update({ admin_reply: val, status: '답변완료' }).eq('id', id);
+        if(error){ alert('저장 실패: ' + error.message); return; }
+        btn.textContent = '저장됨';
+        setTimeout(()=>{ btn.textContent = '답변 저장'; }, 1500);
+        loadInquiries();
+        refreshDashboardStats();
+      });
+    });
+  }
+
+  // --- 로그인 게이트 ---
+  // 이 이메일들만 관리자 화면에 들어올 수 있습니다. (Supabase Auth에 계정이 있어도 여기 없으면 접근 불가)
+  const ADMIN_EMAILS = ['kminseo788@gmail.com'];
+
+  async function showAdmin(){
+    document.getElementById('loginGate').style.display = 'none';
+    document.getElementById('adminShell').style.display = 'grid';
+    loadOrders();
+    loadInquiries();
+    loadProductHours();
+  }
+
+  async function enforceAdminEmail(){
+    const { data } = await sb.auth.getUser();
+    const email = data?.user?.email?.toLowerCase();
+    if(!email || !ADMIN_EMAILS.includes(email)){
+      await sb.auth.signOut();
+      const errBox = document.getElementById('loginErr');
+      errBox.textContent = '관리자 권한이 없는 계정입니다.';
+      errBox.style.display = 'block';
+      return false;
+    }
+    return true;
+  }
+
+  (async function checkSession(){
+    const { data } = await sb.auth.getSession();
+    if(data.session){
+      if(await enforceAdminEmail()) showAdmin();
+    }
+  })();
+
+  document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errBox = document.getElementById('loginErr');
+    errBox.textContent = '이메일 또는 비밀번호가 올바르지 않습니다.';
+    errBox.style.display = 'none';
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if(error){ errBox.style.display = 'block'; return; }
+    if(await enforceAdminEmail()) showAdmin();
+  });
+
+  // 상품별 예상 소요시간 설정
+  async function loadProductHours(){
+    const { data } = await sb.from('site_settings').select('key,value').in('key', ['hours_priceMonitoring','hours_homepage_base','hours_homepage_per_page','hours_writerProfile']);
+    const map = {};
+    (data || []).forEach(r=> map[r.key] = r.value);
+    document.getElementById('hoursInput_priceMonitoring').value = map.hours_priceMonitoring || 15;
+    document.getElementById('hoursInput_homepageBase').value = map.hours_homepage_base || 30;
+    document.getElementById('hoursInput_homepagePerPage').value = map.hours_homepage_per_page || 5;
+    document.getElementById('hoursInput_writerProfile').value = map.hours_writerProfile || 4;
+  }
+
+  async function saveProductHours(){
+    const rows = [
+      { key: 'hours_priceMonitoring', value: document.getElementById('hoursInput_priceMonitoring').value },
+      { key: 'hours_homepage_base', value: document.getElementById('hoursInput_homepageBase').value },
+      { key: 'hours_homepage_per_page', value: document.getElementById('hoursInput_homepagePerPage').value },
+      { key: 'hours_writerProfile', value: document.getElementById('hoursInput_writerProfile').value },
+    ];
+    const { error } = await sb.from('site_settings').upsert(rows);
+    const msg = document.getElementById('productSaveMsg');
+    if(error){ alert('저장 실패: ' + error.message); return; }
+    msg.style.display = 'block';
+    setTimeout(()=> msg.style.display = 'none', 2500);
+  }
+
+  // 제작 일정 — 하루 가용시간 기반 자동 계산
+  async function saveDailyCapacity(){
+    const val = document.getElementById('dailyCapacityInput').value;
+    const { error } = await sb.from('site_settings').upsert({ key: 'daily_capacity_hours', value: val });
+    if(error){ alert('저장 실패: ' + error.message); return; }
+    refreshCapacityPlanner();
+  }
+
+  async function refreshCapacityPlanner(cachedOrders){
+    const { data: capData } = cachedOrders ? { data: cachedOrders } : await sb.from('orders').select('customer_name,product_name,status,estimated_hours');
+    const capOrders = (capData || []).filter(o => o.status !== '완료');
+
+    const { data: settingRow } = await sb.from('site_settings').select('value').eq('key','daily_capacity_hours').maybeSingle();
+    const dailyCapacity = settingRow ? Number(settingRow.value) : 5;
+    document.getElementById('dailyCapacityInput').value = dailyCapacity;
+
+    const totalHours = capOrders.reduce((sum,o)=> sum + (o.estimated_hours || 0), 0);
+    const days = dailyCapacity > 0 ? Math.ceil(totalHours / dailyCapacity) : 0;
+    const suggestDate = new Date();
+    suggestDate.setDate(suggestDate.getDate() + days);
+    const suggestText = suggestDate.toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
+
+    document.getElementById('statPendingHours').textContent = totalHours + '시간';
+    document.getElementById('statPendingDays').textContent = days + '일';
+    document.getElementById('statSuggestedDate').textContent = suggestText;
+
+    const capTable = document.getElementById('capacityOrderTable');
+    capTable.innerHTML = '';
+    if(!capOrders.length){ capTable.innerHTML = '<tr><td colspan="4">진행 중인 주문이 없습니다.</td></tr>'; }
+    capOrders.forEach(o=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${o.customer_name || '-'}</td><td>${o.product_name}</td><td>${o.status}</td><td>${o.estimated_hours || 0}시간</td>`;
+      capTable.appendChild(tr);
+    });
+
+    const hintText = `추천값: ${suggestText} (현재 밀린 작업 ${totalHours}시간 ÷ 하루 ${dailyCapacity}시간)`;
+    const hintPM = document.getElementById('suggestHint_priceMonitoring');
+    const hintHome = document.getElementById('suggestHint_homepage');
+    const hintWP = document.getElementById('suggestHint_writerProfile');
+    if(hintPM) hintPM.textContent = hintText;
+    if(hintHome) hintHome.textContent = hintText;
+    if(hintWP) hintWP.textContent = hintText;
+  }
+
+  // 착수 가능일 저장 — Supabase site_settings 테이블로 모든 방문자에게 공유
+  ['priceMonitoring','homepage','writerProfile'].forEach(async key=>{
+    const { data } = await sb.from('site_settings').select('value').eq('key', 'start_date_' + key).maybeSingle();
+    if(data) document.getElementById('startDateInput_' + key).value = data.value;
+  });
+  async function saveStartDate(key){
+    const val = document.getElementById('startDateInput_' + key).value.trim();
+    if(!val) return;
+    const { error } = await sb.from('site_settings').upsert({ key: 'start_date_' + key, value: val });
+    const msg = document.getElementById('saveMsg');
+    if(error){ alert('저장 실패: ' + error.message); return; }
+    msg.style.display = 'block';
+    setTimeout(()=> msg.style.display = 'none', 2500);
+  }
+</script>
+
+</body>
+</html>
