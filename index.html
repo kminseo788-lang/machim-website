@@ -151,28 +151,20 @@
   .ba-item-after{border-bottom-color:rgba(241,238,230,.15);}
   .ba-item-after::before{content:"✓";color:var(--gold);flex:0 0 auto;font-weight:700;}
 
-  /* ===== 나도 작가도전 ===== */
-  .wc-quote-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:32px 0 22px;}
-  @media(max-width:760px){.wc-quote-grid{grid-template-columns:1fr;}}
-  .wc-quote-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center;}
-  .wc-quote-card .bubble{font-size:14px;color:var(--ink);margin-bottom:10px;line-height:1.5;}
-  .wc-quote-card .who{font-size:12.5px;color:var(--ink-faint);font-weight:600;}
-  .wc-callout{background:#E4EBE2;border-left:4px solid var(--green);padding:16px 20px;border-radius:0 12px 12px 0;font-size:14.5px;font-weight:700;color:var(--green);margin-bottom:36px;}
+  /* ===== 나도 작가도전 (TEASER) ===== */
+  .wc-teaser{background:var(--ink);color:var(--paper);text-align:center;}
+  .wc-teaser .tag{background:transparent;border-color:rgba(241,238,230,.3);color:var(--paper);}
+  .wc-teaser .tag .dot{background:var(--gold);}
+  .wc-teaser h2{color:var(--paper);}
+  .wc-examples{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:36px;}
+  .wc-examples span{background:rgba(241,238,230,.08);border:1px solid rgba(241,238,230,.22);padding:9px 18px;border-radius:999px;font-size:13.5px;color:var(--paper);}
+  .wc-teaser-box{max-width:480px;margin:36px auto 0;background:rgba(241,238,230,.06);border:1.6px solid var(--gold);border-radius:20px;padding:34px 30px;}
+  .wc-teaser-box h3{font-size:23px;color:var(--paper);margin-bottom:12px;}
+  .wc-teaser-box p{font-size:14px;color:rgba(241,238,230,.78);margin-bottom:18px;line-height:1.65;}
+  .wc-teaser-price{font-size:14.5px;font-weight:700;color:var(--gold);margin-bottom:24px;}
 
-  .wc-feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:40px;}
-  @media(max-width:860px){.wc-feat-grid{grid-template-columns:1fr 1fr;}}
-  @media(max-width:520px){.wc-feat-grid{grid-template-columns:1fr;}}
-  .wc-feat-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;}
-  .wc-feat-item .ic{width:36px;height:36px;border-radius:10px;background:#F6E3DD;color:var(--brick-dark);display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:12px;font-weight:800;}
-  .wc-feat-item .t{font-size:14px;font-weight:700;margin-bottom:4px;}
-  .wc-feat-item .d{font-size:12.5px;color:var(--ink-soft);}
-
-  .wc-price-box{background:var(--card);border:1.6px solid var(--brick);border-radius:20px;padding:34px 30px;text-align:center;}
-  .wc-badge{display:inline-block;background:var(--brick);color:#fff;font-size:12.5px;font-weight:700;padding:6px 14px;border-radius:999px;margin-bottom:16px;}
-  .wc-price-row{display:flex;align-items:baseline;justify-content:center;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
-  .wc-original{font-size:15px;color:var(--ink-faint);text-decoration:line-through;}
-  .wc-final{font-size:36px;font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;color:var(--brick);}
-  .wc-sub{font-size:13.5px;color:var(--ink-soft);margin-bottom:22px;}
+  /* 서비스 카드 배지 */
+  .svc-pin{display:inline-block;background:var(--gold);color:var(--ink);font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;margin-bottom:12px;}
 
   /* ===== SERVICES ===== */
   .svc-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:18px;margin-top:44px;}
@@ -377,6 +369,35 @@
   </div>
 </section>
 
+<!-- 나도 작가도전 (TEASER) -->
+<section class="section wc-teaser" id="writerChallenge">
+  <div class="container">
+    <span class="tag"><span class="dot"></span>요즘 1마침이 가장 먼저 만들고 싶은 것</span>
+    <h2 class="fade" style="font-size:clamp(28px,4vw,40px);margin-top:20px;line-height:1.4;">
+      맨날 공짜로 알려주던 그 이야기,<br>이번엔 돈 받고 알려주세요.
+    </h2>
+    <p class="fade" style="color:rgba(241,238,230,.75);font-size:15px;margin-top:16px;max-width:520px;margin-left:auto;margin-right:auto;">
+      친구에게 알려주고, 카톡으로 설명해주고, 블로그에 공짜로 써주던 당신의 경험.<br>
+      필요한 사람에게 하나씩 파는 내 책으로 만들 수 있습니다.
+    </p>
+
+    <div class="wc-examples fade">
+      <span>이혼하면서 직접 알아낸 것</span>
+      <span>아이 키우며 터득한 것</span>
+      <span>내 일 하면서 배운 것</span>
+    </div>
+    <p class="fade" style="color:var(--gold);font-size:14px;font-weight:700;margin-top:12px;">→ 누군가는 지금 그걸 검색하고 있습니다.</p>
+
+    <div class="wc-teaser-box fade">
+      <h3>나도 작가도전</h3>
+      <p>글만 쓰세요. 책이 되고, 가격을 붙이면 바로 판매할 수 있는<br>나만의 온라인 도서관을 만들어드립니다.</p>
+      <div class="wc-teaser-price">777,777원 · 선착순 50명 · 칩북 1년 무료</div>
+      <a href="writer-campaign.html" class="btn btn-primary">내가 가진 경험, 팔아보기 →</a>
+    </div>
+  </div>
+</section>
+<!-- /나도 작가도전 -->
+
 <!-- PAIN -->
 <section class="pain">
   <div class="container">
@@ -442,10 +463,11 @@
         <h3>업무 자동화</h3>
         <p>쇼핑몰이든, 작업실이든, 학원이든, 매장이든 — 가격·재고 확인, 공고 알림, 엑셀 반복업무, 고객 관리처럼 업종·규모와 상관없이 누구나 겪는 반복 업무를 대신 처리하는 프로그램을 만들어드립니다.</p>
       </div>
-      <div class="svc-card svc-sub fade">
+      <div class="svc-card svc-sub fade" style="border-color:var(--gold);border-width:1.6px;">
+        <span class="svc-pin">지금 가장 밀고 있어요</span>
         <span class="svc-label" style="color:var(--brick);">개인 · 창작자에게</span>
         <h3>맞춤 웹서비스</h3>
-        <p>내 그림·글·작업물을 직접 팔고 싶거나, 나만의 예약·회원제 서비스가 필요한 개인을 위해 자동화를 넘어선 웹서비스를 만들어드립니다.</p>
+        <p>내 경험과 지식을 직접 판매하는 나만의 웹서비스. 그림·글·작업물을 팔고 싶거나, 나만의 예약·회원제 서비스가 필요한 개인을 위해 자동화를 넘어선 웹서비스를 만들어드립니다.</p>
       </div>
       <div class="svc-card svc-sub fade">
         <span class="svc-label" style="color:var(--brick);">사업자에게</span>
@@ -654,50 +676,6 @@
           <p>회원 전용 콘텐츠를 발행하고 검색 가능한 아카이브로 운영합니다.</p>
         </div>
       </a>
-    </div>
-  </div>
-</section>
-
-<!-- 나도 작가도전 -->
-<section class="section" id="writerChallenge" style="background:var(--paper-dark);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
-  <div class="container">
-    <span class="tag"><span class="dot"></span>나도 작가도전</span>
-    <h2 class="fade" style="font-size:clamp(26px,3vw,34px);margin-top:16px;">당신의 경험도,<br>누군가에겐 꼭 필요한 책입니다.</h2>
-    <p class="fade" style="color:var(--ink-soft);font-size:14.5px;margin-top:10px;max-width:560px;">
-      거창한 주제가 아니어도 괜찮습니다. 나와 비슷한 상황을 먼저 겪은 사람의 경험이, 전문가의 정리된 지식보다 훨씬 바로 쓸 수 있는 답이 됩니다.
-    </p>
-
-    <div class="wc-quote-grid">
-      <div class="wc-quote-card fade">
-        <div class="bubble">"승급 앞두고, 이걸 어떻게 준비하지?"</div>
-        <div class="who">승급을 앞둔 사람의 고민</div>
-      </div>
-      <div class="wc-quote-card fade">
-        <div class="bubble">"이런 결정, 나 같은 사람도 있을까?"</div>
-        <div class="who">1인가구의 고민</div>
-      </div>
-      <div class="wc-quote-card fade">
-        <div class="bubble">"이걸 진작 알았더라면…"</div>
-        <div class="who">이직을 준비하는 사람의 고민</div>
-      </div>
-    </div>
-    <div class="wc-callout fade">중요한 건 누가 썼는가가 아니라, 나와 얼마나 비슷한 상황인가입니다.</div>
-
-    <div class="wc-feat-grid">
-      <div class="wc-feat-item fade"><div class="ic">✎</div><div class="t">웹에서 바로 쓰고</div><div class="d">바로 판매</div></div>
-      <div class="wc-feat-item fade"><div class="ic">⟳</div><div class="t">수정은 언제든지</div><div class="d">페널티 없이</div></div>
-      <div class="wc-feat-item fade"><div class="ic">🖼</div><div class="t">가격도, 표지도</div><div class="d">내 맘대로 설정</div></div>
-      <div class="wc-feat-item fade"><div class="ic">🔗</div><div class="t">제휴링크로</div><div class="d">부수익까지</div></div>
-    </div>
-
-    <div class="wc-price-box fade">
-      <span class="wc-badge">얼리버드 · 선착순 50명</span>
-      <div class="wc-price-row">
-        <span class="wc-original">정가 1,900,000원</span>
-        <span class="wc-final">777,777원</span>
-      </div>
-      <div class="wc-sub">칩북 1년 무료 입점 혜택 포함 (월 15,000원 × 12개월 상당)</div>
-      <a href="contact.html" class="btn btn-primary">나도 작가도전하기 →</a>
     </div>
   </div>
 </section>
