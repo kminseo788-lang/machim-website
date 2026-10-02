@@ -115,7 +115,8 @@
   /* ===== SERVICES ===== */
   .svc-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:18px;margin-top:44px;}
   @media(max-width:860px){.svc-grid{grid-template-columns:1fr;}}
-  .svc-card{border-radius:20px;padding:34px 30px;}
+  .svc-card{border-radius:20px;padding:34px 30px;display:block;text-decoration:none;color:inherit;transition:transform .2s,box-shadow .2s;}
+  .svc-card:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(27,67,50,.1);}
   .svc-main{background:var(--ink);color:var(--paper);}
   .svc-main .svc-label{color:var(--gold);}
   .svc-sub{background:var(--card);border:1px solid var(--line);color:var(--ink);}
@@ -256,7 +257,7 @@
       <a href="#contact">상담</a>
       <a href="check.html">문의·주문 조회</a>
     </nav>
-    <a href="#services" class="btn btn-primary nav-cta" style="padding:11px 20px;font-size:14px;">자동화 둘러보기</a>
+    <a href="#catalog" class="btn btn-primary nav-cta" style="padding:11px 20px;font-size:14px;">자동화 둘러보기</a>
   </div>
 </header>
 
@@ -273,7 +274,7 @@
         더 창의적이고 중요한 일에 쓰세요.
       </p>
       <div class="hero-actions">
-        <a href="#services" class="btn btn-primary">자동화 상품 둘러보고 바로 신청하기</a>
+        <a href="#catalog" class="btn btn-primary">자동화 상품 둘러보고 바로 신청하기</a>
         <a href="writer-campaign.html" class="btn btn-outline">나도 작가도전하기</a>
       </div>
     </div>
@@ -356,22 +357,22 @@
     <h2 class="fade" style="font-size:clamp(26px,3vw,34px);margin-top:16px;">세 가지 방식으로 일을 덜어드립니다</h2>
     <p class="fade" style="color:var(--ink-soft);font-size:14.5px;margin-top:10px;max-width:560px;">개인이든 사업자든 필요한 것이 다릅니다. 아래에서 지금 나에게 필요한 것을 찾아보세요.</p>
     <div class="svc-grid">
-      <div class="svc-card svc-main fade">
+      <a href="#catalog" class="svc-card svc-main fade">
         <span class="svc-label">개인 · 사업자 모두</span>
         <h3>업무 자동화</h3>
         <p>쇼핑몰이든, 작업실이든, 학원이든, 매장이든 — 가격·재고 확인, 공고 알림, 엑셀 반복업무, 고객 관리처럼 업종·규모와 상관없이 누구나 겪는 반복 업무를 대신 처리하는 프로그램을 만들어드립니다.</p>
-      </div>
-      <div class="svc-card svc-sub fade" style="border-color:var(--gold);border-width:1.6px;">
+      </a>
+      <a href="writer-campaign.html" class="svc-card svc-sub fade" style="border-color:var(--gold);border-width:1.6px;">
         <span class="svc-pin">지금 가장 밀고 있어요</span>
         <span class="svc-label" style="color:var(--brick);">개인 · 창작자에게</span>
         <h3>맞춤 웹서비스</h3>
         <p>내 경험과 지식을 직접 판매하는 나만의 웹서비스. 그림·글·작업물을 팔고 싶거나, 나만의 예약·회원제 서비스가 필요한 개인을 위해 자동화를 넘어선 웹서비스를 만들어드립니다.</p>
-      </div>
-      <div class="svc-card svc-sub fade">
+      </a>
+      <a href="detail-webmaking.html" class="svc-card svc-sub fade">
         <span class="svc-label" style="color:var(--brick);">사업자에게</span>
         <h3>웹 제작</h3>
         <p>사업을 알려야 하는 사장님을 위해 홈페이지, 랜딩페이지, 상세페이지, 쇼핑몰까지 제작합니다.</p>
-      </div>
+      </a>
     </div>
   </div>
 </section>
