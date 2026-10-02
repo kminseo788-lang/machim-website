@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>호스팅 · 도메인 준비 가이드 | 1마침</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="css/common.css">
+
+<style>
+  /* 이 페이지 전용 스타일 (공통 스타일은 css/common.css 참고) */
+  body{font-family:"Noto Sans KR",sans-serif;}
+  .container{width:min(760px, calc(100% - 40px));margin:0 auto;}
+  .container.nav{width:min(1120px, calc(100% - 48px));}
+
+  .p-hero{padding:48px 0 32px;border-bottom:1px solid var(--line);}
+  .p-hero h1{font-size:clamp(24px,3.2vw,32px);margin:14px 0 14px;line-height:1.4;}
+  .p-hero .lede{color:var(--ink-soft);font-size:15px;}
+
+  .guide-step{display:flex;gap:18px;padding:26px 0;border-bottom:1px solid var(--line);}
+  .guide-step:last-child{border-bottom:none;}
+  .guide-step .num{
+    width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:var(--ink);color:var(--paper);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;
+  }
+  .guide-step h3{font-size:17px;margin-bottom:8px;}
+  .guide-step p{font-size:14.3px;color:var(--ink-soft);line-height:1.75;margin-bottom:8px;}
+  .guide-step .tip{font-size:13px;color:var(--green);background:#E4EBE2;display:inline-block;padding:5px 10px;border-radius:8px;margin-top:4px;}
+  .guide-step a.ext{color:var(--brick);text-decoration:underline;}
+
+  .note-box{margin-top:30px;padding:18px 20px;border-radius:12px;background:var(--paper-dark);border:1px dashed var(--ink-faint);font-size:13.8px;color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a href="index.html" class="logo">1<span class="mark">마침</span></a>
+    <a href="javascript:history.back()" class="back-link">← 이전 페이지로 돌아가기</a>
+  </div>
+</header>
+
+<section class="p-hero">
+  <div class="container">
+    <span class="tag"><span class="dot"></span>호스팅 · 도메인 준비 가이드</span>
+    <h1>내 사이트를 올려둘 "집"과<br>"주소"를 먼저 준비해주세요.</h1>
+    <p class="lede">1마침은 사이트를 만들어서 올려드리는 역할이고, 사이트가 실제로 켜져 있는 호스팅 서비스와 도메인(주소)은 신청자 본인 명의로 직접 가입·구매하셔야 합니다. 아래 순서대로만 따라 하시면 10분이면 끝나요. 어려우시면 신청 후 같이 진행해드릴 수 있으니 편하게 문의해주세요.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <div class="guide-step">
+      <div class="num">1</div>
+      <div>
+        <h3>무료 호스팅 서비스에 가입하기</h3>
+        <p><a class="ext" href="https://www.netlify.com" target="_blank">Netlify</a> 또는 <a class="ext" href="https://vercel.com" target="_blank">Vercel</a> 중 하나를 추천드립니다. 둘 다 개인 홈페이지 규모는 무료로 사용할 수 있고, 이메일만으로 간단히 가입할 수 있습니다.</p>
+        <p>가입하실 때는 신청서에 적어주신 이메일로 가입해주세요. 나중에 1마침이 이 계정에 접근할 수 있도록 초대(협업자 추가)해주시면 됩니다.</p>
+        <div class="tip">💡 둘 중 뭘 써야 할지 모르겠으면 Netlify를 추천드려요.</div>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="num">2</div>
+      <div>
+        <h3>1마침을 협업자로 초대하기</h3>
+        <p>가입한 호스팅 서비스의 설정(Settings) 메뉴에서 "팀원 초대" 또는 "Collaborator 추가" 항목을 찾아, 1마침 담당자 이메일을 입력해 초대해주시면 됩니다. (초대 이메일 주소는 신청 접수 후 안내드립니다.)</p>
+        <p>초대만 해주시면 이후 코드 업로드와 설정은 1마침이 전부 진행해드립니다. 따로 더 하실 일은 없습니다.</p>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="num">3</div>
+      <div>
+        <h3>도메인(사이트 주소) 구매하기</h3>
+        <p>원하시는 주소(예: yourname.com)를 <a class="ext" href="https://www.gabia.com" target="_blank">가비아</a>, <a class="ext" href="https://www.whois.co.kr" target="_blank">후이즈</a> 같은 국내 업체나 <a class="ext" href="https://www.namecheap.com" target="_blank">Namecheap</a> 같은 해외 업체에서 직접 구매하시면 됩니다. 보통 1년에 1만~2만원대입니다.</p>
+        <p>이 도메인은 신청자 본인 명의로 구매하시는 것이라, 소유권과 매년 갱신 비용은 본인에게 있습니다.</p>
+        <div class="tip">💡 도메인 이름이 아직 없으시다면, 신청서에 희망하시는 이름 2~3개를 적어주세요. 사용 가능 여부를 같이 확인해드릴게요.</div>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="num">4</div>
+      <div>
+        <h3>구매한 도메인 정보 전달하기</h3>
+        <p>도메인을 구매하셨다면, 구매처(가비아 등) 이름과 도메인 주소만 1마침에게 알려주세요. 호스팅 서비스와 도메인을 연결하는 작업(DNS 설정)은 1마침이 대신 진행해드립니다.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="container">
+    <div class="note-box">
+      이 네 단계만 해주시면 나머지(코드 업로드, 연결, 테스트)는 전부 1마침이 진행합니다. 혼자 진행하기 어려우시면 신청 시 메모란에 "같이 진행 원해요"라고 남겨주세요 — 화면 공유로 함께 가입부터 도와드립니다.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container" style="padding:32px 0;text-align:center;font-size:12.3px;color:var(--ink-faint);">
+    상호 1마침 · 사업자등록번호 859-05-03573 · 통신판매업 제2026-경기김포-5948호
+  </div>
+</footer>
+
+</body>
+</html>

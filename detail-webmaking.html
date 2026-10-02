@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/common.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
+<script src="js/common-consent.js"></script>
 <style>
   /* 이 페이지 전용 스타일 (공통 스타일은 css/common.css 참고) */
   body{font-family:"Noto Sans KR",sans-serif;}
@@ -64,6 +65,7 @@
   .step-back{font-size:13.5px;color:var(--ink-soft);cursor:pointer;}
   .confirm-panel{text-align:center;padding:20px 0;}
   .confirm-panel .stamp-icon{width:76px;height:76px;border-radius:50%;border:3px solid var(--brick);color:var(--brick);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-family:"Pretendard","Noto Sans KR",sans-serif; font-weight:800;font-size:14px;}
+  .btn-primary[disabled]{opacity:.45;pointer-events:none;}
   footer{background:var(--paper-dark);border-top:1px solid var(--line);padding:32px 0;font-size:12.5px;color:var(--ink-faint);text-align:center;}
 </style>
 </head>
@@ -84,7 +86,7 @@
     <div class="plan-grid">
       <div class="plan-card hi">
         <div class="name">기본형 · 즉시결제 가능</div>
-        <div class="amount">490,000원</div>
+        <div class="amount">690,000원</div>
         <ul>
           <li>최대 5페이지</li>
           <li>PC·모바일 반응형</li>
@@ -118,6 +120,9 @@
     </div>
     <div class="note-box">회원가입, 결제, 예약, 관리자페이지, 게시판처럼 기본형 범위를 벗어나는 기능이 필요하면 맞춤 웹서비스 상담으로 진행됩니다.</div>
 
+    <h2 class="h-sec" style="margin-top:40px;">신청 전 꼭 확인해주세요</h2>
+    <div id="consentBox"></div>
+
     <!-- STEP FLOW: 홈페이지 기본형 -->
     <div class="step-flow-box" id="stepflow">
       <div class="steps-track">
@@ -142,7 +147,7 @@
 
         <div class="opt-row">
           <div><div class="opt-name">기본형</div><div class="opt-desc">5페이지 · 반응형 · 디자인 1안 · 수정 2회 · 문의폼 1개</div></div>
-          <div class="opt-price">490,000원</div>
+          <div class="opt-price">690,000원</div>
         </div>
 
         <div class="opt-row">
@@ -164,7 +169,7 @@
           <div class="opt-control"><span class="opt-price">+40,000원</span><input type="checkbox" data-price="40000" class="opt-check-web"></div>
         </div>
 
-        <div class="total-box"><span>총 결제 금액</span><span class="sum" id="totalAmountWeb">490,000원</span></div>
+        <div class="total-box"><span>총 결제 금액</span><span class="sum" id="totalAmountWeb">690,000원</span></div>
 
         <div class="custom-note">
           <span>회원가입, 결제, 예약, 게시판, 관리자페이지가 필요하신가요?</span>
@@ -181,7 +186,7 @@
         <div class="confirm-panel">
           <div class="stamp-icon">1<br>마침</div>
           <h3 style="font-size:20px;margin-bottom:10px;">아래 구성으로 결제를 진행합니다</h3>
-          <p style="color:var(--ink-soft);font-size:14.5px;margin-bottom:22px;">착수 가능일: <strong id="confirmDateWeb">2026년 9월 28일</strong> · 결제 금액: <strong id="confirmAmountWeb" style="color:var(--brick);">490,000원</strong></p>
+          <p style="color:var(--ink-soft);font-size:14.5px;margin-bottom:22px;">착수 가능일: <strong id="confirmDateWeb">2026년 9월 28일</strong> · 결제 금액: <strong id="confirmAmountWeb" style="color:var(--brick);">690,000원</strong></p>
 
           <div style="text-align:left;margin-bottom:20px;">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
@@ -191,8 +196,9 @@
             <input type="email" id="custEmailWeb" placeholder="이메일" style="width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font:inherit;">
           </div>
 
-          <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;" id="payBtnWeb" onclick="submitOrderWeb(); return false;">결제하기</a>
+          <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;" id="payBtnWeb" disabled onclick="submitOrderWeb(); return false;">결제하기</a>
           <p style="font-size:12.5px;color:var(--ink-faint);margin-top:10px;">※ 실제 카드결제 연동 준비 중이라, 접수 후 안내드린 계좌로 입금 확인이 되면 착수됩니다.</p>
+          <p style="font-size:12.5px;color:var(--ink-faint);margin-top:4px;">※ 결제 버튼은 위 "신청 전 꼭 확인해주세요" 항목에 동의하셔야 활성화됩니다.</p>
           <div class="step-nav" style="justify-content:center;margin-top:16px;">
             <a class="step-back" onclick="goStep(2)">← 옵션 다시 선택하기</a>
           </div>
@@ -209,6 +215,23 @@
 </section>
 
 <script>
+  renderConsent({
+    containerId: 'consentBox',
+    payBtnId: 'payBtnWeb',
+    productName: '홈페이지 기본형',
+    extraItems: [
+      {
+        title: '제작 범위와 수정 횟수',
+        html: `
+          <ul>
+            <li>기본형은 최대 5페이지, 디자인 1안, 무상 수정 2회를 포함합니다. 추가 페이지·추가 수정·추가 연출은 STEP 2에서 선택하신 옵션 비용이 적용됩니다.</li>
+            <li>회원가입, 결제, 예약, 게시판, 관리자페이지 등 기본형 범위를 벗어나는 기능은 이 상품에 포함되지 않으며, 별도의 맞춤 웹서비스 상담이 필요합니다.</li>
+          </ul>
+        `
+      }
+    ]
+  });
+
   var pickedDateWeb = null;
   (async function(){
     const grid = document.getElementById('pickCalGridWeb');
@@ -265,7 +288,7 @@
   }
 
   function calcTotalWeb(updateConfirm){
-    var total = 490000 + pageQty * 50000;
+    var total = 690000 + pageQty * 50000;
     document.querySelectorAll('.opt-check-web').forEach(function(c){ if(c.checked) total += Number(c.dataset.price); });
     var formatted = total.toLocaleString('ko-KR') + '원';
     document.getElementById('totalAmountWeb').textContent = formatted;
@@ -274,16 +297,18 @@
   document.querySelectorAll('.opt-check-web').forEach(function(c){ c.addEventListener('change', function(){ calcTotalWeb(false); }); });
 
   async function submitOrderWeb(){
+    const consent = getConsentPayload();
+    if(!consent.agreed){ alert('유의사항 동의가 필요합니다.'); return; }
     const name = document.getElementById('custNameWeb').value.trim();
     const phone = document.getElementById('custPhoneWeb').value.trim();
     const email = document.getElementById('custEmailWeb').value.trim();
     if(!name || !phone){ alert('이름과 연락처를 입력해주세요.'); return; }
     if(!pickedDateWeb){ alert('착수일을 먼저 선택해주세요.'); goStep(1); return; }
 
-    const options = { pages: pageQty, picked_start_date_label: pickedDateWeb };
+    const options = { pages: pageQty, picked_start_date_label: pickedDateWeb, consent: consent };
     document.querySelectorAll('.opt-check-web').forEach(function(c, i){ options['addon_' + i] = c.checked; });
 
-    var total = 490000 + pageQty * 50000;
+    var total = 690000 + pageQty * 50000;
     document.querySelectorAll('.opt-check-web').forEach(function(c){ if(c.checked) total += Number(c.dataset.price); });
 
     const payBtn = document.getElementById('payBtnWeb');

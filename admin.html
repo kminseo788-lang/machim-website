@@ -223,6 +223,10 @@
           <span>작가 프로필 페이지 (칩북 등 창작자용)</span>
           <div><input type="number" id="hoursInput_writerProfile" style="width:80px;"> 시간</div>
         </div>
+        <div class="product-row">
+          <span>나도 작가도전 (온라인 도서관 제작)</span>
+          <div><input type="number" id="hoursInput_writerCampaign" style="width:80px;"> 시간</div>
+        </div>
         <button class="save-btn" style="margin-top:16px;" onclick="saveProductHours()">변경사항 저장</button>
         <div id="productSaveMsg" style="font-size:12.5px;color:var(--green);margin-top:10px;display:none;">저장되었습니다.</div>
       </div>
@@ -254,6 +258,14 @@
           </div>
         </div>
         <div style="font-size:12px;color:var(--ink-faint);margin:-4px 0 14px;" id="suggestHint_writerProfile"></div>
+        <div class="product-row">
+          <span>나도 작가도전</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="startDateInput_writerCampaign" style="width:180px;" placeholder="예: 2026년 9월 28일">
+            <button class="save-btn" onclick="saveStartDate('writerCampaign')">저장</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--ink-faint);margin:-4px 0 14px;" id="suggestHint_writerCampaign"></div>
         <div id="saveMsg" style="font-size:12.5px;color:var(--green);margin-top:10px;display:none;">저장되었습니다. 상세페이지에 반영됩니다.</div>
       </div>
     </section>
@@ -376,6 +388,7 @@
           <div style="margin-top:8px;">
             <textarea class="reply-input" data-id="${q.id}" placeholder="고객에게 보여줄 답변" style="width:100%;min-height:50px;font:inherit;font-size:12.5px;padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;">${q.admin_reply || ''}</textarea>
             <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;" data-reply-save="${q.id}">답변 저장</button>
+            <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;background:var(--gold);" data-add-order="${q.id}" data-name="${q.name || ''}">나도 작가도전 → 제작 일정에 추가</button>
           </div>
         </td>`;
       inquiryTable.appendChild(tr);
@@ -396,6 +409,27 @@
         btn.textContent = '저장됨';
         setTimeout(()=>{ btn.textContent = '답변 저장'; }, 1500);
         loadInquiries();
+        refreshDashboardStats();
+      });
+    });
+    // 나도 작가도전 신청을 수락했을 때, 문의 목록에서 바로 "제작 일정"(주문/시간 집계)에 반영하는 버튼.
+    // contact.html의 문의는 orders 테이블이 아니라 inquiries 테이블에만 쌓이기 때문에,
+    // 별도 주문 페이지가 없는 이 상품은 이 버튼을 눌러야 제작 일정 계산에 시간이 잡힙니다.
+    inquiryTable.querySelectorAll('[data-add-order]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const { data: hourSetting } = await sb.from('site_settings').select('value').eq('key','hours_writerCampaign').maybeSingle();
+        const hours = hourSetting ? Number(hourSetting.value) : 20;
+        const { error } = await sb.from('orders').insert({
+          customer_name: btn.dataset.name || '이름 미상',
+          product_name: '나도 작가도전',
+          status: '결제확인중',
+          estimated_hours: hours,
+          amount: 777777
+        });
+        if(error){ alert('추가 실패: ' + error.message); return; }
+        btn.textContent = '추가됨 ✓';
+        btn.disabled = true;
+        refreshCapacityPlanner();
         refreshDashboardStats();
       });
     });
@@ -447,13 +481,14 @@
 
   // 상품별 예상 소요시간 설정
   async function loadProductHours(){
-    const { data } = await sb.from('site_settings').select('key,value').in('key', ['hours_priceMonitoring','hours_homepage_base','hours_homepage_per_page','hours_writerProfile']);
+    const { data } = await sb.from('site_settings').select('key,value').in('key', ['hours_priceMonitoring','hours_homepage_base','hours_homepage_per_page','hours_writerProfile','hours_writerCampaign']);
     const map = {};
     (data || []).forEach(r=> map[r.key] = r.value);
     document.getElementById('hoursInput_priceMonitoring').value = map.hours_priceMonitoring || 15;
     document.getElementById('hoursInput_homepageBase').value = map.hours_homepage_base || 30;
     document.getElementById('hoursInput_homepagePerPage').value = map.hours_homepage_per_page || 5;
     document.getElementById('hoursInput_writerProfile').value = map.hours_writerProfile || 4;
+    document.getElementById('hoursInput_writerCampaign').value = map.hours_writerCampaign || 20;
   }
 
   async function saveProductHours(){
@@ -462,6 +497,7 @@
       { key: 'hours_homepage_base', value: document.getElementById('hoursInput_homepageBase').value },
       { key: 'hours_homepage_per_page', value: document.getElementById('hoursInput_homepagePerPage').value },
       { key: 'hours_writerProfile', value: document.getElementById('hoursInput_writerProfile').value },
+      { key: 'hours_writerCampaign', value: document.getElementById('hoursInput_writerCampaign').value },
     ];
     const { error } = await sb.from('site_settings').upsert(rows);
     const msg = document.getElementById('productSaveMsg');
@@ -509,13 +545,15 @@
     const hintPM = document.getElementById('suggestHint_priceMonitoring');
     const hintHome = document.getElementById('suggestHint_homepage');
     const hintWP = document.getElementById('suggestHint_writerProfile');
+    const hintWC = document.getElementById('suggestHint_writerCampaign');
     if(hintPM) hintPM.textContent = hintText;
     if(hintHome) hintHome.textContent = hintText;
     if(hintWP) hintWP.textContent = hintText;
+    if(hintWC) hintWC.textContent = hintText;
   }
 
   // 착수 가능일 저장 — Supabase site_settings 테이블로 모든 방문자에게 공유
-  ['priceMonitoring','homepage','writerProfile'].forEach(async key=>{
+  ['priceMonitoring','homepage','writerProfile','writerCampaign'].forEach(async key=>{
     const { data } = await sb.from('site_settings').select('value').eq('key', 'start_date_' + key).maybeSingle();
     if(data) document.getElementById('startDateInput_' + key).value = data.value;
   });
