@@ -90,7 +90,7 @@
 
   /* 요약 */
   .sum{position:sticky;top:92px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 22px;}
-  @media(max-width:900px){.sum{position:static;}}
+  @media(max-width:900px){.sum{position:sticky;top:auto;bottom:10px;z-index:20;box-shadow:0 10px 30px rgba(27,67,50,.18);padding:14px 18px;}.sum h3,.sum ul{display:none;}.sum .nm{font-size:14px;margin-bottom:4px;}.sum .tot{padding-top:8px;}.sum .tot b{font-size:19px;}.sum .meta{margin-top:4px;font-size:12px;}}
   .sum h3{font-size:15px;color:var(--ink-faint);margin-bottom:12px;}
   .sum .nm{font-size:17px;font-weight:800;margin-bottom:8px;}
   .sum ul{list-style:none;font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;}
@@ -149,7 +149,7 @@
       <div class="panel" data-p="2">
         <div class="card">
           <h2 id="s2title">구성 선택</h2>
-          <div class="hint">필요한 항목을 체크하면 오른쪽 금액이 바로 바뀝니다.</div>
+          <div class="hint">필요한 항목을 체크하면 금액이 바로 바뀝니다.</div>
           <div id="optBox"></div>
           <div class="nav2"><span class="back" data-go="1">← 상품 다시 고르기</span><button class="btn btn-primary" id="n2">다음: 착수일 선택</button></div>
         </div>
