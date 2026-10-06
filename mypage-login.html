@@ -107,6 +107,7 @@
   function showMsg(text, ok){
     msgBox.textContent = text;
     msgBox.className = 'msg ' + (ok ? 'ok' : 'err');
+    msgBox.style.display = 'block';
   }
 
   // 로그인된 상태로 이 페이지에 들어오면 바로 내 프로젝트로 보냄
@@ -159,7 +160,15 @@
       });
       submitBtn.disabled = false;
       submitBtn.textContent = '가입하기';
-      if(error){ showMsg(error.message.includes('already') ? '이미 가입된 이메일이에요. 로그인해주세요.' : '가입 중 오류가 발생했습니다.'); return; }
+      if(error){
+        var m = (error.message||'').toLowerCase();
+        showMsg(m.includes('already') ? '이미 가입된 이메일이에요. 로그인해주세요.'
+          : (m.includes('rate') || m.includes('seconds')) ? '잠시 후 다시 시도해주세요. (인증 메일 발송 한도에 걸렸어요)'
+          : m.includes('password') ? '비밀번호를 다시 확인해주세요. (6자 이상)'
+          : '가입 중 오류가 발생했습니다: ' + error.message);
+        return;
+      }
+      if(data.user && data.user.identities && data.user.identities.length === 0){ showMsg('이미 가입된 이메일이에요. 로그인해주세요.'); return; }
       if(data.session){
         // 이메일 인증이 꺼져 있으면 바로 로그인 처리됨
         await claimAndGo();
