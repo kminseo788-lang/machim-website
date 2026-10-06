@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>마이페이지 로그인 | 1마침</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="css/common.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+
+<style>
+  body{font-family:"Noto Sans KR",sans-serif;}
+  .wrap{width:min(420px, calc(100% - 40px));margin:0 auto;padding:70px 0 100px;}
+  .card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:36px 30px;}
+  .card h1{font-size:22px;margin-bottom:6px;}
+  .card p.sub{color:var(--ink-soft);font-size:13.5px;margin-bottom:26px;}
+
+  .tabs{display:flex;gap:8px;margin-bottom:22px;}
+  .tabs button{flex:1;padding:10px;border-radius:8px;font-size:13.5px;font-weight:700;color:var(--ink-soft);background:var(--paper);}
+  .tabs button.active{background:var(--brick);color:#fff;}
+
+  input{
+    width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:10px;
+    background:#fff;font:inherit;color:var(--ink);outline:none;margin-bottom:10px;
+  }
+  input:focus{border-color:var(--brick);}
+
+  .submit-btn{
+    width:100%;padding:14px;border-radius:10px;background:var(--brick);color:#fff;
+    font-size:15px;font-weight:700;margin-top:4px;
+  }
+  .submit-btn:hover{background:var(--brick-dark);}
+  .submit-btn:disabled{opacity:.6;}
+
+  .msg{font-size:13px;margin-top:12px;padding:10px 12px;border-radius:8px;display:none;}
+  .msg.err{display:block;background:#FBEAE6;color:var(--brick-dark);}
+  .msg.ok{display:block;background:#EAF2EA;color:var(--green);}
+
+  .hint{font-size:12.5px;color:var(--ink-faint);margin-top:18px;text-align:center;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="index.html" class="logo">1<span class="mark">마침</span></a>
+    <a href="index.html" class="back-link">← 메인으로</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="card">
+    <h1>마이페이지</h1>
+    <p class="sub">결제하신 이메일로 로그인하면 진행 상황을 바로 확인할 수 있어요.</p>
+
+    <div class="tabs">
+      <button type="button" class="active" data-mode="login">로그인</button>
+      <button type="button" data-mode="signup">처음이에요 (가입)</button>
+    </div>
+
+    <form id="authForm">
+      <input type="email" id="email" placeholder="이메일" required autocomplete="email">
+      <input type="password" id="password" placeholder="비밀번호 (6자 이상)" required minlength="6" autocomplete="current-password">
+      <div id="signupConsent" style="display:none;margin:6px 0 12px;padding:14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font-size:12.5px;color:var(--ink-soft);line-height:1.65;">
+        <div style="font-weight:700;color:var(--ink);margin-bottom:6px;">[필수] 개인정보 수집·이용 안내</div>
+        <ul style="padding-left:16px;margin-bottom:10px;">
+          <li>수집 항목: 이메일, 비밀번호(암호화되어 저장)</li>
+          <li>이용 목적: 마이페이지 로그인, 제작 진행 상황 안내</li>
+          <li>보유 기간: 서비스 종료 후 1년 (관계 법령상 보관 의무가 있으면 그 기간)</li>
+          <li>이 계정은 같은 사업자(1마침)가 운영하는 <strong>칩북(chipbook.net)과 공용</strong>으로 사용됩니다. 다만 마침에서의 주문·프로젝트 정보는 칩북에 공유되거나 홍보에 쓰이지 않으며, 본인 계정으로만 조회됩니다.</li>
+          <li>데이터는 클라우드 서비스에 저장됩니다. 자세한 내용은 <a href="privacy.html" target="_blank" style="color:var(--brick);text-decoration:underline;">개인정보처리방침</a>을 확인해주세요.</li>
+        </ul>
+        <label style="display:flex;gap:8px;align-items:flex-start;color:var(--ink);font-weight:600;">
+          <input type="checkbox" id="privacyAgree" style="width:17px;height:17px;flex:0 0 17px;margin:2px 0 0;accent-color:var(--brick);">
+          <span>위 내용을 확인했으며 동의합니다.</span>
+        </label>
+      </div>
+      <button type="submit" class="submit-btn" id="submitBtn">로그인</button>
+    </form>
+
+    <div class="msg" id="msgBox"></div>
+    <div class="hint">가입 시 입력하는 이메일은 <strong>결제할 때 적으신 이메일과 동일해야</strong> 프로젝트가 자동으로 연결됩니다.<br>칩북 계정을 이미 가지고 계시면 같은 이메일·비밀번호로 로그인하세요.</div>
+  </div>
+</div>
+
+<script>
+  let mode = 'login';
+  const tabs = document.querySelectorAll('.tabs button');
+  const submitBtn = document.getElementById('submitBtn');
+  const msgBox = document.getElementById('msgBox');
+
+  tabs.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      tabs.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      mode = btn.dataset.mode;
+      submitBtn.textContent = mode === 'login' ? '로그인' : '가입하기';
+      msgBox.style.display = 'none';
+      document.getElementById('signupConsent').style.display = mode === 'signup' ? 'block' : 'none';
+    });
+  });
+
+  function showMsg(text, ok){
+    msgBox.textContent = text;
+    msgBox.className = 'msg ' + (ok ? 'ok' : 'err');
+  }
+
+  // 로그인된 상태로 이 페이지에 들어오면 바로 내 프로젝트로 보냄
+  (async function checkSession(){
+    const { data } = await sb.auth.getSession();
+    if(data.session){
+      await claimAndGo();
+    }
+  })();
+
+  async function claimAndGo(){
+    const { data: { user } } = await sb.auth.getUser();
+    if(!user) return;
+    // 이메일이 일치하는, 아직 아무도 연결 안 된 프로젝트를 내 계정으로 연결
+    try{
+      await sb.from('machim_projects')
+        .update({ customer_id: user.id })
+        .is('customer_id', null)
+        .ilike('customer_email', user.email);
+    }catch(e){ console.error(e); }
+    location.href = 'mypage-project.html';
+  }
+
+  document.getElementById('authForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    submitBtn.disabled = true;
+    msgBox.style.display = 'none';
+
+    if(mode === 'login'){
+      submitBtn.textContent = '로그인 중…';
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      submitBtn.disabled = false;
+      submitBtn.textContent = '로그인';
+      if(error){ showMsg('이메일 또는 비밀번호를 다시 확인해주세요.'); return; }
+      await claimAndGo();
+    }else{
+      if(!document.getElementById('privacyAgree').checked){
+        submitBtn.disabled = false;
+        showMsg('개인정보 수집·이용 안내에 동의해주세요.');
+        return;
+      }
+      submitBtn.textContent = '가입 중…';
+      const { data, error } = await sb.auth.signUp({
+        email, password,
+        options: { data: { machim_privacy_consent_at: new Date().toISOString(), machim_privacy_consent_version: '2026-10-06', signup_from: 'machim-mypage' } }
+      });
+      submitBtn.disabled = false;
+      submitBtn.textContent = '가입하기';
+      if(error){ showMsg(error.message.includes('already') ? '이미 가입된 이메일이에요. 로그인해주세요.' : '가입 중 오류가 발생했습니다.'); return; }
+      if(data.session){
+        // 이메일 인증이 꺼져 있으면 바로 로그인 처리됨
+        await claimAndGo();
+      }else{
+        showMsg('가입 확인 메일을 보내드렸어요. 메일함을 확인한 뒤 로그인해주세요.', true);
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

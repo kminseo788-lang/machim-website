@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>마이페이지 | 1마침</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="css/common.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+
+<style>
+  body{font-family:"Noto Sans KR",sans-serif;background:var(--paper);}
+  .wrap{width:min(640px, calc(100% - 40px));margin:0 auto;padding:50px 0 100px;}
+  .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+  .top-row h1{font-size:20px;}
+  .logout-btn{font-size:13px;color:var(--ink-soft);}
+  .logout-btn:hover{color:var(--brick);}
+
+  .card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:30px;margin-bottom:20px;}
+  .card h2{font-size:15px;margin-bottom:18px;color:var(--ink-soft);font-weight:700;}
+  .proj-name{font-size:19px;font-weight:800;margin-bottom:4px;}
+  .proj-amount{font-size:13.5px;color:var(--ink-soft);margin-bottom:0;}
+
+  .timeline{list-style:none;}
+  .timeline li{display:flex;gap:10px;align-items:flex-start;padding:9px 0;font-size:14px;}
+  .timeline .mark{flex-shrink:0;width:20px;text-align:center;font-weight:800;}
+  .timeline li.done .mark{color:var(--green);}
+  .timeline li.current .mark{color:var(--brick);}
+  .timeline li.pending .mark{color:var(--ink-faint);}
+  .timeline li.pending{color:var(--ink-faint);}
+  .timeline .date{color:var(--ink-faint);font-size:12.5px;margin-right:4px;}
+
+  .action-box{border-top:1.5px dashed var(--line);margin-top:10px;padding-top:20px;}
+  .action-box p.desc{font-size:13.5px;color:var(--ink-soft);margin-bottom:14px;white-space:pre-line;}
+  .action-box a.view-link{display:inline-block;margin-bottom:14px;font-size:13.5px;color:var(--brick);text-decoration:underline;}
+
+  textarea{
+    width:100%;min-height:90px;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;
+    background:#fff;font:inherit;color:var(--ink);outline:none;resize:vertical;margin-bottom:10px;
+  }
+  textarea:focus{border-color:var(--brick);}
+
+  .btn-row{display:flex;gap:10px;}
+  .btn{padding:12px 18px;border-radius:10px;font-size:14px;font-weight:700;}
+  .btn-primary{background:var(--brick);color:#fff;}
+  .btn-primary:hover{background:var(--brick-dark);}
+  .btn-ghost{background:var(--paper);color:var(--ink-soft);border:1.5px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--ink-soft);}
+  .btn:disabled{opacity:.6;}
+
+  .brief-box{background:var(--paper);border-radius:10px;padding:16px 18px;margin-bottom:14px;font-size:13.5px;line-height:1.7;}
+  .brief-box div{margin-bottom:4px;}
+  .brief-box b{color:var(--ink-soft);margin-right:6px;}
+
+  .msg{font-size:13px;margin-top:12px;padding:10px 12px;border-radius:8px;display:none;}
+  .msg.err{display:block;background:#FBEAE6;color:var(--brick-dark);}
+  .msg.ok{display:block;background:#EAF2EA;color:var(--green);}
+
+  .empty{text-align:center;padding:60px 20px;color:var(--ink-soft);font-size:14px;}
+  .center-loading{text-align:center;padding:80px 20px;color:var(--ink-faint);font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="index.html" class="logo">1<span class="mark">마침</span></a>
+    <a href="index.html" class="back-link">← 메인으로</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="top-row">
+    <h1>마이페이지</h1>
+    <a href="#" class="logout-btn" id="logoutBtn">로그아웃</a>
+  </div>
+
+  <div id="content">
+    <div class="center-loading">불러오는 중…</div>
+  </div>
+</div>
+
+<script>
+  const STAGE_ORDER = ['자료제출대기','방향서대기','방향서승인대기','프로토타입대기','프로토타입승인대기','개발중','최종확인대기','배포완료'];
+
+  const HOSTING_ACK_TEXT = '배포 서비스는 Cloudflare Pages 한 가지로 통일되며, 호스팅·도메인의 요금제·약관·사용 한도 초과 요금·갱신 비용은 제가 직접 책임진다는 점을 확인했습니다. 다른 서비스를 원할 경우 결제 전에 문의해야 하고, 결제 후 변경·이전은 유료 유지보수임을 이해했습니다.';
+
+  const MAX_FILES = 10;
+  const MAX_FILE_BYTES = 10 * 1024 * 1024;
+
+  // 큰 사진(JPEG/WebP)은 올리기 전에 자동으로 줄여서 용량을 아낍니다. (PNG/문서는 그대로)
+  function isCompressible(f){ return f.type === 'image/jpeg' || f.type === 'image/webp'; }
+  async function maybeCompress(f){
+    if(!isCompressible(f) || f.size < 1.5 * 1024 * 1024) return f;
+    const bmp = await createImageBitmap(f);
+    const maxSide = 2400;
+    const ratio = Math.min(1, maxSide / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(bmp.width * ratio); c.height = Math.round(bmp.height * ratio);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(res => c.toBlob(res, 'image/jpeg', 0.85));
+    return (blob && blob.size < f.size) ? new File([blob], f.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' }) : f;
+  }
+
+  let project = null;
+
+  (async function init(){
+    const { data: { session } } = await sb.auth.getSession();
+    if(!session){ location.href = 'mypage-login.html'; return; }
+
+    const { data: { user } } = await sb.auth.getUser();
+
+    // 혹시 아직 claim 안 된 프로젝트가 있으면 연결 시도
+    await sb.from('machim_projects')
+      .update({ customer_id: user.id })
+      .is('customer_id', null)
+      .ilike('customer_email', user.email);
+
+    const { data, error } = await sb.from('machim_projects')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if(error){
+      document.getElementById('content').innerHTML = '<div class="empty">프로젝트를 불러오지 못했어요. 새로고침해보시거나 문의해주세요.</div>';
+      return;
+    }
+
+    if(!data || data.length === 0){
+      document.getElementById('content').innerHTML = '<div class="empty">아직 연결된 프로젝트가 없어요.<br>결제 시 입력하신 이메일과 가입 이메일이 같은지 확인해주세요.</div>';
+      return;
+    }
+
+    project = data[0]; // v1: 한 고객 = 한 프로젝트 가정
+    render();
+  })();
+
+  document.getElementById('logoutBtn').addEventListener('click', async (e)=>{
+    e.preventDefault();
+    await sb.auth.signOut();
+    location.href = 'mypage-login.html';
+  });
+
+  function fmtDate(iso){
+    if(!iso) return '';
+    const d = new Date(iso);
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return `${mm}.${dd}`;
+  }
+
+  function render(){
+    const el = document.getElementById('content');
+    const idx = STAGE_ORDER.indexOf(project.current_stage);
+
+    const steps = [
+      { key:'결제완료', label:'결제 완료', date: project.payment_confirmed_at, doneIf: true },
+      { key:'자료제출', label:'제작자료 제출', date: project.material_submitted_at, doneAt: idx >= 1 },
+      { key:'방향승인', label:'제작방향 승인', date: project.direction_approved_at, doneAt: idx >= 3 },
+      { key:'시안승인', label:'프로토타입 승인', date: project.prototype_approved_at, doneAt: idx >= 5 },
+      { key:'개발중', label:'개발', date: project.dev_completed_at, doneAt: idx >= 6, currentIf: idx === 5 },
+      { key:'최종확인', label:'최종 확인', date: project.final_approved_at, doneAt: idx >= 7, currentIf: idx === 6 },
+      { key:'배포', label:'배포', date: project.deployed_at, doneAt: idx >= 7, currentIf: idx === 7 && !project.deployed_at },
+    ];
+
+    let timelineHtml = '';
+    steps.forEach(s=>{
+      let cls = 'pending', mark = '○';
+      if(s.doneIf || s.doneAt){ cls='done'; mark='✓'; }
+      else if(s.currentIf){ cls='current'; mark='●'; }
+      timelineHtml += `<li class="${cls}"><span class="mark">${mark}</span><span>${s.date && (cls==='done') ? `<span class="date">${fmtDate(s.date)}</span>`:''}${s.label}</span></li>`;
+    });
+
+    el.innerHTML = `
+      <div class="card">
+        <div class="proj-name">${escapeHtml(project.product_name)}</div>
+        <p class="proj-amount">${project.amount ? Number(project.amount).toLocaleString()+'원' : ''}</p>
+      </div>
+      <div class="card">
+        <h2>현재 제작 단계</h2>
+        <ul class="timeline">${timelineHtml}</ul>
+        <div class="action-box" id="actionBox"></div>
+      </div>
+    `;
+
+    renderAction();
+  }
+
+  function escapeHtml(s){
+    const d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+  }
+
+  function renderAction(){
+    const box = document.getElementById('actionBox');
+    const stage = project.current_stage;
+
+    if(stage === '자료제출대기'){
+      box.innerHTML = `
+        <p class="desc">제작을 시작하려면 필요한 자료와 요청사항을 알려주세요.\n자세히 적어주실수록 원하시는 방향에 가깝게 기획서를 만들어드릴 수 있어요.</p>
+        <div style="font-size:12.8px;color:var(--ink-soft);background:var(--paper);border-radius:10px;padding:12px 14px;margin-bottom:10px;line-height:1.7;">
+          이런 내용을 적어주시면 좋아요<br>
+          · 어떤 사이트(프로그램)를 원하시는지, 누가 쓰는지<br>
+          · 꼭 들어가야 하는 기능과 페이지<br>
+          · 참고하고 싶은 사이트 주소, 좋아하는 분위기·색상<br>
+          · 원하지 않는 것, 걱정되는 점<br>
+          · 어떤 방향으로 만들어졌으면 하는지 (자유롭게 길게 써주셔도 됩니다)
+        </div>
+        <textarea id="materialInput" style="min-height:220px;" placeholder="자유롭게 적어주세요. 예) 학원 홍보용 홈페이지예요. 학부모님이 상담 신청을 쉽게 할 수 있었으면 좋겠고, 따뜻하고 깔끔한 느낌이면 좋겠어요. 참고 사이트는 ..."></textarea>
+        <div style="margin:4px 0 12px;">
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:6px;">첨부파일 (로고, 사진, 참고 이미지, 문서 등 · 최대 10개, 파일당 10MB)</div>
+          <input type="file" id="materialFiles" multiple style="font-size:13px;width:100%;">
+          <div id="fileList" style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;"></div>
+        </div>
+        <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink-soft);margin:6px 0 14px;line-height:1.6;">
+          <input type="checkbox" id="hostingAck" style="width:18px;height:18px;flex:0 0 18px;margin-top:2px;accent-color:var(--brick);">
+          <span id="hostingAckText">${HOSTING_ACK_TEXT}</span>
+        </label>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="submitMaterial">제출하기</button>
+        </div>
+        <div class="msg" id="actionMsg"></div>
+      `;
+      document.getElementById('materialFiles').addEventListener('change', (e)=>{
+        const fl = Array.from(e.target.files || []);
+        document.getElementById('fileList').innerHTML = fl.map(f => escapeHtml(f.name) + ' (' + (f.size/1024/1024).toFixed(1) + 'MB)').join('<br>');
+      });
+      document.getElementById('submitMaterial').addEventListener('click', async ()=>{
+        const note = document.getElementById('materialInput').value.trim();
+        const btn = document.getElementById('submitMaterial');
+        if(!document.getElementById('hostingAck').checked){ showActionMsg('배포 서비스·요금제 안내를 확인하고 체크해주세요.'); return; }
+        const picked = Array.from(document.getElementById('materialFiles').files || []);
+        if(picked.length > MAX_FILES){ showActionMsg('첨부파일은 최대 ' + MAX_FILES + '개까지 올릴 수 있어요.'); return; }
+        const tooBig = picked.find(f => f.size > MAX_FILE_BYTES && !isCompressible(f));
+        if(tooBig){ showActionMsg('"' + tooBig.name + '" 파일이 10MB를 넘어요. 줄이거나 나눠서 올려주세요.'); return; }
+        btn.disabled = true; btn.textContent = '파일 올리는 중…';
+        const uploaded = [];
+        for(const f0 of picked){
+          let f = f0;
+          try{ f = await maybeCompress(f0); }catch(e){ f = f0; }
+          if(f.size > MAX_FILE_BYTES){ showActionMsg('"' + f0.name + '" 파일이 10MB를 넘어요. 줄이거나 나눠서 올려주세요.'); btn.disabled=false; btn.textContent='제출하기'; return; }
+          const safeName = f0.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-80) || 'file';
+          const path = project.id + '/' + Date.now() + '-' + uploaded.length + '-' + safeName;
+          const { error: upErr } = await sb.storage.from('machim-materials').upload(path, f, { contentType: f.type || 'application/octet-stream' });
+          if(upErr){ showActionMsg('"' + f0.name + '" 업로드에 실패했어요. 다시 시도해주세요.'); btn.disabled=false; btn.textContent='제출하기'; return; }
+          uploaded.push({ path, name: f0.name, size: f.size });
+        }
+        btn.textContent = '제출 중…';
+        const { error } = await sb.from('machim_projects').update({
+          material_files: uploaded,
+          material_note: note,
+          hosting_ack_at: new Date().toISOString(),
+          hosting_ack_text: document.getElementById('hostingAckText').textContent.trim(),
+          material_submitted_at: new Date().toISOString(),
+          current_stage: '방향서대기'
+        }).eq('id', project.id);
+        if(error){ showActionMsg('제출 중 오류가 발생했어요. 다시 시도해주세요.'); btn.disabled=false; btn.textContent='제출하기'; return; }
+        location.reload();
+      });
+    }
+
+    else if(stage === '방향서대기'){
+      box.innerHTML = `<p class="desc">제작자료 제출이 완료되었습니다.\n확인 후 제작방향서를 보내드릴게요. 조금만 기다려주세요.</p>`;
+    }
+
+    else if(stage === '방향서승인대기'){
+      const b = project.direction_brief || {};
+      box.innerHTML = `
+        <p class="desc">아래 내용으로 제작 방향을 안내드려요. 확인 후 승인해주시면 디자인 시안 작업을 시작합니다.\n내용 수정이 필요하면 수정요청을 남겨주세요.</p>
+        <div class="brief-box">
+          ${b.purpose ? `<div><b>목적</b>${escapeHtml(b.purpose)}</div>`:''}
+          ${b.pages ? `<div><b>페이지 구성</b>${escapeHtml(b.pages)}</div>`:''}
+          ${b.color ? `<div><b>색상/톤</b>${escapeHtml(b.color)}</div>`:''}
+          ${b.excluded ? `<div><b>포함 안 되는 사항</b>${escapeHtml(b.excluded)}</div>`:''}
+        </div>
+        <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="approveBtn">위 내용으로 제작을 승인합니다</button>
+          <button class="btn btn-ghost" id="requestBtn">수정요청</button>
+        </div>
+        <div class="msg" id="actionMsg"></div>
+      `;
+      document.getElementById('approveBtn').addEventListener('click', async ()=>{
+        await sb.from('machim_projects').update({
+          direction_approved_at: new Date().toISOString(),
+          current_stage: '프로토타입대기'
+        }).eq('id', project.id);
+        location.reload();
+      });
+      document.getElementById('requestBtn').addEventListener('click', ()=>{
+        const note = document.getElementById('requestInput').value.trim();
+        if(!note){ showActionMsg('수정요청 내용을 입력해주세요.'); return; }
+        showActionMsg('수정요청 접수 기능은 준비 중이에요. 우선 채팅/메일로 말씀해주세요.', true);
+      });
+    }
+
+    else if(stage === '프로토타입대기'){
+      box.innerHTML = `<p class="desc">제작방향이 승인되었습니다.\n디자인 시안(프로토타입)을 준비 중이에요.</p>`;
+    }
+
+    else if(stage === '프로토타입승인대기'){
+      box.innerHTML = `
+        <p class="desc">디자인 시안이 준비됐어요. 아래 링크에서 확인해주세요.</p>
+        ${project.prototype_url ? `<a class="view-link" href="${escapeHtml(project.prototype_url)}" target="_blank" rel="noopener">시안 확인하기 →</a>` : ''}
+        <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="approveBtn">위 시안으로 제작을 승인합니다</button>
+          <button class="btn btn-ghost" id="requestBtn">수정요청</button>
+        </div>
+        <div class="msg" id="actionMsg"></div>
+      `;
+      document.getElementById('approveBtn').addEventListener('click', async ()=>{
+        await sb.from('machim_projects').update({
+          prototype_approved_at: new Date().toISOString(),
+          current_stage: '개발중'
+        }).eq('id', project.id);
+        location.reload();
+      });
+      document.getElementById('requestBtn').addEventListener('click', ()=>{
+        const note = document.getElementById('requestInput').value.trim();
+        if(!note){ showActionMsg('수정요청 내용을 입력해주세요.'); return; }
+        showActionMsg('수정요청 접수 기능은 준비 중이에요. 우선 채팅/메일로 말씀해주세요.', true);
+      });
+    }
+
+    else if(stage === '개발중'){
+      box.innerHTML = `<p class="desc">현재 개발 중입니다.\n개발이 끝나면 최종 확인을 요청드릴게요.</p>`;
+    }
+
+    else if(stage === '최종확인대기'){
+      box.innerHTML = `
+        <p class="desc">제작이 완료되었어요. 최종 결과물을 확인해주세요.</p>
+        ${project.final_preview_url ? `<a class="view-link" href="${escapeHtml(project.final_preview_url)}" target="_blank" rel="noopener">최종 결과물 확인하기 →</a>` : ''}
+        <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="approveBtn">위 내용으로 최종 승인합니다</button>
+          <button class="btn btn-ghost" id="requestBtn">수정요청</button>
+        </div>
+        <div class="msg" id="actionMsg"></div>
+      `;
+      document.getElementById('approveBtn').addEventListener('click', async ()=>{
+        await sb.from('machim_projects').update({
+          final_approved_at: new Date().toISOString(),
+          current_stage: '배포완료'
+        }).eq('id', project.id);
+        location.reload();
+      });
+      document.getElementById('requestBtn').addEventListener('click', ()=>{
+        const note = document.getElementById('requestInput').value.trim();
+        if(!note){ showActionMsg('수정요청 내용을 입력해주세요.'); return; }
+        showActionMsg('수정요청 접수 기능은 준비 중이에요. 우선 채팅/메일로 말씀해주세요.', true);
+      });
+    }
+
+    else if(stage === '배포완료'){
+      box.innerHTML = `
+        <p class="desc">배포가 완료되었습니다. 그동안 이용해주셔서 감사합니다!</p>
+        ${project.live_url ? `<a class="view-link" href="${escapeHtml(project.live_url)}" target="_blank" rel="noopener">사이트 바로가기 →</a>` : ''}
+      `;
+    }
+
+    else{
+      box.innerHTML = `<p class="desc">지금은 없습니다. 제작이 완료되면 알려드릴게요.</p>`;
+    }
+  }
+
+  function showActionMsg(text, ok){
+    const m = document.getElementById('actionMsg');
+    if(!m) return;
+    m.textContent = text;
+    m.className = 'msg ' + (ok ? 'ok' : 'err');
+  }
+</script>
+
+</body>
+</html>

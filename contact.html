@@ -197,7 +197,7 @@
     };
 
     try{
-      const { error } = await sb.from('inquiries').insert(payload);
+      const { error } = await sb.from('machim_inquiries').insert(payload);
       if(error) throw error;
       form.style.display = 'none';
       document.getElementById('confirmBox').classList.add('show');

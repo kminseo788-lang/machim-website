@@ -122,6 +122,7 @@
       <button class="active" data-view="dashboard">대시보드</button>
       <button data-view="schedule">제작 일정</button>
       <button data-view="orders">주문 관리</button>
+      <button data-view="projects">프로젝트 관리</button>
       <button data-view="inquiries">문의 관리</button>
       <button data-view="products">상품 설정</button>
     </div>
@@ -187,6 +188,27 @@
           <thead><tr><th>고객</th><th>상품</th><th>금액</th><th>연락처</th><th>착수일</th><th>상태 / 고객에게 보여줄 메모</th></tr></thead>
           <tbody id="orderTable"><tr><td colspan="6">불러오는 중…</td></tr></tbody>
         </table>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="view" data-view="projects">
+      <div class="panel">
+        <h3>새 프로젝트 만들기</h3>
+        <div class="desc">결제(또는 입금) 확인 후, 고객 이메일로 프로젝트를 만들어두면 고객이 마이페이지에 같은 이메일로 가입/로그인할 때 자동으로 연결됩니다.</div>
+        <div class="field-row" style="gap:10px;">
+          <input type="email" id="newProjectEmail" placeholder="고객 이메일" style="width:220px;">
+          <input type="text" id="newProjectName" placeholder="상품명 (예: 이북 사이트 제작)" style="width:220px;">
+          <input type="number" id="newProjectAmount" placeholder="금액" style="width:120px;">
+          <button class="save-btn" onclick="createProject()">프로젝트 생성</button>
+        </div>
+        <div id="newProjectMsg" style="font-size:12.5px;margin-top:10px;display:none;"></div>
+      </div>
+
+      <div class="panel">
+        <h3>진행 중 프로젝트</h3>
+        <div class="desc">단계별 버튼을 눌러 다음 단계로 넘기세요. 방향서/프로토타입은 내용을 입력하면 고객 마이페이지에 바로 표시됩니다.</div>
+        <div id="projectList">불러오는 중…</div>
       </div>
     </section>
 
@@ -292,7 +314,7 @@
   const STATUS_OPTIONS = ['결제확인중','결제완료','착수대기','제작중','검수중','완료'];
 
   async function loadOrders(){
-    const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+    const { data, error } = await sb.from('machim_orders').select('*').order('created_at', { ascending: false });
     if(error){ console.error(error); orderTable.innerHTML = '<tr><td colspan="6">불러오기 실패</td></tr>'; return; }
 
     orderTable.innerHTML = '';
@@ -320,7 +342,7 @@
       sel.addEventListener('change', async ()=>{
         const id = sel.dataset.id;
         const newStatus = sel.value;
-        const { error } = await sb.from('orders').update({
+        const { error } = await sb.from('machim_orders').update({
           status: newStatus,
           completed_at: newStatus === '완료' ? new Date().toISOString() : null
         }).eq('id', id);
@@ -335,7 +357,7 @@
       btn.addEventListener('click', async ()=>{
         const id = btn.dataset.noteSave;
         const val = orderTable.querySelector(`textarea[data-id="${id}"]`).value;
-        const { error } = await sb.from('orders').update({ admin_note: val }).eq('id', id);
+        const { error } = await sb.from('machim_orders').update({ admin_note: val }).eq('id', id);
         if(error){ alert('저장 실패: ' + error.message); return; }
         btn.textContent = '저장됨';
         setTimeout(()=>{ btn.textContent = '메모 저장'; }, 1500);
@@ -357,20 +379,20 @@
   }
 
   async function refreshDashboardStats(cachedOrders){
-    const { data: orders } = cachedOrders ? { data: cachedOrders } : await sb.from('orders').select('status');
+    const { data: orders } = cachedOrders ? { data: cachedOrders } : await sb.from('machim_orders').select('status');
     const inProgress = (orders || []).filter(o=>o.status==='제작중' || o.status==='검수중').length;
     const waiting = (orders || []).filter(o=>o.status==='결제확인중' || o.status==='결제완료' || o.status==='착수대기').length;
     document.getElementById('statInProgress').textContent = inProgress + '건';
     document.getElementById('statWaiting').textContent = waiting + '건';
 
-    const { count } = await sb.from('inquiries').select('*', { count: 'exact', head: true }).eq('status','신규');
+    const { count } = await sb.from('machim_inquiries').select('*', { count: 'exact', head: true }).eq('status','신규');
     document.getElementById('statNewInquiries').textContent = (count ?? 0) + '건';
   }
 
   // inquiries
   const inquiryTable = document.getElementById('inquiryTable');
   async function loadInquiries(){
-    const { data, error } = await sb.from('inquiries').select('*').order('created_at', { ascending: false });
+    const { data, error } = await sb.from('machim_inquiries').select('*').order('created_at', { ascending: false });
     if(error){ console.error(error); inquiryTable.innerHTML = '<tr><td colspan="6">불러오기 실패</td></tr>'; return; }
     inquiryTable.innerHTML = '';
     if(!data.length){ inquiryTable.innerHTML = '<tr><td colspan="6">아직 접수된 문의가 없습니다.</td></tr>'; }
@@ -395,7 +417,7 @@
     });
     inquiryTable.querySelectorAll('.status-select').forEach(sel=>{
       sel.addEventListener('change', async ()=>{
-        const { error } = await sb.from('inquiries').update({ status: sel.value }).eq('id', sel.dataset.id);
+        const { error } = await sb.from('machim_inquiries').update({ status: sel.value }).eq('id', sel.dataset.id);
         if(error){ alert('상태 변경 실패: ' + error.message); return; }
         refreshDashboardStats();
       });
@@ -404,7 +426,7 @@
       btn.addEventListener('click', async ()=>{
         const id = btn.dataset.replySave;
         const val = inquiryTable.querySelector(`textarea[data-id="${id}"]`).value;
-        const { error } = await sb.from('inquiries').update({ admin_reply: val, status: '답변완료' }).eq('id', id);
+        const { error } = await sb.from('machim_inquiries').update({ admin_reply: val, status: '답변완료' }).eq('id', id);
         if(error){ alert('저장 실패: ' + error.message); return; }
         btn.textContent = '저장됨';
         setTimeout(()=>{ btn.textContent = '답변 저장'; }, 1500);
@@ -417,9 +439,9 @@
     // 별도 주문 페이지가 없는 이 상품은 이 버튼을 눌러야 제작 일정 계산에 시간이 잡힙니다.
     inquiryTable.querySelectorAll('[data-add-order]').forEach(btn=>{
       btn.addEventListener('click', async ()=>{
-        const { data: hourSetting } = await sb.from('site_settings').select('value').eq('key','hours_writerCampaign').maybeSingle();
+        const { data: hourSetting } = await sb.from('machim_site_settings').select('value').eq('key','hours_writerCampaign').maybeSingle();
         const hours = hourSetting ? Number(hourSetting.value) : 20;
-        const { error } = await sb.from('orders').insert({
+        const { error } = await sb.from('machim_orders').insert({
           customer_name: btn.dataset.name || '이름 미상',
           product_name: '나도 작가도전',
           status: '결제확인중',
@@ -445,6 +467,7 @@
     loadOrders();
     loadInquiries();
     loadProductHours();
+    loadProjects();
   }
 
   async function enforceAdminEmail(){
@@ -481,7 +504,7 @@
 
   // 상품별 예상 소요시간 설정
   async function loadProductHours(){
-    const { data } = await sb.from('site_settings').select('key,value').in('key', ['hours_priceMonitoring','hours_homepage_base','hours_homepage_per_page','hours_writerProfile','hours_writerCampaign']);
+    const { data } = await sb.from('machim_site_settings').select('key,value').in('key', ['hours_priceMonitoring','hours_homepage_base','hours_homepage_per_page','hours_writerProfile','hours_writerCampaign']);
     const map = {};
     (data || []).forEach(r=> map[r.key] = r.value);
     document.getElementById('hoursInput_priceMonitoring').value = map.hours_priceMonitoring || 15;
@@ -499,7 +522,7 @@
       { key: 'hours_writerProfile', value: document.getElementById('hoursInput_writerProfile').value },
       { key: 'hours_writerCampaign', value: document.getElementById('hoursInput_writerCampaign').value },
     ];
-    const { error } = await sb.from('site_settings').upsert(rows);
+    const { error } = await sb.from('machim_site_settings').upsert(rows);
     const msg = document.getElementById('productSaveMsg');
     if(error){ alert('저장 실패: ' + error.message); return; }
     msg.style.display = 'block';
@@ -509,16 +532,16 @@
   // 제작 일정 — 하루 가용시간 기반 자동 계산
   async function saveDailyCapacity(){
     const val = document.getElementById('dailyCapacityInput').value;
-    const { error } = await sb.from('site_settings').upsert({ key: 'daily_capacity_hours', value: val });
+    const { error } = await sb.from('machim_site_settings').upsert({ key: 'daily_capacity_hours', value: val });
     if(error){ alert('저장 실패: ' + error.message); return; }
     refreshCapacityPlanner();
   }
 
   async function refreshCapacityPlanner(cachedOrders){
-    const { data: capData } = cachedOrders ? { data: cachedOrders } : await sb.from('orders').select('customer_name,product_name,status,estimated_hours');
+    const { data: capData } = cachedOrders ? { data: cachedOrders } : await sb.from('machim_orders').select('customer_name,product_name,status,estimated_hours');
     const capOrders = (capData || []).filter(o => o.status !== '완료');
 
-    const { data: settingRow } = await sb.from('site_settings').select('value').eq('key','daily_capacity_hours').maybeSingle();
+    const { data: settingRow } = await sb.from('machim_site_settings').select('value').eq('key','daily_capacity_hours').maybeSingle();
     const dailyCapacity = settingRow ? Number(settingRow.value) : 5;
     document.getElementById('dailyCapacityInput').value = dailyCapacity;
 
@@ -552,15 +575,193 @@
     if(hintWC) hintWC.textContent = hintText;
   }
 
+  // --- 프로젝트 관리 (마이페이지 파이프라인) ---
+  const PROJECT_STATUS_LABEL = {
+    '자료제출대기':'고객 자료 제출 대기',
+    '방향서대기':'방향서 작성 필요',
+    '방향서승인대기':'고객 승인 대기 (방향서)',
+    '프로토타입대기':'프로토타입 업로드 필요',
+    '프로토타입승인대기':'고객 승인 대기 (프로토타입)',
+    '개발중':'개발 중',
+    '최종확인대기':'고객 최종 확인 대기',
+    '배포완료':'배포 완료'
+  };
+
+  async function createProject(){
+    const email = document.getElementById('newProjectEmail').value.trim();
+    const name = document.getElementById('newProjectName').value.trim();
+    const amount = document.getElementById('newProjectAmount').value;
+    const msg = document.getElementById('newProjectMsg');
+    if(!email || !name){
+      msg.style.display='block'; msg.style.color='var(--brick)'; msg.textContent='이메일과 상품명을 입력해주세요.';
+      return;
+    }
+    const { error } = await sb.from('machim_projects').insert({
+      customer_email: email,
+      product_name: name,
+      amount: amount ? Number(amount) : null
+    });
+    if(error){ msg.style.display='block'; msg.style.color='var(--brick)'; msg.textContent='생성 실패: ' + error.message; return; }
+    msg.style.display='block'; msg.style.color='var(--green)'; msg.textContent='프로젝트가 생성되었습니다.';
+    document.getElementById('newProjectEmail').value='';
+    document.getElementById('newProjectName').value='';
+    document.getElementById('newProjectAmount').value='';
+    loadProjects();
+  }
+
+  async function loadProjects(){
+    const listEl = document.getElementById('projectList');
+    const { data, error } = await sb.from('machim_projects').select('*').order('created_at', { ascending: false });
+    if(error){ listEl.innerHTML = '불러오기 실패: ' + error.message; return; }
+    if(!data.length){ listEl.innerHTML = '<div class="desc">아직 생성된 프로젝트가 없습니다.</div>'; return; }
+
+    listEl.innerHTML = data.map(p => projectCardHtml(p)).join('');
+
+    data.forEach(p => bindProjectCard(p));
+    data.forEach(p => fillProjectFiles(p));
+  }
+
+  // 비공개 첨부파일은 1시간짜리 임시 링크로 열어봅니다.
+  async function fillProjectFiles(p){
+    const el = document.querySelector(`[data-files="${p.id}"]`);
+    if(!el) return;
+    const links = [];
+    for(const f of p.material_files){
+      const { data } = await sb.storage.from('machim-materials').createSignedUrl(f.path, 3600);
+      const size = f.size ? ' (' + (f.size/1024/1024).toFixed(1) + 'MB)' : '';
+      links.push(data ? `<a href="${data.signedUrl}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(f.name)}</a>${size}` : escapeHtmlA(f.name) + ' (열기 실패)');
+    }
+    el.innerHTML = '<b>첨부파일:</b> ' + links.join(' · ');
+  }
+
+  function projectCardHtml(p){
+    const amountText = p.amount ? Number(p.amount).toLocaleString('ko-KR') + '원' : '-';
+    let actionHtml = '';
+
+    if(p.current_stage === '자료제출대기'){
+      actionHtml = `<div class="desc">고객이 자료를 제출하면 다음 단계(방향서 작성)로 넘어갈 수 있어요.</div>`;
+    }
+    else if(p.current_stage === '방향서대기'){
+      actionHtml = `
+        ${p.material_note ? `<div class="desc" style="white-space:pre-line;"><b>고객 제출 자료:</b> ${escapeHtmlA(p.material_note)}</div>` : ''}
+        <textarea data-field="purpose" placeholder="목적 (예: 전자책 판매 + 작가 소개)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
+        <textarea data-field="pages" placeholder="페이지 구성 (예: 메인, 작품 목록, 작가 소개, 문의)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
+        <textarea data-field="color" placeholder="색상/디자인 톤 (예: 베이지+그린, 차분한 느낌)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
+        <textarea data-field="excluded" placeholder="포함되지 않는 사항 (예: 다국어 지원 제외)" style="width:100%;min-height:36px;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
+        <button class="save-btn" data-action="sendBrief" data-id="${p.id}">방향서 올리기 (고객 승인 요청)</button>
+      `;
+    }
+    else if(p.current_stage === '방향서승인대기'){
+      actionHtml = `<div class="desc">고객의 방향서 승인을 기다리는 중입니다.</div>`;
+    }
+    else if(p.current_stage === '프로토타입대기'){
+      actionHtml = `
+        <input type="text" data-field="prototype_url" placeholder="프로토타입/시안 링크 (피그마, 미리보기 URL 등)" style="width:100%;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
+        <textarea data-field="prototype_note" placeholder="고객에게 전달할 메모 (선택)" style="width:100%;min-height:36px;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
+        <button class="save-btn" data-action="sendPrototype" data-id="${p.id}">프로토타입 올리기 (고객 승인 요청)</button>
+      `;
+    }
+    else if(p.current_stage === '프로토타입승인대기'){
+      actionHtml = `<div class="desc">고객의 프로토타입 승인을 기다리는 중입니다.</div>`;
+    }
+    else if(p.current_stage === '개발중'){
+      actionHtml = `
+        <input type="text" data-field="final_preview_url" placeholder="최종 결과물 확인 링크" style="width:100%;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
+        <button class="save-btn" data-action="sendFinal" data-id="${p.id}">개발완료 처리 (고객 최종확인 요청)</button>
+      `;
+    }
+    else if(p.current_stage === '최종확인대기'){
+      actionHtml = `<div class="desc">고객의 최종 승인을 기다리는 중입니다.</div>`;
+    }
+    else if(p.current_stage === '배포완료' && !p.deployed_at){
+      actionHtml = `
+        <input type="text" data-field="live_url" placeholder="실제 배포된 사이트 주소" style="width:100%;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
+        <button class="save-btn" data-action="deploy" data-id="${p.id}">배포완료 처리</button>
+      `;
+    }
+    else if(p.deployed_at){
+      actionHtml = `<div class="desc">배포 완료됨 — <a href="${escapeHtmlA(p.live_url || '#')}" target="_blank">${escapeHtmlA(p.live_url || '')}</a></div>`;
+    }
+
+    return `
+      <div class="panel" style="margin-bottom:14px;" data-project-card="${p.id}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+          <div>
+            <div style="font-weight:800;font-size:15.5px;">${escapeHtmlA(p.product_name)}</div>
+            <div style="font-size:12.5px;color:var(--ink-faint);">${escapeHtmlA(p.customer_email)} · ${amountText}</div>
+          </div>
+          <span class="status-badge" style="background:#E4EAF6;color:#3A5A9C;">${PROJECT_STATUS_LABEL[p.current_stage] || p.current_stage}</span>
+        </div>
+        ${(p.material_files && p.material_files.length) ? `<div class="desc" data-files="${p.id}" style="margin-top:6px;"><b>첨부파일:</b> 불러오는 중…</div>` : ''}
+        ${actionHtml}
+        <div class="msg-area" data-msg="${p.id}" style="font-size:12.5px;margin-top:8px;display:none;"></div>
+      </div>
+    `;
+  }
+
+  function escapeHtmlA(s){
+    const d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+  }
+
+  function bindProjectCard(p){
+    const card = document.querySelector(`[data-project-card="${p.id}"]`);
+    if(!card) return;
+    const getField = (name) => {
+      const el = card.querySelector(`[data-field="${name}"]`);
+      return el ? el.value.trim() : '';
+    };
+    const showCardMsg = (text, ok) => {
+      const m = card.querySelector(`[data-msg="${p.id}"]`);
+      if(!m) return;
+      m.style.display='block'; m.style.color = ok ? 'var(--green)' : 'var(--brick)'; m.textContent = text;
+    };
+
+    const btn = card.querySelector('[data-action]');
+    if(!btn) return;
+    btn.addEventListener('click', async ()=>{
+      const action = btn.dataset.action;
+      let update = {};
+      if(action === 'sendBrief'){
+        update = {
+          direction_brief: {
+            purpose: getField('purpose'),
+            pages: getField('pages'),
+            color: getField('color'),
+            excluded: getField('excluded')
+          },
+          current_stage: '방향서승인대기'
+        };
+      } else if(action === 'sendPrototype'){
+        const url = getField('prototype_url');
+        if(!url){ showCardMsg('링크를 입력해주세요.'); return; }
+        update = { prototype_url: url, prototype_note: getField('prototype_note'), current_stage: '프로토타입승인대기' };
+      } else if(action === 'sendFinal'){
+        const url = getField('final_preview_url');
+        if(!url){ showCardMsg('링크를 입력해주세요.'); return; }
+        update = { final_preview_url: url, dev_completed_at: new Date().toISOString(), current_stage: '최종확인대기' };
+      } else if(action === 'deploy'){
+        const url = getField('live_url');
+        if(!url){ showCardMsg('배포 주소를 입력해주세요.'); return; }
+        update = { live_url: url, deployed_at: new Date().toISOString() };
+      }
+      btn.disabled = true;
+      const { error } = await sb.from('machim_projects').update(update).eq('id', p.id);
+      if(error){ showCardMsg('처리 실패: ' + error.message); btn.disabled = false; return; }
+      loadProjects();
+    });
+  }
+
   // 착수 가능일 저장 — Supabase site_settings 테이블로 모든 방문자에게 공유
   ['priceMonitoring','homepage','writerProfile','writerCampaign'].forEach(async key=>{
-    const { data } = await sb.from('site_settings').select('value').eq('key', 'start_date_' + key).maybeSingle();
+    const { data } = await sb.from('machim_site_settings').select('value').eq('key', 'start_date_' + key).maybeSingle();
     if(data) document.getElementById('startDateInput_' + key).value = data.value;
   });
   async function saveStartDate(key){
     const val = document.getElementById('startDateInput_' + key).value.trim();
     if(!val) return;
-    const { error } = await sb.from('site_settings').upsert({ key: 'start_date_' + key, value: val });
+    const { error } = await sb.from('machim_site_settings').upsert({ key: 'start_date_' + key, value: val });
     const msg = document.getElementById('saveMsg');
     if(error){ alert('저장 실패: ' + error.message); return; }
     msg.style.display = 'block';

@@ -299,7 +299,7 @@
 
     let earliestDate = new Date(2026, 9, 1);
     try{
-      const { data: earliest } = await sb.rpc('get_earliest_start_date');
+      const { data: earliest } = await sb.rpc('machim_get_earliest_start_date');
       if(earliest) earliestDate = new Date(earliest + 'T00:00:00');
     }catch(e){ console.error(e); }
 
@@ -353,12 +353,12 @@
 
     let estHours = 4;
     try{
-      const { data: hd } = await sb.from('site_settings').select('value').eq('key','hours_writerProfile').maybeSingle();
+      const { data: hd } = await sb.from('machim_site_settings').select('value').eq('key','hours_writerProfile').maybeSingle();
       if(hd) estHours = Number(hd.value) || 4;
     }catch(e){}
 
     try{
-      const { error } = await sb.from('orders').insert({
+      const { error } = await sb.from('machim_orders').insert({
         product_name: '작가 프로필 페이지',
         options: { picked_start_date_label: pickedDate, note: note || null, consent: consent },
         amount: 149000,

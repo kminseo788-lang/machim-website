@@ -375,7 +375,7 @@
     // 현재 밀린 일감을 기준으로 계산된, 실제로 착수 가능한 가장 이른 날짜
     let earliestDate = new Date(2026, 9, 1);
     try{
-      const { data: earliest } = await sb.rpc('get_earliest_start_date');
+      const { data: earliest } = await sb.rpc('machim_get_earliest_start_date');
       if(earliest) earliestDate = new Date(earliest + 'T00:00:00');
     }catch(e){ console.error(e); }
 
@@ -452,12 +452,12 @@
 
     let estHours = 15;
     try{
-      const { data: hd } = await sb.from('site_settings').select('value').eq('key','hours_priceMonitoring').maybeSingle();
+      const { data: hd } = await sb.from('machim_site_settings').select('value').eq('key','hours_priceMonitoring').maybeSingle();
       if(hd) estHours = Number(hd.value) || 15;
     }catch(e){}
 
     try{
-      const { error } = await sb.from('orders').insert({
+      const { error } = await sb.from('machim_orders').insert({
         product_name: '경쟁사 가격·재고 모니터링',
         options: options,
         amount: total,

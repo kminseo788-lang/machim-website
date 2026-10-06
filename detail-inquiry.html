@@ -264,7 +264,7 @@ let pickedDate = null;
   const availableDays = [7,8,9,14,15,16,21,22,23,28,29,30];
   let earliestDate = new Date(2026, 9, 1);
   try{
-    const { data: earliest } = await sb.rpc('get_earliest_start_date');
+    const { data: earliest } = await sb.rpc('machim_get_earliest_start_date');
     if(earliest) earliestDate = new Date(earliest + 'T00:00:00');
   }catch(e){ console.error(e); }
 
@@ -334,12 +334,12 @@ async function submitOrder(){
 
   let estHours = 16;
   try{
-    const { data: hd } = await sb.from('site_settings').select('value').eq('key','hours_inquiry').maybeSingle();
+    const { data: hd } = await sb.from('machim_site_settings').select('value').eq('key','hours_inquiry').maybeSingle();
     if(hd) estHours = Number(hd.value) || 16;
   }catch(e){}
 
   try{
-    const { error } = await sb.from('orders').insert({
+    const { error } = await sb.from('machim_orders').insert({
       product_name: '문의 분류 자동화',
       options: options,
       amount: total,

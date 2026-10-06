@@ -90,8 +90,8 @@
     submitBtn.textContent = '조회 중…';
 
     const [inqRes, ordRes] = await Promise.all([
-      sb.rpc('get_inquiry_status', { p_name: name, p_phone: phone }),
-      sb.rpc('get_order_status', { p_name: name, p_phone: phone })
+      sb.rpc('machim_get_inquiry_status', { p_name: name, p_phone: phone }),
+      sb.rpc('machim_get_order_status', { p_name: name, p_phone: phone })
     ]);
 
     submitBtn.disabled = false;

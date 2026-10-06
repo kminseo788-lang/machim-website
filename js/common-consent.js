@@ -21,18 +21,25 @@
        // orders.insert(...) 의 options 필드 등에 consent 를 같이 저장
    ========================================================= */
 
-const CONSENT_VERSION = '2026-10-02';
+const CONSENT_VERSION = '2026-10-06';
+
+// 1마침이 기본으로 안내하는 배포(호스팅) 서비스. 서비스를 바꾸고 싶으면 이 한 줄만 고치면
+// 동의 문구에 반영됩니다. (terms.html, guide-hosting-domain.html 의 문구도 같이 확인하세요)
+const DEFAULT_HOSTING_NAME = 'Cloudflare Pages';
+const HOSTING_ITEM_TITLE = '도메인 · 서버(호스팅) 안내';
 
 // 모든 상품 공통 유의사항 (서버/도메인 정책: 호스팅 계정·도메인은 고객이 직접 가입/구매)
 const COMMON_CONSENT_ITEMS = [
   {
-    title: '도메인 · 서버(호스팅) 안내',
+    title: HOSTING_ITEM_TITLE,
     html: `
       <ul>
-        <li>1마침은 사이트를 <strong>제작하고 코드를 전달(배포)</strong>하는 역할을 하며, 사이트가 실제로 돌아가는 <strong>호스팅 계정과 도메인은 신청자 본인이 직접 가입·구매</strong>합니다.</li>
-        <li>신청자가 안내받은 방법대로 호스팅 서비스에 가입하고 접속 권한을 전달해주시면, 1마침이 그 계정에 사이트를 설치(배포)해드립니다.</li>
-        <li>도메인도 신청자 본인 명의로 직접 구매하며, 그 소유권과 구매·갱신 비용은 전적으로 신청자 본인에게 있습니다.</li>
-        <li>호스팅 서비스의 요금제, 약관, 장애·점검으로 인한 문제는 해당 호스팅 회사의 정책을 따르며, 1마침은 배포(설치) 작업에 대해서만 책임을 집니다.</li>
+        <li>1마침은 사이트를 <strong>제작하고 코드를 전달(배포)</strong>하는 역할을 하며, 사이트가 실제로 돌아가는 <strong>호스팅 계정과 도메인은 신청자 본인이 직접 가입·구매</strong>하고 본인 명의로 소유합니다. 1마침은 신청자의 아이디·비밀번호를 받지 않으며, 신청자가 계정에 <strong>공동관리자(협업자)로 초대</strong>해주시면 그 권한으로만 작업합니다.</li>
+        <li><strong>배포 서비스는 ${DEFAULT_HOSTING_NAME} 한 가지로 통일</strong>해서 제작·배포합니다. 모든 고객에게 같은 방식으로 제작해야 일정과 품질을 일정하게 보장할 수 있기 때문입니다.</li>
+        <li>다른 호스팅 서비스를 원하시는 경우에는 <strong>결제 전에</strong> 별도로 문의해주셔야 하며, 가능 여부와 추가 비용은 개별 협의로 정해집니다. 결제 후에 서비스 변경을 요청하시는 경우에는 별도의 유지보수 작업으로 진행되며 비용이 청구됩니다.</li>
+        <li><strong>요금제와 이용약관은 신청자의 책임입니다.</strong> 호스팅·도메인 서비스의 무료·유료 요금제, 사용량 한도(트래픽·저장공간 등), 한도 초과 시 추가 요금, 계정 정지·제한, 결제수단 등록·자동결제, 도메인 갱신 비용은 모두 신청자 본인이 해당 회사와 직접 계약한 내용이며 신청자가 부담합니다.</li>
+        <li>사이트를 영리 목적(상품·서비스 판매, 광고 수익 등)으로 운영하시는 경우, 선택한 서비스의 요금제가 영리 목적 이용을 허용하는지를 <strong>신청자가 직접 확인</strong>해야 합니다. 1마침이 안내한 서비스라도 해당 회사의 약관·요금 정책은 회사가 언제든 바꿀 수 있고, 그 변경으로 인한 요금 발생이나 서비스 제한은 1마침의 책임이 아닙니다.</li>
+        <li>호스팅 회사의 정책 변경·장애·점검·계정 정지 등으로 사이트가 중단되거나 다른 서비스로 옮겨야 하는 경우, 이전·복구 작업은 별도 유지보수로 진행되며 비용과 일정은 건별로 협의합니다.</li>
         <li>호스팅 가입과 도메인 구매 방법은 <a href="guide-hosting-domain.html" target="_blank" style="color:var(--brick);text-decoration:underline;">이 안내 페이지</a>에서 그대로 따라 하시면 됩니다. 어려우시면 신청 후 화면 공유로 같이 진행해드릴 수 있습니다.</li>
       </ul>
     `
@@ -82,6 +89,7 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
     ? COMMON_CONSENT_ITEMS.filter((it) => !omitItems.includes(it.title))
     : COMMON_CONSENT_ITEMS;
   const items = baseItems.concat(extraItems || []);
+  const hasHosting = items.some((it) => it.title === HOSTING_ITEM_TITLE);
   const container = document.getElementById(containerId);
   if (!container) return;
 
@@ -97,6 +105,14 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
       <div class="cc-lead">⚠️ 신청 전 꼭 확인해야 하는 사항 (${items.length}가지)</div>
       <div class="cc-sub">각 항목을 눌러서 펼쳐보실 수 있습니다. 아래 체크박스에 동의해야 신청이 접수됩니다.</div>
       ${itemsHtml}
+      ${hasHosting ? `
+      <div class="cc-agree-row">
+        <input type="checkbox" id="cc-host-${containerId}">
+        <label for="cc-host-${containerId}">
+          배포 서비스는 <strong>${DEFAULT_HOSTING_NAME} 한 가지로 통일</strong>되며, 호스팅·도메인의 <strong>요금제·약관·비용은 제가 직접 책임진다</strong>는 점을 확인했습니다.
+          <span class="cc-fine">다른 서비스를 원하면 결제 전에 문의해야 하고, 결제 후 변경은 유료 유지보수임을 이해했습니다.</span>
+        </label>
+      </div>` : ''}
       <div class="cc-agree-row">
         <input type="checkbox" id="cc-agree-${containerId}">
         <label for="cc-agree-${containerId}">
@@ -144,17 +160,38 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
   });
 
   const checkbox = document.getElementById('cc-agree-' + containerId);
+  const hostBox = document.getElementById('cc-host-' + containerId);
   const payBtn = payBtnId ? document.getElementById(payBtnId) : null;
   if (payBtn) payBtn.disabled = true;
-  checkbox.addEventListener('change', () => {
-    if (payBtn) payBtn.disabled = !checkbox.checked;
+
+  // 동의 당시 화면에 실제로 보였던 문구를 그대로 저장 (나중에 약관이 바뀌어도 증거가 남도록)
+  const textSnapshot = items.map((it) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = it.html;
+    return '[' + it.title + '] ' + tmp.textContent.replace(/\s+/g, ' ').trim();
+  }).join('\n');
+
+  let hostAckAt = null;
+  function refresh() {
+    const hostOk = !hostBox || hostBox.checked;
+    const ok = checkbox.checked && hostOk;
+    if (payBtn) payBtn.disabled = !ok;
     _lastConsentPayload = {
-      agreed: checkbox.checked,
-      agreed_at: new Date().toISOString(),
+      agreed: ok,
+      agreed_at: ok ? new Date().toISOString() : null,
       consent_version: CONSENT_VERSION,
       product_name: productName || null,
-      items_shown: items.map((it) => it.title)
+      items_shown: items.map((it) => it.title),
+      text_snapshot: textSnapshot,
+      hosting_ack: hostBox ? { agreed: hostBox.checked, at: hostAckAt, hosting_service: DEFAULT_HOSTING_NAME } : null,
+      page_url: location.href,
+      user_agent: navigator.userAgent
     };
+  }
+  checkbox.addEventListener('change', refresh);
+  if (hostBox) hostBox.addEventListener('change', () => {
+    hostAckAt = hostBox.checked ? new Date().toISOString() : null;
+    refresh();
   });
 }
 
