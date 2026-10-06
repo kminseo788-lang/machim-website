@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>의뢰하기 — 1마침</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="css/common.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="js/common-consent.js"></script>
+<style>
+  body{word-break:keep-all;}
+  .wrap{width:min(1120px, calc(100% - 48px));margin:0 auto;padding:36px 0 90px;}
+  .page-title{font-size:clamp(24px,3vw,32px);margin-bottom:6px;}
+  .page-sub{color:var(--ink-soft);font-size:14.5px;margin-bottom:26px;}
+
+  /* 단계 표시 */
+  .stepper{display:flex;gap:8px;margin-bottom:26px;flex-wrap:wrap;}
+  .stp{flex:1;min-width:120px;display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:13.5px;color:var(--ink-faint);font-weight:600;}
+  .stp .n{width:24px;height:24px;border-radius:50%;background:var(--line);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:0 0 24px;}
+  .stp.on{color:var(--ink);border-color:var(--ink);}
+  .stp.on .n{background:var(--ink);}
+  .stp.done .n{background:var(--green);}
+  .stp.done{color:var(--ink-soft);cursor:pointer;}
+
+  .layout{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;}
+  @media(max-width:900px){.layout{grid-template-columns:1fr;}}
+  .panel{display:none;}
+  .panel.on{display:block;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 26px;}
+  .card h2{font-size:19px;margin-bottom:6px;}
+  .card .hint{font-size:13.8px;color:var(--ink-soft);margin-bottom:18px;}
+
+  .grp{font-size:13px;font-weight:700;color:var(--ink-faint);margin:22px 0 10px;letter-spacing:.02em;}
+  .grp:first-of-type{margin-top:6px;}
+  .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:620px){.pgrid{grid-template-columns:1fr;}}
+  .pc{border:1.6px solid var(--line);border-radius:14px;padding:18px 18px 16px;background:#fff;cursor:pointer;transition:.15s;text-align:left;display:block;width:100%;}
+  .pc:hover{border-color:var(--ink-faint);}
+  .pc.sel{border-color:var(--brick);background:#FBF4F1;box-shadow:0 0 0 3px rgba(217,119,87,.14);}
+  .pc .nm{font-size:16px;font-weight:800;margin-bottom:4px;}
+  .pc .ds{font-size:13px;color:var(--ink-soft);margin-bottom:10px;line-height:1.55;}
+  .pc .pr{font-size:14.5px;font-weight:800;color:var(--brick);}
+  .pc .du{font-size:12.3px;color:var(--ink-faint);margin-top:2px;}
+  .pc a.more{display:inline-block;margin-top:8px;font-size:12.3px;color:var(--ink-soft);text-decoration:underline;}
+  .side-links{margin-top:20px;font-size:13.5px;color:var(--ink-soft);display:flex;gap:16px;flex-wrap:wrap;}
+  .side-links a{text-decoration:underline;}
+
+  .opt{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid var(--line);}
+  .opt:last-of-type{border-bottom:none;}
+  .opt .t{font-size:15px;font-weight:700;}
+  .opt .d{font-size:13px;color:var(--ink-soft);}
+  .opt .r{display:flex;align-items:center;gap:12px;white-space:nowrap;font-size:14px;color:var(--brick);font-weight:700;}
+  .opt input[type=checkbox]{width:20px;height:20px;accent-color:var(--brick);}
+  .qty{display:inline-flex;align-items:center;gap:10px;}
+  .qty button{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--line);background:#fff;font-size:17px;line-height:1;}
+  .qty span{min-width:18px;text-align:center;color:var(--ink);font-weight:700;}
+  .inc{background:var(--paper-dark);border-radius:12px;padding:14px 16px;font-size:13.5px;color:var(--ink-soft);margin-top:14px;}
+  .inc ul{padding-left:18px;}
+  .note{font-size:12.8px;color:var(--ink-faint);margin-top:14px;}
+
+  /* 달력 */
+  .calhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .calhead b{font-size:16px;}
+  .calhead button{padding:6px 12px;border:1.5px solid var(--line);border-radius:8px;background:#fff;font-size:13px;}
+  .calhead button:disabled{opacity:.35;cursor:default;}
+  .dow,.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .dow span{text-align:center;font-size:12px;color:var(--ink-faint);padding-bottom:4px;}
+  .cell{height:48px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13.5px;background:transparent;color:var(--line);}
+  .cell.ok{background:#EAF2EA;border:1px solid var(--green);color:var(--green);font-weight:700;cursor:pointer;}
+  .cell.ok:hover{transform:translateY(-2px);}
+  .cell.pick{background:var(--green);color:#fff;}
+  .cell.no{color:var(--ink-faint);text-decoration:line-through;opacity:.5;}
+  .legend{font-size:12.5px;color:var(--ink-soft);margin-top:12px;}
+  .picked{margin-top:14px;padding:13px 16px;border-radius:12px;background:#EAF2EA;border:1px solid var(--green);font-size:14px;color:var(--green);font-weight:700;display:none;}
+  .picked.show{display:block;}
+
+  /* 폼 */
+  .fld{margin-bottom:14px;}
+  .fld label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px;}
+  .fld input{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:15px;background:#fff;}
+  .fld input[readonly]{background:var(--paper-dark);color:var(--ink-soft);}
+  .loginbox{text-align:center;padding:26px 10px;}
+  .loginbox p{font-size:14.5px;color:var(--ink-soft);margin-bottom:16px;}
+
+  .nav2{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:12px;}
+  .back{font-size:14px;color:var(--ink-soft);cursor:pointer;text-decoration:underline;}
+  .btn[disabled]{opacity:.4;pointer-events:none;}
+
+  /* 요약 */
+  .sum{position:sticky;top:92px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 22px;}
+  @media(max-width:900px){.sum{position:static;}}
+  .sum h3{font-size:15px;color:var(--ink-faint);margin-bottom:12px;}
+  .sum .nm{font-size:17px;font-weight:800;margin-bottom:8px;}
+  .sum ul{list-style:none;font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;}
+  .sum li{display:flex;justify-content:space-between;gap:10px;padding:3px 0;}
+  .sum .empty{font-size:13.5px;color:var(--ink-faint);padding:6px 0 10px;}
+  .sum .tot{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);padding-top:14px;}
+  .sum .tot b{font-size:22px;color:var(--brick);}
+  .sum .meta{font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.7;}
+
+  .donebox{display:none;text-align:center;padding:34px 10px;}
+  .donebox h2{font-size:22px;margin-bottom:10px;}
+  .donebox p{font-size:14.5px;color:var(--ink-soft);margin-bottom:18px;}
+  .testbadge{display:inline-block;font-size:12px;font-weight:700;background:var(--gold);color:var(--ink);padding:3px 10px;border-radius:999px;margin-bottom:12px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="index.html" class="logo">1<span class="mark">마침</span></a>
+    <a href="index.html" class="back-link">← 메인으로</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1 class="page-title">의뢰하기</h1>
+  <p class="page-sub">상담 없이, 아래 순서대로 고르면 가격이 정해지고 바로 시작할 수 있어요.</p>
+
+  <div class="stepper" id="stepper">
+    <div class="stp on" data-s="1"><span class="n">1</span>무엇을 만들까요</div>
+    <div class="stp" data-s="2"><span class="n">2</span>구성 선택</div>
+    <div class="stp" data-s="3"><span class="n">3</span>착수일 선택</div>
+    <div class="stp" data-s="4"><span class="n">4</span>확인 · 결제</div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <!-- STEP 1 -->
+      <div class="panel on" data-p="1">
+        <div class="card">
+          <h2>어떤 것을 만들까요?</h2>
+          <div class="hint">하나를 고르면 다음 단계에서 세부 구성을 정합니다.</div>
+          <div class="grp">웹 제작</div>
+          <div class="pgrid" id="gridWeb"></div>
+          <div class="grp">업무 자동화</div>
+          <div class="pgrid" id="gridAuto"></div>
+          <div class="side-links">
+            <a href="writer-campaign.html">나도 작가도전(777,777원 패키지) 신청하기 →</a>
+            <a href="contact.html">표에 없는 방식은 문의 남기기 →</a>
+          </div>
+          <div class="nav2"><span></span><button class="btn btn-primary" id="n1" disabled>다음: 구성 선택</button></div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="panel" data-p="2">
+        <div class="card">
+          <h2 id="s2title">구성 선택</h2>
+          <div class="hint">필요한 항목을 체크하면 오른쪽 금액이 바로 바뀝니다.</div>
+          <div id="optBox"></div>
+          <div class="nav2"><span class="back" data-go="1">← 상품 다시 고르기</span><button class="btn btn-primary" id="n2">다음: 착수일 선택</button></div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="panel" data-p="3">
+        <div class="card">
+          <h2>언제부터 시작할까요?</h2>
+          <div class="hint">초록색 날짜 중에서 고르세요. 현재 작업 일정이 반영된 날짜만 선택할 수 있어요.</div>
+          <div class="calhead"><button id="prevM">‹ 이전 달</button><b id="monthLbl"></b><button id="nextM">다음 달 ›</button></div>
+          <div class="dow"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+          <div class="cg" id="cg"></div>
+          <div class="legend">🟢 착수 가능 · 클릭해서 선택 &nbsp; 주말·일정이 찬 날짜는 선택할 수 없어요.</div>
+          <div class="picked" id="pickedBox"></div>
+          <div class="nav2"><span class="back" data-go="2">← 구성 다시 보기</span><button class="btn btn-primary" id="n3" disabled>다음: 확인 · 결제</button></div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="panel" data-p="4">
+        <div class="card" id="s4card">
+          <h2>마지막으로 확인해주세요</h2>
+          <div class="hint">내용 확인 후 결제하면 제작 대기열에 등록되고, 마이페이지에서 자료 제출 단계가 열립니다.</div>
+
+          <div id="needLogin" class="loginbox" style="display:none;">
+            <p>주문 내용은 마이페이지에서 계속 확인하고 진행하기 때문에 <b>로그인(회원가입)</b>이 필요해요.<br>지금까지 고른 내용은 그대로 저장돼 있어요.</p>
+            <a class="btn btn-primary" id="goLogin" href="#">로그인 / 회원가입하고 돌아오기</a>
+          </div>
+
+          <div id="s4form" style="display:none;">
+            <div class="fld"><label>이메일 (로그인 계정)</label><input id="custEmail" readonly></div>
+            <div class="fld"><label>이름</label><input id="custName" placeholder="신청자 이름"></div>
+            <div class="fld"><label>연락처</label><input id="custPhone" placeholder="010-0000-0000" inputmode="tel"></div>
+            <div id="consentBox" style="margin-top:22px;"></div>
+            <div class="nav2"><span class="back" data-go="3">← 일정 다시 보기</span><button class="btn btn-primary" id="payBtn">결제하기</button></div>
+          </div>
+        </div>
+
+        <div class="card donebox" id="doneBox">
+          <h2 id="doneTitle">주문이 접수되었습니다</h2>
+          <p id="doneText"></p>
+          <a class="btn btn-primary" id="doneLink" href="mypage-project.html">마이페이지로 이동</a>
+        </div>
+      </div>
+    </div>
+
+    <aside class="sum">
+      <h3>선택한 내용</h3>
+      <div id="sumBody"><div class="empty">아직 선택한 상품이 없어요.</div></div>
+      <div class="tot"><span>총 결제 금액</span><b id="sumTotal">0원</b></div>
+      <div class="meta" id="sumMeta"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+  // ===== 상품 정의 (가격·옵션은 여기 한 곳에서 관리) =====
+  var PRODUCTS = {
+    web_basic:  { group:'web', name:'홈페이지 기본형', base:690000, desc:'최대 5페이지 · 반응형 · 디자인 1안 · 수정 2회 · 문의폼 1개', dur:'제작기간 착수일로부터 10영업일', detail:'detail-webmaking.html', orderName:'홈페이지 기본형', hoursKey:['hours_homepage_base','hours_homepage_per_page'], hoursDefault:30,
+      qty:{ id:'pages', title:'페이지 추가', desc:'1페이지당 50,000원 (최대 5페이지 추가)', unit:50000, max:5 },
+      addons:[ {id:'rev', title:'수정 1회 추가', desc:'기본 2회 이후 추가 수정', price:30000}, {id:'anim', title:'추가 애니메이션 섹션', desc:'스크롤 인터랙션 등 별도 연출 1개 섹션', price:40000} ],
+      note:'회원가입·결제·게시판·관리자페이지가 필요하면 "쇼핑몰 풀커머스"를 선택해주세요.' },
+    web_detail: { group:'web', name:'상세페이지 제작', base:290000, desc:'상품 상세페이지 1건 · 모바일 최적화 · 수정 2회', dur:'제작기간 착수일로부터 5영업일', detail:'detail-webmaking.html', orderName:'상세페이지 제작', hoursKey:['hours_detailpage'], hoursDefault:10, include:['상품 상세페이지 1건','모바일 최적화','수정 2회'], note:'고정가 상품입니다. 여러 건이 필요하면 주문을 여러 번 진행해주세요.' },
+    web_ecom:   { group:'web', name:'쇼핑몰 풀커머스', base:1200000, desc:'회원가입·결제·주문관리 포함 · 상품 50개까지', dur:'제작기간 착수일로부터 20~25영업일', detail:'detail-webmaking.html', orderName:'쇼핑몰 풀커머스', hoursKey:['hours_ecommerce_base'], hoursDefault:80,
+      addons:[ {id:'p150', title:'상품 수 확장', desc:'50개 → 150개까지 등록', price:150000}, {id:'grade', title:'회원등급 · 적립금 시스템', desc:'등급별 혜택, 구매 적립금', price:180000}, {id:'coupon', title:'쿠폰 · 할인코드 시스템', desc:'기간/대상 한정 쿠폰, 할인코드', price:120000}, {id:'stats', title:'관리자 매출 통계 대시보드', desc:'기간별 매출·주문 현황', price:150000} ],
+      include:['상품 50개까지 등록','결제 연동(PG 1개)','주문·배송 관리자페이지'], note:'옵션 금액은 1차 기준이며 상품·운영 규모에 따라 조정될 수 있어요. 상품 150개 초과, PG 2개 이상 연동은 정찰제로 제공하지 않습니다.' },
+    web_writer: { group:'web', name:'작가 프로필 페이지', base:149000, desc:'프로필·소개·책 목록을 담은 1페이지 소개 사이트', dur:'제작기간은 상품 페이지 참고', detail:'detail-writer-profile.html', orderName:'작가 프로필 페이지', hoursKey:['hours_writerProfile'], hoursDefault:20, include:['프로필·소개·책 목록 1페이지','반응형'], note:'고정가 상품입니다.' },
+    auto_price: { group:'auto', name:'경쟁사 가격·재고 모니터링', base:450000, desc:'등록한 상품의 가격·재고를 자동 확인하고 변경 시 알려드려요', dur:'제작기간 착수일로부터 7~10영업일', detail:'detail-price-monitoring.html', orderName:'경쟁사 가격·재고 모니터링', hoursKey:['hours_priceMonitoring'], hoursDefault:20, include:['표준 사양 기준 모니터링 프로그램','이메일 알림'], note:'스마트스토어 공개 상품 페이지 등 표준 사양 범위의 고정가 상품입니다.' },
+    auto_ann:   { group:'auto', name:'공고·지원사업 모니터링', base:450000, desc:'업종·지역 조건에 맞는 공고만 매일 알려드려요', dur:'제작기간 착수일로부터 10~13영업일', detail:'detail-announcement.html', orderName:'공고·지원사업 모니터링', hoursKey:['hours_announcement'], hoursDefault:25, include:['조건 맞춤 공고 수집·필터','매일 알림'], note:'고정가 상품입니다.' },
+    auto_excel: { group:'auto', name:'엑셀 반복업무 자동화', base:350000, desc:'수집·정리·파일 생성까지 버튼 하나로', dur:'제작기간 착수일로부터 6~9영업일', detail:'detail-excel.html', orderName:'엑셀 반복업무 자동화', hoursKey:['hours_excel'], hoursDefault:15, include:['규칙이 정해진 엑셀 업무 1종 자동화'], note:'고정가 상품입니다.' },
+    auto_inq:   { group:'auto', name:'문의 분류 자동화', base:450000, desc:'구매 의사를 먼저 확인해 진짜 상담이 필요한 분만 연결', dur:'제작기간 착수일로부터 8~11영업일', detail:'detail-inquiry.html', orderName:'문의 분류 자동화', hoursKey:['hours_inquiry'], hoursDefault:22, include:['사전 질문 폼','조건별 분류'], note:'고정가 상품입니다.' }
+  };
+
+  var state = { key:null, qty:0, addons:{}, date:null, step:1 };
+  var ADMIN_EMAILS = ['kminseo788@gmail.com'];
+  var won = function(n){ return n.toLocaleString('ko-KR') + '원'; };
+
+  function calcTotal(){
+    var p = PRODUCTS[state.key]; if(!p) return 0;
+    var t = p.base;
+    if(p.qty) t += state.qty * p.qty.unit;
+    (p.addons||[]).forEach(function(a){ if(state.addons[a.id]) t += a.price; });
+    return t;
+  }
+
+  function save(){ try{ sessionStorage.setItem('machim_order_state', JSON.stringify(state)); }catch(e){} }
+  function load(){ try{ var s = JSON.parse(sessionStorage.getItem('machim_order_state')||'null'); if(s && PRODUCTS[s.key]) state = s; }catch(e){} }
+
+  // ----- 1단계 -----
+  function renderProducts(){
+    ['web','auto'].forEach(function(g){
+      var el = document.getElementById(g==='web'?'gridWeb':'gridAuto'); el.innerHTML = '';
+      Object.keys(PRODUCTS).forEach(function(k){
+        var p = PRODUCTS[k]; if(p.group!==g) return;
+        var b = document.createElement('div'); b.className = 'pc' + (state.key===k?' sel':''); b.dataset.k = k;
+        b.innerHTML = '<div class="nm">'+p.name+'</div><div class="ds">'+p.desc+'</div><div class="pr">'+(p.addons||p.qty ? won(p.base)+'부터' : won(p.base))+'</div><div class="du">'+p.dur+'</div><a class="more" href="'+p.detail+'" target="_blank" onclick="event.stopPropagation()">자세히 보기</a>';
+        b.addEventListener('click', function(){
+          if(state.key!==k){ state.key = k; state.qty = 0; state.addons = {}; state.date = null; }
+          renderProducts(); refresh(); save();
+          document.getElementById('n1').disabled = false;
+        });
+        el.appendChild(b);
+      });
+    });
+    document.getElementById('n1').disabled = !state.key;
+  }
+
+  // ----- 2단계 -----
+  function renderOptions(){
+    var p = PRODUCTS[state.key]; var box = document.getElementById('optBox'); if(!p) return;
+    document.getElementById('s2title').textContent = p.name + ' · 구성 선택';
+    var h = '<div class="opt"><div><div class="t">'+p.name+' 기본</div><div class="d">'+p.desc+'</div></div><div class="r">'+won(p.base)+'</div></div>';
+    if(p.qty){ h += '<div class="opt"><div><div class="t">'+p.qty.title+'</div><div class="d">'+p.qty.desc+'</div></div><div class="r"><div class="qty"><button type="button" data-q="-1">−</button><span id="qv">'+state.qty+'</span><button type="button" data-q="1">+</button></div></div></div>'; }
+    (p.addons||[]).forEach(function(a){ h += '<div class="opt"><div><div class="t">'+a.title+'</div><div class="d">'+a.desc+'</div></div><div class="r">+'+won(a.price)+'<input type="checkbox" data-a="'+a.id+'" '+(state.addons[a.id]?'checked':'')+'></div></div>'; });
+    if(p.include){ h += '<div class="inc"><b>기본 포함</b><ul>'+p.include.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul></div>'; }
+    if(p.note){ h += '<div class="note">'+p.note+'</div>'; }
+    box.innerHTML = h;
+    box.querySelectorAll('[data-q]').forEach(function(b){ b.addEventListener('click', function(){ state.qty = Math.max(0, Math.min(p.qty.max, state.qty + Number(b.dataset.q))); document.getElementById('qv').textContent = state.qty; refresh(); save(); }); });
+    box.querySelectorAll('[data-a]').forEach(function(c){ c.addEventListener('change', function(){ state.addons[c.dataset.a] = c.checked; refresh(); save(); }); });
+  }
+
+  // ----- 3단계: 달력 (착수 가능일 = 현재 일정 반영 날짜 이후의 평일) -----
+  var earliest = null, viewY, viewM;
+  async function loadEarliest(){
+    var d = new Date(); d.setDate(d.getDate()+7); d.setHours(0,0,0,0); // 조회 실패 시 임시값
+    try{ var r = await sb.rpc('machim_get_earliest_start_date'); if(r.data){ d = new Date(r.data+'T00:00:00'); } }catch(e){ console.error(e); }
+    var tmr = new Date(); tmr.setDate(tmr.getDate()+1); tmr.setHours(0,0,0,0);
+    if(d < tmr) d = tmr;
+    earliest = d;
+    if(state.date && new Date(state.date+'T00:00:00') < earliest){ state.date = null; }
+    var base = state.date ? new Date(state.date+'T00:00:00') : earliest;
+    viewY = base.getFullYear(); viewM = base.getMonth();
+  }
+  function iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function renderCal(){
+    var cg = document.getElementById('cg'); cg.innerHTML = '';
+    document.getElementById('monthLbl').textContent = viewY+'년 '+(viewM+1)+'월';
+    var first = new Date(viewY, viewM, 1), days = new Date(viewY, viewM+1, 0).getDate();
+    for(var i=0;i<first.getDay();i++){ cg.appendChild(document.createElement('div')); }
+    var limit = new Date(earliest); limit.setDate(limit.getDate()+75);
+    for(var d=1; d<=days; d++){
+      var dt = new Date(viewY, viewM, d), c = document.createElement('div'), wk = dt.getDay()===0||dt.getDay()===6;
+      var ok = !wk && dt >= earliest && dt <= limit;
+      c.textContent = d; c.className = 'cell' + (ok?' ok':' no') + (state.date===iso(dt)?' pick':'');
+      if(ok){ (function(dt,c){ c.addEventListener('click', function(){ state.date = iso(dt); save(); renderCal(); refresh(); }); })(dt,c); }
+      cg.appendChild(c);
+    }
+    var minM = new Date(earliest.getFullYear(), earliest.getMonth(), 1), maxM = new Date(limit.getFullYear(), limit.getMonth(), 1), cur = new Date(viewY, viewM, 1);
+    document.getElementById('prevM').disabled = cur <= minM;
+    document.getElementById('nextM').disabled = cur >= maxM;
+  }
+  function fmtDate(s){ var d = new Date(s+'T00:00:00'); return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일'; }
+
+  // ----- 오른쪽 요약 -----
+  function refresh(){
+    var p = PRODUCTS[state.key], body = document.getElementById('sumBody');
+    if(!p){ body.innerHTML = '<div class="empty">아직 선택한 상품이 없어요.</div>'; document.getElementById('sumTotal').textContent = '0원'; document.getElementById('sumMeta').textContent=''; return; }
+    var li = '<li><span>기본</span><span>'+won(p.base)+'</span></li>';
+    if(p.qty && state.qty) li += '<li><span>'+p.qty.title+' × '+state.qty+'</span><span>+'+won(state.qty*p.qty.unit)+'</span></li>';
+    (p.addons||[]).forEach(function(a){ if(state.addons[a.id]) li += '<li><span>'+a.title+'</span><span>+'+won(a.price)+'</span></li>'; });
+    body.innerHTML = '<div class="nm">'+p.name+'</div><ul>'+li+'</ul>';
+    document.getElementById('sumTotal').textContent = won(calcTotal());
+    document.getElementById('sumMeta').innerHTML = p.dur + (state.date ? '<br>착수일: <b>'+fmtDate(state.date)+'</b>' : '');
+    var pk = document.getElementById('pickedBox');
+    if(state.date){ pk.textContent = '선택한 착수일: '+fmtDate(state.date)+' ('+p.dur.replace('제작기간 ','')+')'; pk.classList.add('show'); } else { pk.classList.remove('show'); }
+    document.getElementById('n3').disabled = !state.date;
+  }
+
+  // ----- 단계 이동 -----
+  async function go(n){
+    if(n>1 && !state.key) n = 1;
+    if(n>3 && !state.date) n = 3;
+    state.step = n; save();
+    document.querySelectorAll('.panel').forEach(function(x){ x.classList.toggle('on', x.dataset.p==n); });
+    document.querySelectorAll('.stp').forEach(function(s){ var i = Number(s.dataset.s); s.classList.toggle('on', i===n); s.classList.toggle('done', i<n); });
+    if(n===2) renderOptions();
+    if(n===3){ if(!earliest) await loadEarliest(); renderCal(); }
+    if(n===4) await prepareStep4();
+    refresh();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  var currentUser = null;
+  async function prepareStep4(){
+    var r = await sb.auth.getSession(); currentUser = r.data && r.data.session ? r.data.session.user : null;
+    document.getElementById('needLogin').style.display = currentUser ? 'none' : 'block';
+    document.getElementById('s4form').style.display = currentUser ? 'block' : 'none';
+    document.getElementById('goLogin').href = 'mypage-login.html?next=order.html';
+    if(currentUser){
+      document.getElementById('custEmail').value = currentUser.email;
+      renderConsent({ containerId:'consentBox', payBtnId:'payBtn', productName: PRODUCTS[state.key].name });
+    }
+  }
+
+  // ===== 결제 연동 지점 =====
+  // 실제 결제창(PortOne/KCP) 연동은 여기에 붙입니다. 결제 성공 + 서버 검증이 끝난 뒤에만 true 를 돌려주세요.
+  async function requestPayment(order){ return false; }
+
+  async function submitOrder(){
+    var consent = getConsentPayload();
+    if(!consent || !consent.agreed){ alert('유의사항 동의가 필요합니다.'); return; }
+    var name = document.getElementById('custName').value.trim(), phone = document.getElementById('custPhone').value.trim();
+    if(!name || !phone){ alert('이름과 연락처를 입력해주세요.'); return; }
+    if(!currentUser){ alert('로그인이 필요합니다.'); return; }
+    var p = PRODUCTS[state.key], total = calcTotal();
+    var btn = document.getElementById('payBtn'); btn.disabled = true; btn.textContent = '처리 중…';
+
+    var estHours = p.hoursDefault;
+    try{
+      var hd = (await sb.from('machim_site_settings').select('key,value').in('key', p.hoursKey)).data || [];
+      var g = function(k){ var r = hd.find(function(x){return x.key===k;}); return r ? Number(r.value) : null; };
+      if(state.key==='web_basic'){ estHours = (g('hours_homepage_base')||30) + state.qty*(g('hours_homepage_per_page')||5); }
+      else { estHours = g(p.hoursKey[0]) || p.hoursDefault; }
+    }catch(e){}
+
+    var orderId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : null;
+    var row = {
+      product_name: p.orderName, amount: total, customer_name: name, customer_phone: phone, customer_email: currentUser.email,
+      start_date: state.date, estimated_hours: estHours, status: '결제확인중',
+      options: { product: state.key, pages: state.qty, addons: state.addons, picked_start_date: state.date, consent: consent }
+    };
+    if(orderId) row.id = orderId;
+    var ins = await sb.from('machim_orders').insert(row);
+    if(ins.error){ console.error(ins.error); btn.disabled = false; btn.textContent = '결제하기'; alert('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'); return; }
+
+    var paid = false, testMode = false;
+    try{ paid = await requestPayment(row); }catch(e){ console.error(e); }
+
+    // 관리자 계정으로 주문한 경우에만: 결제 단계를 건너뛰고 프로젝트를 바로 만들어 전체 흐름을 테스트할 수 있게 함
+    if(!paid && ADMIN_EMAILS.indexOf((currentUser.email||'').toLowerCase())>=0){ paid = true; testMode = true; }
+
+    document.getElementById('s4card').style.display = 'none';
+    var done = document.getElementById('doneBox'); done.style.display = 'block';
+    if(paid){
+      var pr = await sb.from('machim_projects').insert({ order_id: orderId, customer_email: currentUser.email, customer_id: currentUser.id, product_name: p.orderName, amount: total });
+      if(!pr.error && orderId){ await sb.from('machim_orders').update({ status:'결제완료' }).eq('id', orderId); }
+      try{ sessionStorage.removeItem('machim_order_state'); }catch(e){}
+      document.getElementById('doneTitle').innerHTML = (testMode?'<span class="testbadge">관리자 테스트 결제</span><br>':'') + '결제가 완료되었습니다';
+      document.getElementById('doneText').innerHTML = pr.error ? '프로젝트 생성에 실패했습니다: '+pr.error.message : '이제 <b>마이페이지</b>에서 로고·사진·소개글 같은 제작 자료를 제출해주세요.<br>자료를 받은 뒤 제작 방향서를 보내드립니다.';
+      document.getElementById('doneLink').textContent = '자료 제출하러 가기 →';
+    } else {
+      try{ sessionStorage.removeItem('machim_order_state'); }catch(e){}
+      document.getElementById('doneTitle').textContent = '주문이 접수되었습니다';
+      document.getElementById('doneText').innerHTML = '결제 안내를 입력하신 연락처와 이메일로 보내드립니다.<br>결제가 확인되면 마이페이지에서 <b>자료 제출</b> 단계가 열립니다.';
+      document.getElementById('doneLink').textContent = '마이페이지 보기';
+    }
+  }
+
+  // ----- 이벤트 -----
+  document.getElementById('n1').addEventListener('click', function(){ go(2); });
+  document.getElementById('n2').addEventListener('click', function(){ go(3); });
+  document.getElementById('n3').addEventListener('click', function(){ go(4); });
+  document.getElementById('payBtn').addEventListener('click', submitOrder);
+  document.getElementById('prevM').addEventListener('click', function(){ viewM--; if(viewM<0){viewM=11;viewY--;} renderCal(); });
+  document.getElementById('nextM').addEventListener('click', function(){ viewM++; if(viewM>11){viewM=0;viewY++;} renderCal(); });
+  document.querySelectorAll('[data-go]').forEach(function(a){ a.addEventListener('click', function(){ go(Number(a.dataset.go)); }); });
+  document.querySelectorAll('.stp').forEach(function(s){ s.addEventListener('click', function(){ var i = Number(s.dataset.s); if(i < state.step) go(i); }); });
+
+  // ----- 시작 -----
+  (async function init(){
+    load();
+    var q = new URLSearchParams(location.search).get('p');           // 메인/상품 페이지에서 ?p=web_basic 로 바로 진입 가능
+    if(q && PRODUCTS[q]){ if(state.key!==q){ state = { key:q, qty:0, addons:{}, date:null, step:1 }; } }
+    renderProducts(); refresh();
+    var target = state.step || 1;
+    if(!state.key) target = 1;
+    if(q && PRODUCTS[q] && target<2) target = 2;
+    await go(target);
+  })();
+</script>
+</body>
+</html>
