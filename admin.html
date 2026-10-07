@@ -563,7 +563,7 @@
 
   async function refreshCapacityPlanner(cachedOrders){
     const { data: capData } = cachedOrders ? { data: cachedOrders } : await sb.from('machim_orders').select('customer_name,product_name,status,estimated_hours');
-    const capOrders = (capData || []).filter(o => o.status !== '완료');
+    const capOrders = (capData || []).filter(o => ['결제완료','착수대기','제작중','검수중'].includes(o.status));
 
     const { data: settingRow } = await sb.from('machim_site_settings').select('value').eq('key','daily_capacity_hours').maybeSingle();
     const dailyCapacity = settingRow ? Number(settingRow.value) : 5;
