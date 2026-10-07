@@ -107,6 +107,8 @@
   }
 
   let project = null;
+  let allProjects = [];
+  const NEED_ME = ['자료제출대기','방향서승인대기','프로토타입승인대기','최종확인대기'];
 
   (async function init(){
     const { data: { session } } = await sb.auth.getSession();
@@ -135,7 +137,10 @@
       return;
     }
 
-    project = data[0]; // v1: 한 고객 = 한 프로젝트 가정
+    allProjects = data;
+    // 열 프로젝트 선택: 주소의 ?id= → 고객 확인이 필요한 것 → 최신
+    const wantId = new URLSearchParams(location.search).get('id');
+    project = data.find(x => x.id === wantId) || data.find(x => NEED_ME.includes(x.current_stage)) || data[0];
     render();
   })();
 
@@ -175,7 +180,19 @@
       timelineHtml += `<li class="${cls}"><span class="mark">${mark}</span><span>${s.date && (cls==='done') ? `<span class="date">${fmtDate(s.date)}</span>`:''}${s.label}</span></li>`;
     });
 
-    el.innerHTML = `
+    let switcherHtml = '';
+    if(allProjects.length > 1){
+      switcherHtml = '<div class="card" style="padding:18px 20px;"><h2 style="margin-bottom:10px;">내 프로젝트 (' + allProjects.length + ')</h2>' +
+        allProjects.map(x => {
+          const need = NEED_ME.includes(x.current_stage);
+          const on = x.id === project.id;
+          return '<button type="button" data-pid="' + x.id + '" style="display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;text-align:left;padding:11px 14px;margin-bottom:8px;border-radius:10px;border:1.5px solid ' + (on ? 'var(--brick)' : 'var(--line)') + ';background:' + (on ? '#fff' : 'var(--paper)') + ';font:inherit;cursor:pointer;">' +
+            '<span style="font-weight:' + (on ? '800' : '600') + ';">' + escapeHtml(x.product_name) + '</span>' +
+            '<span style="font-size:12px;white-space:nowrap;color:' + (need ? 'var(--brick)' : 'var(--ink-faint)') + ';font-weight:700;">' + (x.current_stage === '배포완료' ? '완료' : (need ? '확인 필요' : '진행 중')) + '</span></button>';
+        }).join('') + '</div>';
+    }
+
+    el.innerHTML = switcherHtml + `
       <div class="card">
         <div class="proj-name">${escapeHtml(project.product_name)}</div>
         <p class="proj-amount">${project.amount ? Number(project.amount).toLocaleString()+'원' : ''}</p>
@@ -187,7 +204,26 @@
       </div>
     `;
 
+    el.querySelectorAll('[data-pid]').forEach(b => b.addEventListener('click', ()=>{
+      project = allProjects.find(x => x.id === b.dataset.pid) || project;
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }));
+
     renderAction();
+  }
+
+  async function fillDeliverFiles(stageTag){
+    const el = document.getElementById('deliverFiles'); if(!el) return;
+    const files = (project.deliver_files || []).filter(f => f.stage === stageTag);
+    if(!files.length){ el.remove(); return; }
+    const rows = [];
+    for(const f of files){
+      const { data } = await sb.storage.from('machim-materials').createSignedUrl(f.path, 3600);
+      const size = f.size ? ' (' + (f.size/1024/1024).toFixed(1) + 'MB)' : '';
+      rows.push(data ? '<div style="padding:4px 0;"><a class="view-link" href="' + data.signedUrl + '" target="_blank" rel="noopener">' + escapeHtml(f.name) + '</a>' + size + '</div>' : '<div>' + escapeHtml(f.name) + ' (열기 실패)</div>');
+    }
+    el.innerHTML = '<div style="margin:10px 0;"><div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px;">첨부 파일</div>' + rows.join('') + '</div>';
   }
 
   function escapeHtml(s){
@@ -287,7 +323,7 @@
           current_stage: '방향서대기'
         }).eq('id', project.id);
         if(error){ showActionMsg('제출 중 오류가 발생했어요. 다시 시도해주세요.'); btn.disabled=false; btn.textContent='제출하기'; return; }
-        location.reload();
+        location.href = 'mypage-project.html?id=' + project.id;
       });
     }
 
@@ -299,6 +335,7 @@
       const b = project.direction_brief || {};
       box.innerHTML = `
         <p class="desc">아래 내용으로 제작 방향을 안내드려요. 확인 후 승인해주시면 디자인 시안 작업을 시작합니다.\n내용 수정이 필요하면 수정요청을 남겨주세요.</p>
+        <div id="deliverFiles"></div>
         <div class="brief-box">
           ${b.purpose ? `<div><b>목적</b>${escapeHtml(b.purpose)}</div>`:''}
           ${b.pages ? `<div><b>페이지 구성</b>${escapeHtml(b.pages)}</div>`:''}
@@ -317,7 +354,7 @@
           direction_approved_at: new Date().toISOString(),
           current_stage: '프로토타입대기'
         }).eq('id', project.id);
-        location.reload();
+        location.href = 'mypage-project.html?id=' + project.id;
       });
       document.getElementById('requestBtn').addEventListener('click', ()=>{
         const note = document.getElementById('requestInput').value.trim();
@@ -332,7 +369,8 @@
 
     else if(stage === '프로토타입승인대기'){
       box.innerHTML = `
-        <p class="desc">디자인 시안이 준비됐어요. 아래 링크에서 확인해주세요.</p>
+        <p class="desc">디자인 시안이 준비됐어요. 아래에서 확인해주세요.</p>
+        <div id="deliverFiles"></div>
         ${project.prototype_url ? `<a class="view-link" href="${escapeHtml(project.prototype_url)}" target="_blank" rel="noopener">시안 확인하기 →</a>` : ''}
         <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
         <div class="btn-row">
@@ -346,7 +384,7 @@
           prototype_approved_at: new Date().toISOString(),
           current_stage: '개발중'
         }).eq('id', project.id);
-        location.reload();
+        location.href = 'mypage-project.html?id=' + project.id;
       });
       document.getElementById('requestBtn').addEventListener('click', ()=>{
         const note = document.getElementById('requestInput').value.trim();
@@ -362,6 +400,7 @@
     else if(stage === '최종확인대기'){
       box.innerHTML = `
         <p class="desc">제작이 완료되었어요. 최종 결과물을 확인해주세요.</p>
+        <div id="deliverFiles"></div>
         ${project.final_preview_url ? `<a class="view-link" href="${escapeHtml(project.final_preview_url)}" target="_blank" rel="noopener">최종 결과물 확인하기 →</a>` : ''}
         <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
         <div class="btn-row">
@@ -375,7 +414,7 @@
           final_approved_at: new Date().toISOString(),
           current_stage: '배포완료'
         }).eq('id', project.id);
-        location.reload();
+        location.href = 'mypage-project.html?id=' + project.id;
       });
       document.getElementById('requestBtn').addEventListener('click', ()=>{
         const note = document.getElementById('requestInput').value.trim();
@@ -394,6 +433,10 @@
     else{
       box.innerHTML = `<p class="desc">지금은 없습니다. 제작이 완료되면 알려드릴게요.</p>`;
     }
+
+    // 마침이 보낸 파일(방향서·시안·최종 결과물) 표시
+    const tag = { '방향서승인대기':'방향서', '프로토타입승인대기':'프로토타입', '최종확인대기':'최종' }[stage];
+    if(tag) fillDeliverFiles(tag);
   }
 
   function showActionMsg(text, ok){

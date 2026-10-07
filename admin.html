@@ -132,7 +132,7 @@
   <main class="main">
     <div class="topbar">
       <h1 id="viewTitle">대시보드</h1>
-      <span class="today">2026년 9월 16일</span>
+      <span class="today"></span>
     </div>
 
     <!-- DASHBOARD -->
@@ -199,7 +199,7 @@
         <div class="field-row" style="gap:10px;">
           <input type="email" id="newProjectEmail" placeholder="고객 이메일" style="width:220px;">
           <input type="text" id="newProjectName" placeholder="상품명 (예: 이북 사이트 제작)" style="width:220px;">
-          <input type="number" id="newProjectAmount" placeholder="금액" style="width:120px;">
+          <input type="number" id="newProjectAmount" placeholder="금액 (선택)" min="0" step="1000" style="width:140px;">
           <button class="save-btn" onclick="createProject()">프로젝트 생성</button>
         </div>
         <div id="newProjectMsg" style="font-size:12.5px;margin-top:10px;display:none;"></div>
@@ -643,6 +643,7 @@
 
     data.forEach(p => bindProjectCard(p));
     data.forEach(p => fillProjectFiles(p));
+    data.forEach(p => fillDeliverFilesAdmin(p));
   }
 
   // 비공개 첨부파일은 1시간짜리 임시 링크로 열어봅니다.
@@ -656,6 +657,10 @@
       links.push(data ? `<a href="${data.signedUrl}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(f.name)}</a>${size}` : escapeHtmlA(f.name) + ' (열기 실패)');
     }
     el.innerHTML = '<b>첨부파일:</b> ' + links.join(' · ');
+  }
+
+  function deliverInputHtml(){
+    return `<div style="margin:2px 0 10px;"><div style="font-size:12.5px;color:var(--ink-faint);margin-bottom:4px;">파일 첨부 (PDF·이미지 등, 최대 10개, 파일당 10MB · 선택사항)</div><input type="file" multiple data-deliver-files style="font-size:13px;width:100%;"></div>`;
   }
 
   function projectCardHtml(p){
@@ -672,6 +677,7 @@
         <textarea data-field="pages" placeholder="페이지 구성 (예: 메인, 작품 목록, 작가 소개, 문의)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
         <textarea data-field="color" placeholder="색상/디자인 톤 (예: 베이지+그린, 차분한 느낌)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
         <textarea data-field="excluded" placeholder="포함되지 않는 사항 (예: 다국어 지원 제외)" style="width:100%;min-height:36px;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
+        ${deliverInputHtml()}
         <button class="save-btn" data-action="sendBrief" data-id="${p.id}">방향서 올리기 (고객 승인 요청)</button>
       `;
     }
@@ -680,8 +686,9 @@
     }
     else if(p.current_stage === '프로토타입대기'){
       actionHtml = `
-        <input type="text" data-field="prototype_url" placeholder="프로토타입/시안 링크 (피그마, 미리보기 URL 등)" style="width:100%;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
+        <input type="text" data-field="prototype_url" placeholder="프로토타입/시안 링크 (피그마, 미리보기 URL 등 · 파일만 올려도 돼요)" style="width:100%;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
         <textarea data-field="prototype_note" placeholder="고객에게 전달할 메모 (선택)" style="width:100%;min-height:36px;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
+        ${deliverInputHtml()}
         <button class="save-btn" data-action="sendPrototype" data-id="${p.id}">프로토타입 올리기 (고객 승인 요청)</button>
       `;
     }
@@ -690,7 +697,8 @@
     }
     else if(p.current_stage === '개발중'){
       actionHtml = `
-        <input type="text" data-field="final_preview_url" placeholder="최종 결과물 확인 링크" style="width:100%;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
+        <input type="text" data-field="final_preview_url" placeholder="최종 결과물 확인 링크 (파일만 올려도 돼요)" style="width:100%;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
+        ${deliverInputHtml()}
         <button class="save-btn" data-action="sendFinal" data-id="${p.id}">개발완료 처리 (고객 최종확인 요청)</button>
       `;
     }
@@ -717,10 +725,22 @@
           <span class="status-badge" style="background:#E4EAF6;color:#3A5A9C;">${PROJECT_STATUS_LABEL[p.current_stage] || p.current_stage}</span>
         </div>
         ${(p.material_files && p.material_files.length) ? `<div class="desc" data-files="${p.id}" style="margin-top:6px;"><b>첨부파일:</b> 불러오는 중…</div>` : ''}
+        ${(p.deliver_files && p.deliver_files.length) ? `<div class="desc" data-dfiles="${p.id}" style="margin-top:6px;"><b>보낸 파일:</b> 불러오는 중…</div>` : ''}
         ${actionHtml}
         <div class="msg-area" data-msg="${p.id}" style="font-size:12.5px;margin-top:8px;display:none;"></div>
       </div>
     `;
+  }
+
+  async function fillDeliverFilesAdmin(p){
+    const el = document.querySelector(`[data-dfiles="${p.id}"]`);
+    if(!el) return;
+    const links = [];
+    for(const f of (p.deliver_files || [])){
+      const { data } = await sb.storage.from('machim-materials').createSignedUrl(f.path, 3600);
+      links.push((f.stage ? '[' + escapeHtmlA(f.stage) + '] ' : '') + (data ? `<a href="${data.signedUrl}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(f.name)}</a>` : escapeHtmlA(f.name) + ' (열기 실패)'));
+    }
+    el.innerHTML = '<b>고객에게 보낸 파일:</b> ' + links.join(' · ');
   }
 
   function escapeHtmlA(s){
@@ -747,30 +767,45 @@
     btn.addEventListener('click', async ()=>{
       const action = btn.dataset.action;
       let update = {};
+      const picked = Array.from((card.querySelector('[data-deliver-files]') || {}).files || []);
+      const stageTag = { sendBrief:'방향서', sendPrototype:'프로토타입', sendFinal:'최종' }[action];
+      if(picked.length > 10){ showCardMsg('첨부파일은 최대 10개까지 올릴 수 있어요.'); return; }
+      const big = picked.find(f => f.size > 10*1024*1024);
+      if(big){ showCardMsg('"' + big.name + '" 파일이 10MB를 넘어요.'); return; }
+      const uploadDeliver = async ()=>{
+        const out = (p.deliver_files || []).slice();
+        for(let i=0;i<picked.length;i++){
+          const f = picked[i];
+          const safe = f.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-80) || 'file';
+          const path = p.id + '/deliver/' + stageTag + '-' + Date.now() + '-' + i + '-' + safe;
+          const { error: upErr } = await sb.storage.from('machim-materials').upload(path, f, { contentType: f.type || 'application/octet-stream' });
+          if(upErr) throw new Error('"' + f.name + '" 업로드 실패: ' + upErr.message);
+          out.push({ stage: stageTag, path, name: f.name, size: f.size });
+        }
+        return out;
+      };
       if(action === 'sendBrief'){
-        update = {
-          direction_brief: {
-            purpose: getField('purpose'),
-            pages: getField('pages'),
-            color: getField('color'),
-            excluded: getField('excluded')
-          },
-          current_stage: '방향서승인대기'
-        };
+        const brief = { purpose: getField('purpose'), pages: getField('pages'), color: getField('color'), excluded: getField('excluded') };
+        if(!brief.purpose && !brief.pages && !brief.color && !brief.excluded && !picked.length){ showCardMsg('방향서 내용을 적거나 파일을 첨부해주세요.'); return; }
+        update = { direction_brief: brief, current_stage: '방향서승인대기' };
       } else if(action === 'sendPrototype'){
         const url = getField('prototype_url');
-        if(!url){ showCardMsg('링크를 입력해주세요.'); return; }
-        update = { prototype_url: url, prototype_note: getField('prototype_note'), current_stage: '프로토타입승인대기' };
+        if(!url && !picked.length){ showCardMsg('링크를 입력하거나 파일을 첨부해주세요.'); return; }
+        update = { prototype_url: url || null, prototype_note: getField('prototype_note'), current_stage: '프로토타입승인대기' };
       } else if(action === 'sendFinal'){
         const url = getField('final_preview_url');
-        if(!url){ showCardMsg('링크를 입력해주세요.'); return; }
-        update = { final_preview_url: url, dev_completed_at: new Date().toISOString(), current_stage: '최종확인대기' };
+        if(!url && !picked.length){ showCardMsg('링크를 입력하거나 파일을 첨부해주세요.'); return; }
+        update = { final_preview_url: url || null, dev_completed_at: new Date().toISOString(), current_stage: '최종확인대기' };
       } else if(action === 'deploy'){
         const url = getField('live_url');
         if(!url){ showCardMsg('배포 주소를 입력해주세요.'); return; }
         update = { live_url: url, deployed_at: new Date().toISOString() };
       }
       btn.disabled = true;
+      if(stageTag && picked.length){
+        btn.textContent = '파일 올리는 중…';
+        try{ update.deliver_files = await uploadDeliver(); }catch(e){ showCardMsg(e.message); btn.disabled = false; btn.textContent = '다시 시도'; return; }
+      }
       const { error } = await sb.from('machim_projects').update(update).eq('id', p.id);
       if(error){ showCardMsg('처리 실패: ' + error.message); btn.disabled = false; return; }
       loadProjects();
@@ -793,5 +828,6 @@
   }
 </script>
 
+<script>document.querySelectorAll('.topbar .today').forEach(function(el){el.textContent=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});});</script>
 </body>
 </html>
