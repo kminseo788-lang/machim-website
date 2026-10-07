@@ -313,6 +313,20 @@
   const recentOrderTable = document.getElementById('recentOrderTable');
   const STATUS_OPTIONS = ['결제확인중','결제완료','착수대기','제작중','검수중','완료'];
 
+  // 결제 확인 시: 이 주문으로 프로젝트가 없으면 만들어서 고객 마이페이지에 자료 제출 단계를 엽니다.
+  async function openProjectForOrder(orderId){
+    const { data: o, error: e1 } = await sb.from('machim_orders').select('*').eq('id', orderId).maybeSingle();
+    if(e1 || !o){ alert('주문을 찾지 못했습니다.'); return false; }
+    if(!o.customer_email){ alert('이 주문에는 이메일이 없어 프로젝트를 만들 수 없습니다. 프로젝트 관리에서 직접 만들어주세요.'); return false; }
+    const { data: ex } = await sb.from('machim_projects').select('id').eq('order_id', orderId).limit(1);
+    if(!ex || !ex.length){
+      const { error } = await sb.from('machim_projects').insert({ order_id: orderId, customer_email: o.customer_email, product_name: o.product_name, amount: o.amount });
+      if(error){ alert('프로젝트 생성 실패: ' + error.message); return false; }
+    }
+    await sb.from('machim_orders').update({ status: '결제완료' }).eq('id', orderId);
+    return true;
+  }
+
   async function loadOrders(){
     const { data, error } = await sb.from('machim_orders').select('*').order('created_at', { ascending: false });
     if(error){ console.error(error); orderTable.innerHTML = '<tr><td colspan="6">불러오기 실패</td></tr>'; return; }
@@ -324,12 +338,13 @@
       const amountText = (o.amount || 0).toLocaleString('ko-KR') + '원';
       const startText = o.start_date || (o.options && o.options.picked_start_date_label) || '-';
       tr.innerHTML = `
-        <td>${o.customer_name || '-'}</td><td>${o.product_name}</td><td>${amountText}</td>
+        <td>${o.customer_name || '-'}<div style="font-size:11.5px;color:var(--ink-faint);">${o.customer_email || ''}</div></td><td>${o.product_name}</td><td>${amountText}</td>
         <td>${o.customer_phone || '-'}</td><td>${startText}</td>
         <td>
           <select class="status-select" data-id="${o.id}">
             ${STATUS_OPTIONS.map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}
           </select>
+          ${o.status==='결제확인중' ? `<button class="save-btn" style="margin-top:8px;font-size:12.5px;padding:6px 12px;" data-confirm-pay="${o.id}">결제 확인 → 자료제출 열기</button>` : ''}
           <div style="margin-top:8px;">
             <textarea class="note-input" data-id="${o.id}" placeholder="고객에게 보여줄 메모 (예: 자재 발주 완료, 9/25 전달 예정)" style="width:100%;min-height:44px;font:inherit;font-size:12.5px;padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;">${o.admin_note || ''}</textarea>
             <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;" data-note-save="${o.id}">메모 저장</button>
@@ -342,6 +357,7 @@
       sel.addEventListener('change', async ()=>{
         const id = sel.dataset.id;
         const newStatus = sel.value;
+        if(newStatus === '결제완료'){ const ok = await openProjectForOrder(id); if(ok){ alert('결제 확인 완료. 고객 마이페이지에 자료 제출 단계가 열렸습니다.'); loadOrders(); if(typeof loadProjects==='function') loadProjects(); } return; }
         const { error } = await sb.from('machim_orders').update({
           status: newStatus,
           completed_at: newStatus === '완료' ? new Date().toISOString() : null
@@ -350,6 +366,14 @@
         // TODO: 여기서 카카오 알림톡/문자 발송 트리거 연결 예정
         refreshDashboardStats();
         refreshCapacityPlanner();
+      });
+    });
+
+    orderTable.querySelectorAll('[data-confirm-pay]').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!confirm('결제를 확인했나요? 고객 마이페이지에 자료 제출 단계가 열립니다.')) return;
+        const ok = await openProjectForOrder(btn.dataset.confirmPay);
+        if(ok){ alert('완료되었습니다. 고객이 마이페이지에 로그인하면 자료 제출 화면이 보입니다.'); loadOrders(); if(typeof loadProjects==='function') loadProjects(); }
       });
     });
 

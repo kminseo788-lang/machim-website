@@ -82,6 +82,20 @@
       <button type="submit" class="submit-btn" id="submitBtn">로그인</button>
     </form>
 
+    <div id="sentBox" style="display:none;text-align:center;padding:8px 0 4px;">
+      <div style="font-size:40px;margin-bottom:8px;">📧</div>
+      <h2 style="font-size:20px;margin-bottom:6px;">인증 메일을 보내드렸어요</h2>
+      <p style="font-size:14px;color:var(--ink-soft);margin-bottom:16px;"><strong id="sentEmail" style="color:var(--ink);"></strong></p>
+      <ol style="text-align:left;font-size:14px;line-height:1.8;padding:16px 18px 16px 34px;background:#F3F6F1;border-radius:10px;margin-bottom:14px;">
+        <li>메일함을 열어 <strong>마침 인증 메일</strong>을 찾으세요.</li>
+        <li>메일 안의 <strong>인증(확인) 링크를 누르세요.</strong></li>
+        <li>그다음 <strong>이 이메일과 비밀번호로 로그인</strong>하면 끝!</li>
+      </ol>
+      <p style="font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin-bottom:12px;">메일이 보이지 않으면 <strong>스팸함</strong>도 확인해주세요. 몇 분 걸릴 수 있어요.</p>
+      <button type="button" class="submit-btn" onclick="backToLogin()">로그인하기</button>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin-top:14px;">메일을 받지 못했나요? <button type="button" id="resendBtn" onclick="resendMail()" style="background:none;border:none;color:var(--brick);text-decoration:underline;cursor:pointer;font:inherit;">인증 메일 다시 보내기</button></p>
+    </div>
+
     <div class="msg" id="msgBox"></div>
     <div class="hint">가입 시 입력하는 이메일은 <strong>결제할 때 적으신 이메일과 동일해야</strong> 프로젝트가 자동으로 연결됩니다.<br>칩북 계정을 이미 가지고 계시면 같은 이메일·비밀번호로 로그인하세요.</div>
   </div>
@@ -104,6 +118,33 @@
     });
   });
 
+  function showSent(email){
+    document.querySelector('.tabs').style.display='none';
+    document.getElementById('authForm').style.display='none';
+    msgBox.style.display='none';
+    var h=document.querySelector('.hint'); if(h) h.style.display='none';
+    document.getElementById('sentEmail').textContent=email;
+    document.getElementById('sentBox').style.display='block';
+    window.scrollTo(0,0);
+  }
+  let resendAt=0;
+  async function resendMail(){
+    const b=document.getElementById('resendBtn');
+    const email=document.getElementById('sentEmail').textContent;
+    if(Date.now()<resendAt) return;
+    b.disabled=true; b.textContent='보내는 중…';
+    const { error } = await sb.auth.resend({ type:'signup', email });
+    resendAt=Date.now()+60000;
+    b.textContent = error ? '잠시 후 다시 시도해주세요 (발송 한도)' : '다시 보냈어요. 메일함을 확인해주세요';
+    setTimeout(()=>{ b.disabled=false; b.textContent='인증 메일 다시 보내기'; }, 60000);
+  }
+  function backToLogin(){
+    document.getElementById('sentBox').style.display='none';
+    document.querySelector('.tabs').style.display='';
+    document.getElementById('authForm').style.display='';
+    var h=document.querySelector('.hint'); if(h) h.style.display='';
+    tabs[0].click();
+  }
   function showMsg(text, ok){
     msgBox.textContent = text;
     msgBox.className = 'msg ' + (ok ? 'ok' : 'err');
@@ -173,7 +214,7 @@
         // 이메일 인증이 꺼져 있으면 바로 로그인 처리됨
         await claimAndGo();
       }else{
-        showMsg('가입 확인 메일을 보내드렸어요. 메일함을 확인한 뒤 로그인해주세요.', true);
+        showSent(email);
       }
     }
   });

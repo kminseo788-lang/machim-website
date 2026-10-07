@@ -122,6 +122,7 @@
 
     const { data, error } = await sb.from('machim_projects')
       .select('*')
+      .eq('customer_id', user.id)
       .order('created_at', { ascending: false });
 
     if(error){
@@ -130,7 +131,7 @@
     }
 
     if(!data || data.length === 0){
-      document.getElementById('content').innerHTML = '<div class="empty">아직 연결된 프로젝트가 없어요.<br>결제 시 입력하신 이메일과 가입 이메일이 같은지 확인해주세요.</div>';
+      document.getElementById('content').innerHTML = '<div class="empty">아직 연결된 프로젝트가 없어요.<br>결제가 확인되면 이 화면에 자료 제출 단계가 열립니다.<br>주문하신 이메일과 로그인한 이메일이 같은지도 확인해주세요.</div>';
       return;
     }
 
