@@ -633,12 +633,23 @@
     loadProjects();
   }
 
+  let projectEvents = {};
+  const fmtDT = (iso)=> iso ? new Date(iso).toLocaleString('ko-KR',{ timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false }) : '';
+
   async function loadProjects(){
     const listEl = document.getElementById('projectList');
     const { data, error } = await sb.from('machim_projects').select('*').order('created_at', { ascending: false });
     if(error){ listEl.innerHTML = '불러오기 실패: ' + error.message; return; }
     if(!data.length){ listEl.innerHTML = '<div class="desc">아직 생성된 프로젝트가 없습니다.</div>'; return; }
 
+    // 내 차례 → 고객 차례 → 완료 순으로 정렬
+    projectEvents = {};
+    try{
+      const ev = await sb.from('machim_project_events').select('*').order('occurred_at', { ascending: true });
+      (ev.data || []).forEach(e => { (projectEvents[e.project_id] = projectEvents[e.project_id] || []).push(e); });
+    }catch(e){}
+    const rank = (p)=> (['방향서대기','프로토타입대기','개발중'].includes(p.current_stage) || (p.current_stage==='배포완료' && !p.deployed_at)) ? 0 : (p.deployed_at ? 2 : 1);
+    data.sort((a,b)=> rank(a)-rank(b));
     listEl.innerHTML = data.map(p => projectCardHtml(p)).join('');
 
     data.forEach(p => bindProjectCard(p));
@@ -647,16 +658,25 @@
   }
 
   // 비공개 첨부파일은 1시간짜리 임시 링크로 열어봅니다.
+  async function fileLinksHtml(files){
+    const out = [];
+    for(const f of files){
+      const { data } = await sb.storage.from('machim-materials').createSignedUrl(f.path, 3600);
+      const size = (f.size ? ' <span style="color:var(--ink-faint);">(' + (f.size/1024/1024).toFixed(1) + 'MB)</span>' : '') + (f.sha256 ? ' <span title="SHA-256 ' + f.sha256 + '" style="color:var(--ink-faint);font-size:11px;">#' + f.sha256.slice(0,8) + '</span>' : '');
+      out.push('<div style="padding:2px 0;">' + (data ? `<a href="${data.signedUrl}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(f.name)}</a>` : escapeHtmlA(f.name) + ' (열기 실패)') + size + '</div>');
+    }
+    return out.join('');
+  }
   async function fillProjectFiles(p){
     const el = document.querySelector(`[data-files="${p.id}"]`);
     if(!el) return;
-    const links = [];
-    for(const f of p.material_files){
-      const { data } = await sb.storage.from('machim-materials').createSignedUrl(f.path, 3600);
-      const size = f.size ? ' (' + (f.size/1024/1024).toFixed(1) + 'MB)' : '';
-      links.push(data ? `<a href="${data.signedUrl}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(f.name)}</a>${size}` : escapeHtmlA(f.name) + ' (열기 실패)');
-    }
-    el.innerHTML = '<b>첨부파일:</b> ' + links.join(' · ');
+    el.innerHTML = await fileLinksHtml(p.material_files || []);
+  }
+
+  async function sha256Hex(file){
+    const buf = await file.arrayBuffer();
+    const h = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
   function deliverInputHtml(){
@@ -672,7 +692,6 @@
     }
     else if(p.current_stage === '방향서대기'){
       actionHtml = `
-        ${p.material_note ? `<div class="desc" style="white-space:pre-line;"><b>고객 제출 자료:</b> ${escapeHtmlA(p.material_note)}</div>` : ''}
         <textarea data-field="purpose" placeholder="목적 (예: 전자책 판매 + 작가 소개)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
         <textarea data-field="pages" placeholder="페이지 구성 (예: 메인, 작품 목록, 작가 소개, 문의)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
         <textarea data-field="color" placeholder="색상/디자인 톤 (예: 베이지+그린, 차분한 느낌)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
@@ -715,32 +734,114 @@
       actionHtml = `<div class="desc">배포 완료됨 — <a href="${escapeHtmlA(p.live_url || '#')}" target="_blank">${escapeHtmlA(p.live_url || '')}</a></div>`;
     }
 
+    const evs = projectEvents[p.id] || [];
+    const evAt = (type)=>{ const m = evs.filter(e => e.event_type === type); return m.length ? m[m.length-1].occurred_at : null; };
+    const sentBrief = evAt('방향서 발송'), sentProto = evAt('시안 발송'), sentFinal = evAt('최종 결과물 발송');
+    const fd = (iso)=> iso ? new Date(iso).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'}) : '';
+    const idx = ['자료제출대기','방향서대기','방향서승인대기','프로토타입대기','프로토타입승인대기','개발중','최종확인대기','배포완료'].indexOf(p.current_stage);
+    const steps = [
+      { label:'결제',     done:true },
+      { label:'자료제출', done: idx >= 1 },
+      { label:'방향서',   done: idx >= 3 },
+      { label:'시안',     done: idx >= 5 },
+      { label:'개발',     done: idx >= 6 },
+      { label:'최종확인', done: idx >= 7 },
+      { label:'배포',     done: !!p.deployed_at }
+    ];
+    let curSet = false;
+    const stepperHtml = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 14px;">' + steps.map(st=>{
+      let style, mark;
+      if(st.done){ style='background:#EAF2EA;color:#3B6B45;'; mark='✓ '; }
+      else if(!curSet){ curSet=true; style='background:#FBE9E3;color:#B8452A;font-weight:800;'; mark='● '; }
+      else { style='background:#F1EEE6;color:#9a948a;'; mark=''; }
+      return '<span style="padding:4px 10px;border-radius:999px;font-size:12.5px;'+style+'">'+mark+st.label+'</span>';
+    }).join('') + '</div>';
+
+    const MINE = { '방향서대기':'방향서를 작성해서 고객에게 보내기', '프로토타입대기':'디자인 시안을 고객에게 보내기', '개발중':'개발을 마치고 최종 결과물 보내기' };
+    const CUST = { '자료제출대기':'고객이 제작 자료를 제출하는 중이에요', '방향서승인대기':'고객이 방향서를 확인하는 중이에요', '프로토타입승인대기':'고객이 시안을 확인하는 중이에요', '최종확인대기':'고객이 최종 결과물을 확인하는 중이에요' };
+    let turnHtml;
+    if(p.current_stage === '배포완료' && !p.deployed_at){
+      turnHtml = '<div style="border:1.5px solid #E08A6E;background:#FFF6F2;border-radius:10px;padding:14px 16px;margin-bottom:12px;"><div style="font-size:12px;font-weight:800;color:#B8452A;margin-bottom:2px;">지금 내 차례</div><div style="font-weight:800;margin-bottom:10px;">사이트를 배포하고 주소 입력하기 (고객이 최종 승인했어요)</div>' + actionHtml + '</div>';
+    } else if(MINE[p.current_stage]){
+      turnHtml = '<div style="border:1.5px solid #E08A6E;background:#FFF6F2;border-radius:10px;padding:14px 16px;margin-bottom:12px;"><div style="font-size:12px;font-weight:800;color:#B8452A;margin-bottom:2px;">지금 내 차례</div><div style="font-weight:800;margin-bottom:10px;">' + MINE[p.current_stage] + '</div>' + actionHtml + '</div>';
+    } else if(CUST[p.current_stage]){
+      turnHtml = '<div style="border:1.5px solid #D9D3C4;background:#F7F4EC;border-radius:10px;padding:12px 16px;margin-bottom:12px;"><div style="font-size:12px;font-weight:800;color:#6b665c;margin-bottom:2px;">고객 차례 · 내가 할 일 없음</div><div style="font-weight:700;">' + CUST[p.current_stage] + '</div></div>';
+    } else {
+      turnHtml = '<div style="border:1.5px solid #CFE0CF;background:#F1F7F1;border-radius:10px;padding:12px 16px;margin-bottom:12px;"><div style="font-weight:700;">모든 단계가 끝났어요</div>' + actionHtml + '</div>';
+    }
+
+    const secStyle = 'border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff;';
+    const sumStyle = 'cursor:pointer;padding:10px 14px;font-weight:700;font-size:13.5px;';
+    const bodyStyle = 'padding:2px 14px 12px;font-size:13.5px;line-height:1.7;';
+    const row = (label, html)=> html ? `<div style="margin-top:8px;"><div style="font-size:12px;color:var(--ink-faint);font-weight:700;">${label}</div><div style="white-space:pre-line;">${html}</div></div>` : '';
+    const brief = p.direction_brief || null;
+    const briefHtml = brief ? [
+      row('목적', escapeHtmlA(brief.purpose)), row('페이지 구성', escapeHtmlA(brief.pages)),
+      row('색상/톤', escapeHtmlA(brief.color)), row('포함 안 되는 사항', escapeHtmlA(brief.excluded))
+    ].join('') : '';
+    const hasDeliver = (st)=> (p.deliver_files || []).some(f => f.stage === st);
+    const slot = (st)=> hasDeliver(st) ? `<div style="margin-top:8px;"><div style="font-size:12px;color:var(--ink-faint);font-weight:700;">첨부 파일</div><div data-dstage="${p.id}|${st}">불러오는 중…</div></div>` : '';
+
+    const custOpen = (p.current_stage === '방향서대기') ? ' open' : '';
+    const mineOpen = (idx >= 2) ? ' open' : '';
+    const custSection = `
+      <details style="${secStyle}"${custOpen}>
+        <summary style="${sumStyle}">고객이 보낸 것 ${p.material_submitted_at ? '<span style="font-weight:400;color:var(--ink-faint);">· ' + fd(p.material_submitted_at) + ' 제출</span>' : '<span style="font-weight:400;color:var(--ink-faint);">· 아직 없음</span>'}</summary>
+        <div style="${bodyStyle}">
+          ${p.material_submitted_at ? '<div style="font-size:12px;color:var(--ink-faint);">제출 일시: ' + fmtDT(evAt('고객 자료 제출') || p.material_submitted_at) + '</div>' : ''}
+          ${p.material_submitted_at ? '' : '<div style="color:var(--ink-faint);">고객이 아직 자료를 제출하지 않았어요.</div>'}
+          ${row('요청 내용(메모)', p.material_note ? escapeHtmlA(p.material_note) : (p.material_submitted_at ? '<span style="color:var(--ink-faint);">메모 없이 제출했어요</span>' : ''))}
+          ${(p.material_files && p.material_files.length) ? `<div style="margin-top:8px;"><div style="font-size:12px;color:var(--ink-faint);font-weight:700;">첨부 파일 ${p.material_files.length}개</div><div data-files="${p.id}">불러오는 중…</div></div>` : ''}
+          ${p.hosting_ack_at ? row('배포·요금제 안내 확인', fd(p.hosting_ack_at) + ' 확인함') : ''}
+        </div>
+      </details>`;
+    const sentAny = !!(brief || p.prototype_url || p.prototype_note || p.final_preview_url || (p.deliver_files && p.deliver_files.length) || p.live_url);
+    const mineSection = `
+      <details style="${secStyle}"${mineOpen}>
+        <summary style="${sumStyle}">내가 보낸 것 ${sentAny ? '' : '<span style="font-weight:400;color:var(--ink-faint);">· 아직 없음</span>'}</summary>
+        <div style="${bodyStyle}">
+          ${!sentAny ? '<div style="color:var(--ink-faint);">아직 고객에게 보낸 내용이 없어요.</div>' : ''}
+          ${brief || hasDeliver('방향서') ? `<div style="margin-top:6px;font-weight:800;">방향서 ${sentBrief ? '<span style="font-weight:400;color:var(--ink-faint);">· ' + fmtDT(sentBrief) + ' 발송</span>' : ''} ${p.direction_approved_at ? '<span style="font-weight:400;color:#3B6B45;">· ' + fmtDT(evAt('고객 방향서 승인') || p.direction_approved_at) + ' 고객 승인</span>' : '<span style="font-weight:400;color:var(--ink-faint);">· 승인 대기</span>'}</div>${briefHtml}${slot('방향서')}` : ''}
+          ${(p.prototype_url || p.prototype_note || hasDeliver('프로토타입')) ? `<div style="margin-top:12px;font-weight:800;">시안 ${sentProto ? '<span style="font-weight:400;color:var(--ink-faint);">· ' + fmtDT(sentProto) + ' 발송</span>' : ''} ${p.prototype_approved_at ? '<span style="font-weight:400;color:#3B6B45;">· ' + fmtDT(evAt('고객 시안 승인') || p.prototype_approved_at) + ' 고객 승인</span>' : '<span style="font-weight:400;color:var(--ink-faint);">· 승인 대기</span>'}</div>${row('링크', p.prototype_url ? `<a href="${escapeHtmlA(p.prototype_url)}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(p.prototype_url)}</a>` : '')}${row('전달 메모', escapeHtmlA(p.prototype_note))}${slot('프로토타입')}` : ''}
+          ${(p.final_preview_url || hasDeliver('최종')) ? `<div style="margin-top:12px;font-weight:800;">최종 결과물 ${sentFinal ? '<span style="font-weight:400;color:var(--ink-faint);">· ' + fmtDT(sentFinal) + ' 발송</span>' : ''} ${p.final_approved_at ? '<span style="font-weight:400;color:#3B6B45;">· ' + fmtDT(evAt('고객 최종 승인') || p.final_approved_at) + ' 고객 승인</span>' : '<span style="font-weight:400;color:var(--ink-faint);">· 승인 대기</span>'}</div>${row('링크', p.final_preview_url ? `<a href="${escapeHtmlA(p.final_preview_url)}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(p.final_preview_url)}</a>` : '')}${slot('최종')}` : ''}
+          ${p.live_url ? `<div style="margin-top:12px;font-weight:800;">배포 ${p.deployed_at ? '<span style="font-weight:400;color:#3B6B45;">· ' + fd(p.deployed_at) + ' 완료</span>' : ''}</div>${row('사이트 주소', `<a href="${escapeHtmlA(p.live_url)}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(p.live_url)}</a>`)}` : ''}
+        </div>
+      </details>`;
+
+    const ACT = { customer:'고객', admin:'마침', system:'시스템' };
+    const timelineSection = `
+      <details style="${secStyle}">
+        <summary style="${sumStyle}">진행 기록 (증빙) <span style="font-weight:400;color:var(--ink-faint);">· ${evs.length}건</span></summary>
+        <div style="${bodyStyle}">
+          ${evs.length ? evs.map(e => `<div style="padding:3px 0;border-bottom:1px dashed var(--line);"><span style="color:var(--ink-faint);font-variant-numeric:tabular-nums;">${fmtDT(e.occurred_at)}</span> &nbsp;<b style="color:${e.actor==='customer'?'#3A5A9C':'#B8452A'};">[${ACT[e.actor]||e.actor}]</b> ${escapeHtmlA(e.event_type)}</div>`).join('') : '<div style="color:var(--ink-faint);">아직 기록이 없어요. (SQL을 실행하면 이후 활동부터 자동 기록돼요)</div>'}
+          <div style="margin-top:10px;"><button type="button" data-export="${p.id}" style="border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 12px;font-size:12.5px;cursor:pointer;">증빙 내려받기 (JSON)</button> <span style="font-size:12px;color:var(--ink-faint);">시각은 서버 기준(한국시간)이며, 각 기록에는 그 시점의 전체 내용과 파일 해시가 함께 저장돼요.</span></div>
+        </div>
+      </details>`;
+
     return `
       <div class="panel" style="margin-bottom:14px;" data-project-card="${p.id}">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;flex-wrap:wrap;">
           <div>
-            <div style="font-weight:800;font-size:15.5px;">${escapeHtmlA(p.product_name)}</div>
-            <div style="font-size:12.5px;color:var(--ink-faint);">${escapeHtmlA(p.customer_email)} · ${amountText}</div>
+            <div style="font-weight:800;font-size:16px;">${escapeHtmlA(p.product_name)}</div>
+            <div style="font-size:12.5px;color:var(--ink-faint);">${escapeHtmlA(p.customer_email)} · ${amountText} · 결제 ${fd(p.payment_confirmed_at)}</div>
           </div>
-          <span class="status-badge" style="background:#E4EAF6;color:#3A5A9C;">${PROJECT_STATUS_LABEL[p.current_stage] || p.current_stage}</span>
         </div>
-        ${(p.material_files && p.material_files.length) ? `<div class="desc" data-files="${p.id}" style="margin-top:6px;"><b>첨부파일:</b> 불러오는 중…</div>` : ''}
-        ${(p.deliver_files && p.deliver_files.length) ? `<div class="desc" data-dfiles="${p.id}" style="margin-top:6px;"><b>보낸 파일:</b> 불러오는 중…</div>` : ''}
-        ${actionHtml}
+        ${stepperHtml}
+        ${turnHtml}
+        ${custSection}
+        ${mineSection}
+        ${timelineSection}
         <div class="msg-area" data-msg="${p.id}" style="font-size:12.5px;margin-top:8px;display:none;"></div>
       </div>
     `;
   }
 
   async function fillDeliverFilesAdmin(p){
-    const el = document.querySelector(`[data-dfiles="${p.id}"]`);
-    if(!el) return;
-    const links = [];
-    for(const f of (p.deliver_files || [])){
-      const { data } = await sb.storage.from('machim-materials').createSignedUrl(f.path, 3600);
-      links.push((f.stage ? '[' + escapeHtmlA(f.stage) + '] ' : '') + (data ? `<a href="${data.signedUrl}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(f.name)}</a>` : escapeHtmlA(f.name) + ' (열기 실패)'));
+    for(const st of ['방향서','프로토타입','최종']){
+      const el = document.querySelector(`[data-dstage="${p.id}|${st}"]`);
+      if(!el) continue;
+      el.innerHTML = await fileLinksHtml((p.deliver_files || []).filter(f => f.stage === st));
     }
-    el.innerHTML = '<b>고객에게 보낸 파일:</b> ' + links.join(' · ');
   }
 
   function escapeHtmlA(s){
@@ -762,6 +863,16 @@
       m.style.display='block'; m.style.color = ok ? 'var(--green)' : 'var(--brick)'; m.textContent = text;
     };
 
+    const exp = card.querySelector('[data-export]');
+    if(exp) exp.addEventListener('click', ()=>{
+      const payload = { exported_at: new Date().toISOString(), project: p, events: projectEvents[p.id] || [] };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '증빙_' + (p.product_name || 'project').replace(/[^\w가-힣]+/g,'_') + '_' + new Date().toISOString().slice(0,10) + '.json';
+      a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
+    });
+
     const btn = card.querySelector('[data-action]');
     if(!btn) return;
     btn.addEventListener('click', async ()=>{
@@ -780,7 +891,8 @@
           const path = p.id + '/deliver/' + stageTag + '-' + Date.now() + '-' + i + '-' + safe;
           const { error: upErr } = await sb.storage.from('machim-materials').upload(path, f, { contentType: f.type || 'application/octet-stream' });
           if(upErr) throw new Error('"' + f.name + '" 업로드 실패: ' + upErr.message);
-          out.push({ stage: stageTag, path, name: f.name, size: f.size });
+          let digest = ''; try{ digest = await sha256Hex(f); }catch(e){}
+          out.push({ stage: stageTag, path, name: f.name, size: f.size, sha256: digest });
         }
         return out;
       };

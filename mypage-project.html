@@ -106,6 +106,12 @@
     return (blob && blob.size < f.size) ? new File([blob], f.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' }) : f;
   }
 
+  async function sha256Hex(file){
+    const buf = await file.arrayBuffer();
+    const h = await crypto.subtle.digest('SHA-256', buf);
+    return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
   let project = null;
   let allProjects = [];
   const NEED_ME = ['자료제출대기','방향서승인대기','프로토타입승인대기','최종확인대기'];
@@ -311,7 +317,8 @@
           const path = project.id + '/' + Date.now() + '-' + uploaded.length + '-' + safeName;
           const { error: upErr } = await sb.storage.from('machim-materials').upload(path, f, { contentType: f.type || 'application/octet-stream' });
           if(upErr){ showActionMsg('"' + f0.name + '" 업로드에 실패했어요. 다시 시도해주세요.'); btn.disabled=false; btn.textContent='제출하기'; return; }
-          uploaded.push({ path, name: f0.name, size: f.size });
+          let digest = ''; try{ digest = await sha256Hex(f); }catch(e){}
+          uploaded.push({ path, name: f0.name, size: f.size, sha256: digest });
         }
         btn.textContent = '제출 중…';
         const { error } = await sb.from('machim_projects').update({
