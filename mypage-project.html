@@ -226,15 +226,36 @@
         </div>
         <div class="msg" id="actionMsg"></div>
       `;
+      // 파일을 고를 때마다 목록에 누적 (최대 MAX_FILES), 개별 삭제 가능
+      let pickedFiles = [];
+      const renderFileList = ()=>{
+        document.getElementById('fileList').innerHTML = pickedFiles.map((f,i) =>
+          '<div style="display:flex;gap:8px;align-items:center;padding:3px 0;">' +
+          '<span style="flex:1;word-break:break-all;">' + escapeHtml(f.name) + ' (' + (f.size/1024/1024).toFixed(1) + 'MB)</span>' +
+          '<button type="button" data-rm="' + i + '" style="border:1px solid var(--line,#ccc);background:#fff;border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;">삭제</button></div>'
+        ).join('') + (pickedFiles.length ? '<div style="margin-top:4px;">' + pickedFiles.length + '/' + MAX_FILES + '개 선택됨 · 파일 선택을 다시 누르면 추가돼요</div>' : '');
+      };
+      document.getElementById('fileList').addEventListener('click', (e)=>{
+        const b = e.target.closest('[data-rm]'); if(!b) return;
+        pickedFiles.splice(Number(b.dataset.rm), 1); renderFileList();
+      });
       document.getElementById('materialFiles').addEventListener('change', (e)=>{
         const fl = Array.from(e.target.files || []);
-        document.getElementById('fileList').innerHTML = fl.map(f => escapeHtml(f.name) + ' (' + (f.size/1024/1024).toFixed(1) + 'MB)').join('<br>');
+        let skipped = 0;
+        fl.forEach(f=>{
+          if(pickedFiles.some(x => x.name === f.name && x.size === f.size && x.lastModified === f.lastModified)) return;
+          if(pickedFiles.length >= MAX_FILES){ skipped++; return; }
+          pickedFiles.push(f);
+        });
+        e.target.value = '';
+        renderFileList();
+        if(skipped) showActionMsg('첨부파일은 최대 ' + MAX_FILES + '개까지 올릴 수 있어요. ' + skipped + '개는 제외했어요.');
       });
       document.getElementById('submitMaterial').addEventListener('click', async ()=>{
         const note = document.getElementById('materialInput').value.trim();
         const btn = document.getElementById('submitMaterial');
         if(!document.getElementById('hostingAck').checked){ showActionMsg('배포 서비스·요금제 안내를 확인하고 체크해주세요.'); return; }
-        const picked = Array.from(document.getElementById('materialFiles').files || []);
+        const picked = pickedFiles.slice();
         if(picked.length > MAX_FILES){ showActionMsg('첨부파일은 최대 ' + MAX_FILES + '개까지 올릴 수 있어요.'); return; }
         const tooBig = picked.find(f => f.size > MAX_FILE_BYTES && !isCompressible(f));
         if(tooBig){ showActionMsg('"' + tooBig.name + '" 파일이 10MB를 넘어요. 줄이거나 나눠서 올려주세요.'); return; }
