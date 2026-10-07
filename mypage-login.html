@@ -80,6 +80,7 @@
         </label>
       </div>
       <button type="submit" class="submit-btn" id="submitBtn">로그인</button>
+      <p id="forgotWrap" style="text-align:center;margin-top:14px;font-size:13px;"><button type="button" id="forgotBtn" style="background:none;border:none;color:var(--brick);text-decoration:underline;cursor:pointer;font:inherit;">비밀번호를 잊으셨나요?</button></p>
     </form>
 
     <div id="sentBox" style="display:none;text-align:center;padding:8px 0 4px;">
@@ -115,7 +116,22 @@
       submitBtn.textContent = mode === 'login' ? '로그인' : '가입하기';
       msgBox.style.display = 'none';
       document.getElementById('signupConsent').style.display = mode === 'signup' ? 'block' : 'none';
+      document.getElementById('forgotWrap').style.display = mode === 'login' ? 'block' : 'none';
     });
+  });
+
+  document.getElementById('forgotBtn').addEventListener('click', async function(){
+    var email = document.getElementById('email').value.trim();
+    if(!email){ showMsg('위 이메일 칸에 가입한 이메일을 먼저 입력하고, 다시 눌러주세요.'); return; }
+    var b = this; b.disabled = true;
+    var res = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/reset-password.html' });
+    b.disabled = false;
+    if(res.error){
+      var m = (res.error.message||'').toLowerCase();
+      showMsg((m.includes('rate') || m.includes('seconds')) ? '잠시 후 다시 시도해주세요. (메일 발송 한도에 걸렸어요)' : '메일을 보내지 못했어요. 이메일을 확인하고 다시 시도해주세요.');
+      return;
+    }
+    showMsg(email + ' 로 비밀번호 재설정 메일을 보냈어요. 메일의 링크를 눌러 새 비밀번호를 정해주세요. (가입된 이메일일 때만 도착해요. 스팸함도 확인해주세요.)', true);
   });
 
   function showSent(email){
