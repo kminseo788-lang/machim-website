@@ -241,15 +241,21 @@
       });
       document.getElementById('materialFiles').addEventListener('change', (e)=>{
         const fl = Array.from(e.target.files || []);
-        let skipped = 0;
+        const skippedNames = [];
         fl.forEach(f=>{
           if(pickedFiles.some(x => x.name === f.name && x.size === f.size && x.lastModified === f.lastModified)) return;
-          if(pickedFiles.length >= MAX_FILES){ skipped++; return; }
+          if(pickedFiles.length >= MAX_FILES){ skippedNames.push(f.name); return; }
           pickedFiles.push(f);
         });
         e.target.value = '';
         renderFileList();
-        if(skipped) showActionMsg('첨부파일은 최대 ' + MAX_FILES + '개까지 올릴 수 있어요. ' + skipped + '개는 제외했어요.');
+        if(skippedNames.length){
+          document.getElementById('fileList').insertAdjacentHTML('beforeend',
+            '<div style="margin-top:8px;padding:10px 12px;border-radius:8px;background:#fdf1ec;color:#a4432a;line-height:1.6;">' +
+            '첨부파일은 최대 ' + MAX_FILES + '개까지 올릴 수 있어서 아래 파일은 담기지 않았어요.<br>' +
+            skippedNames.map(n => '· ' + escapeHtml(n)).join('<br>') +
+            '<br>담긴 파일 중 필요 없는 걸 삭제하면 다시 추가할 수 있어요.</div>');
+        }
       });
       document.getElementById('submitMaterial').addEventListener('click', async ()=>{
         const note = document.getElementById('materialInput').value.trim();
