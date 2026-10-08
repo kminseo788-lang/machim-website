@@ -945,10 +945,10 @@
       btn.disabled = true;
       if(stageTag && picked.length){
         btn.textContent = '파일 올리는 중…';
-        try{ update.deliver_files = await uploadDeliver(); }catch(e){ showCardMsg(e.message); btn.disabled = false; btn.textContent = '다시 시도'; return; }
+        try{ update.deliver_files = await uploadDeliver(); }catch(e){ showCardMsg(e.message); alert('파일 올리기에 실패했어요.\n' + e.message); btn.disabled = false; btn.textContent = '다시 시도'; return; }
       }
       const { error } = await sb.from('machim_projects').update(update).eq('id', p.id);
-      if(error){ showCardMsg('처리 실패: ' + error.message); btn.disabled = false; return; }
+      if(error){ showCardMsg('처리 실패: ' + error.message); alert('처리에 실패했어요.\n' + error.message); btn.disabled = false; return; }
       loadProjects();
     });
   }
