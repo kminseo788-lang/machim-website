@@ -268,6 +268,13 @@
     el.innerHTML = '<div style="margin:10px 0;"><div style="font-size:13px;color:var(--ink-soft);margin-bottom:4px;">첨부 파일</div>' + rows.join('') + '</div>';
   }
 
+function normUrl(u){
+  u = (u || '').trim();
+  if(!u) return '';
+  if(/^(javascript|data|vbscript):/i.test(u)) return '';
+  if(!/^https?:\/\//i.test(u)) u = 'https://' + u.replace(/^\/+/, '');
+  return u;
+}
   function escapeHtml(s){
     const d = document.createElement('div');
     d.textContent = s || '';
@@ -413,7 +420,7 @@
       box.innerHTML = `
         <p class="desc">디자인 시안이 준비됐어요. 아래에서 확인해주세요.</p>
         <div id="deliverFiles"></div>
-        ${project.prototype_url ? `<a class="view-link" href="${escapeHtml(project.prototype_url)}" target="_blank" rel="noopener">시안 확인하기 →</a>` : ''}
+        ${project.prototype_url ? `<a class="view-link" href="${escapeHtml(normUrl(project.prototype_url))}" target="_blank" rel="noopener">시안 확인하기 →</a>` : ''}
         <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
         <div class="btn-row">
           <button class="btn btn-primary" id="approveBtn">위 시안으로 제작을 승인합니다</button>
@@ -443,7 +450,7 @@
       box.innerHTML = `
         <p class="desc">제작이 완료되었어요. 최종 결과물을 확인해주세요.</p>
         <div id="deliverFiles"></div>
-        ${project.final_preview_url ? `<a class="view-link" href="${escapeHtml(project.final_preview_url)}" target="_blank" rel="noopener">최종 결과물 확인하기 →</a>` : ''}
+        ${project.final_preview_url ? `<a class="view-link" href="${escapeHtml(normUrl(project.final_preview_url))}" target="_blank" rel="noopener">최종 결과물 확인하기 →</a>` : ''}
         <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
         <div class="btn-row">
           <button class="btn btn-primary" id="approveBtn">위 내용으로 최종 승인합니다</button>
@@ -468,8 +475,8 @@
     else if(stage === '배포완료'){
       box.innerHTML = `
         <p class="desc">배포가 완료되었습니다. 그동안 이용해주셔서 감사합니다!</p>
-        ${project.live_url ? `<a class="view-link" href="${escapeHtml(project.live_url)}" target="_blank" rel="noopener">사이트 바로가기 →</a>` : ''}
-        ${project.source_repo_url ? `<div style="font-size:13px;color:var(--ink-soft);">소스코드는 고객님 저장소에 전달했어요: <a class="view-link" href="${escapeHtml(project.source_repo_url)}" target="_blank" rel="noopener">${escapeHtml(project.source_repo_url)}</a></div>` : ''}
+        ${project.live_url ? `<a class="view-link" href="${escapeHtml(normUrl(project.live_url))}" target="_blank" rel="noopener">사이트 바로가기 →</a>` : ''}
+        ${project.source_repo_url ? `<div style="font-size:13px;color:var(--ink-soft);">소스코드는 고객님 저장소에 전달했어요: <a class="view-link" href="${escapeHtml(normUrl(project.source_repo_url))}" target="_blank" rel="noopener">${escapeHtml(project.source_repo_url)}</a></div>` : ''}
       `;
     }
 
