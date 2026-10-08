@@ -172,6 +172,12 @@
         if(replied && q.payable && q.product_key){
           pay = '<a href="order.html?p=' + encodeURIComponent(q.product_key) + '&inq=' + encodeURIComponent(q.id) + '" style="display:inline-block;margin-top:10px;padding:11px 18px;border-radius:10px;background:var(--brick);color:#fff;font-weight:700;text-decoration:none;">이 조건으로 결제하기</a>';
         }
+        if(replied && q.product_key){
+          const base = 'order.html?p=' + encodeURIComponent(q.product_key);
+          pay += q.payable
+            ? ' <a href="' + base + '" style="display:inline-block;margin-top:10px;margin-left:6px;padding:10px 16px;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-weight:600;text-decoration:none;font-size:13.5px;">기본 서비스로 결제하기</a>'
+            : '<a href="' + base + '" style="display:inline-block;margin-top:10px;padding:11px 18px;border-radius:10px;background:var(--brick);color:#fff;font-weight:700;text-decoration:none;">기본 서비스로 결제하기</a>';
+        }
         return '<div style="border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px;background:var(--paper);">' +
           '<div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--ink-faint);"><span>' + when + ' 접수</span><b style="color:' + (replied ? 'var(--brick)' : 'var(--ink-faint)') + ';">' + (replied ? '답변 도착' : '확인 중') + '</b></div>' +
           '<div style="white-space:pre-wrap;font-size:13.5px;margin-top:8px;color:var(--ink-soft);">' + escapeHtml(q.scope || '') + '</div>' +

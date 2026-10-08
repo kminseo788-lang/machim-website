@@ -435,7 +435,7 @@
             <textarea class="reply-input" data-id="${q.id}" placeholder="고객에게 보여줄 답변" style="width:100%;min-height:50px;font:inherit;font-size:12.5px;padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;">${q.admin_reply || ''}</textarea>
             ${q.customer_id && q.product_key && q.host_service ? `<label style="display:block;font-size:12px;margin-top:4px;"><input type="checkbox" data-payable="${q.id}" ${q.payable?'checked':''}> 가능해요 → 고객 마이페이지에 "이 조건으로 결제하기" 표시 (${q.host_service})</label>` : ''}
             <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;" data-reply-save="${q.id}">답변 저장</button>
-            <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;background:var(--gold);" data-add-order="${q.id}" data-name="${q.name || ''}">나도 작가도전 → 제작 일정에 추가</button>
+            ${/작가/.test((q.task_type||'')+(q.scope||'')) ? `<button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;background:var(--gold);" data-add-order="${q.id}" data-name="${q.name || ''}">나도 작가도전 → 제작 일정에 추가</button>` : ''}
           </div>
         </td>`;
       inquiryTable.appendChild(tr);
