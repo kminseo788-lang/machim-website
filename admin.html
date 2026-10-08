@@ -915,7 +915,8 @@
         for(let i=0;i<picked.length;i++){
           const f = picked[i];
           const safe = f.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-80) || 'file';
-          const path = p.id + '/deliver/' + stageTag + '-' + Date.now() + '-' + i + '-' + safe;
+          const stageKey = { '방향서':'brief', '프로토타입':'proto', '최종':'final' }[stageTag] || 'file';
+          const path = p.id + '/deliver/' + stageKey + '-' + Date.now() + '-' + i + '-' + safe;
           const { error: upErr } = await sb.storage.from('machim-materials').upload(path, f, { contentType: f.type || 'application/octet-stream' });
           if(upErr) throw new Error('"' + f.name + '" 업로드 실패: ' + upErr.message);
           let digest = ''; try{ digest = await sha256Hex(f); }catch(e){}
