@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="css/common.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase-config.js"></script>
+<script src="js/site-config.js"></script>
 
 <style>
   body{font-family:"Noto Sans KR",sans-serif;background:var(--paper);}
@@ -187,6 +188,69 @@
     }catch(e){ console.error(e); }
   }
 
+
+  const PREP_STAGES = ['개발중','최종확인대기','배포완료'];
+  function needsPrep(x){ return PREP_STAGES.includes(x.current_stage) && !x.deployed_at && !x.deploy_prep_done_at; }
+  const PREP_ACK_TEXT = '배포 준비 요청일로부터 14일이 지나도 준비가 완료되지 않으면 마침이 다른 고객님 작업을 먼저 진행할 수 있고, 준비가 끝나면 가장 빠른 일정으로 이어서 배포한다는 점(약관 제4조 4-7)을 확인했습니다.';
+
+  function renderPrepCard(){
+    const box = document.getElementById('prepBox');
+    if(!box) return;
+    if(!PREP_STAGES.includes(project.current_stage) || project.deployed_at){ box.innerHTML = ''; return; }
+    const dp = project.deploy_prep || {};
+    const done = !!project.deploy_prep_done_at;
+    const req = project.deploy_prep_requested_at ? fmtDate(project.deploy_prep_requested_at) : '';
+    const remind = project.deploy_prep_reminded_at ? fmtDate(project.deploy_prep_reminded_at) : '';
+    const invite = (typeof MACHIM_INVITE_EMAIL !== 'undefined') ? MACHIM_INVITE_EMAIL : '';
+    const chk = (id, label, on) => '<label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:8px 0;line-height:1.5;"><input type="checkbox" id="' + id + '" ' + (on ? 'checked' : '') + ' style="width:18px;height:18px;flex:0 0 18px;margin-top:2px;accent-color:var(--brick);"><span>' + label + '</span></label>';
+    const inp = (id, ph, val) => '<input type="text" id="' + id + '" placeholder="' + ph + '" value="' + escapeHtml(val || '') + '" style="width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font:inherit;margin:4px 0 10px;box-sizing:border-box;">';
+    const msg = '[배포 준비 문의]\n프로젝트: ' + project.product_name + ' (#' + String(project.id).slice(0,4) + ')\n막힌 단계: (호스팅 가입 / 협업자 초대 / 도메인 구매 / 기타 중 적어주세요)\n막힌 내용:\n(화면 캡처가 있다면 설명으로 적어주세요. 비밀번호·인증번호는 가려주세요)';
+    const askHref = 'contact.html?host=1&kind=deploy&msg=' + encodeURIComponent(msg);
+    box.innerHTML = '<div class="card" style="border:1.5px solid ' + (done ? '#CFE0CF' : 'var(--brick)') + ';">' +
+      '<h2>배포 준비 ' + (done ? '<span style="font-size:13px;color:#3B6B45;">· ✓ 준비 완료 제출함</span>' : '<span style="font-size:13px;color:var(--brick);">· 고객님이 해주실 일</span>') + '</h2>' +
+      '<p class="desc" style="margin-bottom:10px;">사이트를 올릴 "집(호스팅)"과 "주소(도메인)"를 고객님 명의로 준비해주세요. 보통 20~30분이면 끝나고, <b>개발이 진행되는 동안 해주시면 일정이 늦어지지 않아요.</b>' + (req ? ' (준비 요청일 ' + req + ')' : '') + '</p>' +
+      (remind ? '<div style="font-size:13px;color:#a4432a;background:#fdf1ec;border-radius:8px;padding:9px 12px;margin-bottom:10px;">마침이 ' + remind + '에 배포 준비를 다시 요청했어요.</div>' : '') +
+      '<a href="guide-hosting-domain.html" target="_blank" rel="noopener" class="view-link" style="display:inline-block;margin-bottom:12px;">단계별 준비 방법 자세히 보기 →</a>' +
+      '<div style="background:var(--paper);border-radius:10px;padding:12px 14px;font-size:13.5px;line-height:1.7;margin-bottom:12px;">' +
+      '<b>협업자로 초대할 마침 이메일</b><br><span id="inviteMail" style="font-weight:800;user-select:all;">' + escapeHtml(invite) + '</span> <button type="button" id="copyInvite" style="border:1px solid var(--line);background:#fff;border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;">복사</button><br>' +
+      '<span style="color:var(--ink-faint);font-size:12.5px;">아이디·비밀번호는 절대 보내지 마세요. 초대만 해주시면 됩니다.</span></div>' +
+      chk('prepCf', '호스팅(Cloudflare) 계정을 만들었어요', dp.cloudflare_done) +
+      chk('prepInvite', '위 이메일로 협업자(멤버) 초대를 보냈어요', dp.invited) +
+      '<div style="font-size:13px;color:var(--ink-soft);margin-top:10px;">도메인(사이트 주소)</div>' +
+      inp('prepDomain', '구매하셨다면 주소 (예: myname.com) · 아직이라면 희망 이름 2~3개', dp.domain) +
+      '<div style="font-size:13px;color:var(--ink-soft);">도메인 구매처</div>' +
+      inp('prepRegistrar', '예: 가비아, 후이즈, Namecheap · 아직이라면 비워두세요', dp.registrar) +
+      chk('prepDomainBought', '도메인을 구매했어요 (아직이면 체크하지 마세요)', dp.domain_bought) +
+      '<label style="display:flex;gap:10px;align-items:flex-start;font-size:12.8px;color:var(--ink-soft);margin:12px 0;line-height:1.6;"><input type="checkbox" id="prepAck" ' + (dp.ack_at ? 'checked' : '') + ' style="width:18px;height:18px;flex:0 0 18px;margin-top:2px;accent-color:var(--brick);"><span>' + PREP_ACK_TEXT + '</span></label>' +
+      '<div class="btn-row"><button class="btn btn-primary" id="prepSave">배포 준비 정보 저장</button> <a class="btn btn-ghost" href="' + askHref + '" style="text-decoration:none;display:inline-block;">막혔어요, 문의하기</a></div>' +
+      '<div class="msg" id="prepMsg"></div>' +
+      (dp.saved_at ? '<div style="font-size:12px;color:var(--ink-faint);margin-top:8px;">마지막 저장: ' + fmtDateTime(dp.saved_at) + '</div>' : '') +
+      '</div>';
+    const cp = document.getElementById('copyInvite');
+    if(cp) cp.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(invite); cp.textContent = '복사됨'; }catch(e){ cp.textContent = '직접 선택해 복사해주세요'; } });
+    document.getElementById('prepSave').addEventListener('click', async ()=>{
+      const m = document.getElementById('prepMsg');
+      const v = (id)=> document.getElementById(id).value.trim();
+      const c = (id)=> document.getElementById(id).checked;
+      if(!c('prepAck')){ m.className = 'msg err'; m.textContent = '일정 안내 확인에 체크해주세요.'; return; }
+      const now = new Date().toISOString();
+      const next = {
+        cloudflare_done: c('prepCf'), invited: c('prepInvite'),
+        domain: v('prepDomain'), registrar: v('prepRegistrar'), domain_bought: c('prepDomainBought'),
+        ack_at: dp.ack_at || now, ack_text: PREP_ACK_TEXT, saved_at: now
+      };
+      const complete = next.cloudflare_done && next.invited && next.domain && next.domain_bought;
+      const upd = { deploy_prep: next };
+      if(complete && !project.deploy_prep_done_at) upd.deploy_prep_done_at = now;
+      if(!complete && project.deploy_prep_done_at) upd.deploy_prep_done_at = null;
+      const { error } = await sb.from('machim_projects').update(upd).eq('id', project.id);
+      if(error){ m.className = 'msg err'; m.textContent = '저장에 실패했어요: ' + error.message; return; }
+      m.className = 'msg ok';
+      m.textContent = complete ? '준비 완료로 접수됐어요. 확인 후 배포를 진행해드릴게요.' : '저장됐어요. 아직 남은 항목이 있어요 (계정, 초대, 도메인 구매). 끝나면 다시 저장해주세요.';
+      setTimeout(()=>{ location.href = 'mypage-project.html?id=' + project.id; }, 1200);
+    });
+  }
+
   function fmtDateTime(iso){
     if(!iso) return '';
     const d = new Date(iso);
@@ -211,7 +275,7 @@
       { key:'시안승인', label:'프로토타입 승인', date: project.prototype_approved_at, doneAt: idx >= 5 },
       { key:'개발중', label:'개발', date: project.dev_completed_at, doneAt: idx >= 6, currentIf: idx === 5 },
       { key:'최종확인', label:'최종 확인', date: project.final_approved_at, doneAt: idx >= 7, currentIf: idx === 6 },
-      { key:'배포', label:'배포', date: project.deployed_at, doneAt: idx >= 7, currentIf: idx === 7 && !project.deployed_at },
+      { key:'배포', label:'배포', date: project.deployed_at, doneAt: !!project.deployed_at, currentIf: idx === 7 && !project.deployed_at },
     ];
 
     let timelineHtml = '';
@@ -230,7 +294,7 @@
           const on = x.id === project.id;
           return '<button type="button" data-pid="' + x.id + '" style="display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;text-align:left;padding:11px 14px;margin-bottom:8px;border-radius:10px;border:1.5px solid ' + (on ? 'var(--brick)' : 'var(--line)') + ';background:' + (on ? '#fff' : 'var(--paper)') + ';font:inherit;cursor:pointer;">' +
             '<span style="font-weight:' + (on ? '800' : '600') + ';">' + escapeHtml(x.product_name) + '<span style="font-weight:500;font-size:12px;color:var(--ink-faint);margin-left:8px;">' + fmtDateTime(x.payment_confirmed_at || x.created_at) + ' 결제</span></span>' +
-            '<span style="font-size:12px;white-space:nowrap;color:' + (need ? 'var(--brick)' : 'var(--ink-faint)') + ';font-weight:700;">' + (x.current_stage === '배포완료' ? '완료' : (need ? '확인 필요' : '진행 중')) + '</span></button>';
+            '<span style="font-size:12px;white-space:nowrap;color:' + ((need || needsPrep(x)) ? 'var(--brick)' : 'var(--ink-faint)') + ';font-weight:700;">' + (x.deployed_at ? '완료' : (need ? '확인 필요' : (needsPrep(x) ? '배포 준비 필요' : '진행 중'))) + '</span></button>';
         }).join('') + '</div>';
     }
 
@@ -239,6 +303,7 @@
         <div class="proj-name">${escapeHtml(project.product_name)}</div>
         <p class="proj-amount">${project.amount ? Number(project.amount).toLocaleString()+'원' : ''}</p>
       </div>
+      <div id="prepBox"></div>
       <div class="card">
         <h2>현재 제작 단계</h2>
         <ul class="timeline">${timelineHtml}</ul>
@@ -252,6 +317,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }));
 
+    renderPrepCard();
     renderAction();
   }
 
@@ -474,7 +540,7 @@ function normUrl(u){
 
     else if(stage === '배포완료'){
       box.innerHTML = `
-        <p class="desc">배포가 완료되었습니다. 그동안 이용해주셔서 감사합니다!</p>
+        ${project.deployed_at ? '<p class="desc">배포가 완료되었습니다. 그동안 이용해주셔서 감사합니다!</p>' : '<p class="desc">최종 승인 감사합니다. 지금 사이트를 배포하고 있어요. 배포가 끝나면 사이트 주소와 안내를 여기에 남겨드릴게요.</p>'}
         ${project.live_url ? `<a class="view-link" href="${escapeHtml(normUrl(project.live_url))}" target="_blank" rel="noopener">사이트 바로가기 →</a>` : ''}
         ${project.source_repo_url ? `<div style="font-size:13px;color:var(--ink-soft);">소스코드는 고객님 저장소에 전달했어요: <a class="view-link" href="${escapeHtml(normUrl(project.source_repo_url))}" target="_blank" rel="noopener">${escapeHtml(project.source_repo_url)}</a></div>` : ''}
       `;

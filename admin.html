@@ -730,6 +730,7 @@
     }
     else if(p.current_stage === '배포완료' && !p.deployed_at){
       actionHtml = `
+        <div style="font-size:12.5px;margin-bottom:8px;padding:8px 10px;border-radius:8px;${p.deploy_prep_done_at ? 'background:#EAF2EA;color:#3B6B45;' : 'background:#FDF1EC;color:#A4432A;'}">${p.deploy_prep_done_at ? '✓ 고객이 배포 준비 완료를 제출했어요. 도메인: ' + escapeHtmlA((p.deploy_prep||{}).domain || '-') + ' (초대와 계정은 직접 확인하세요)' : '아직 고객의 배포 준비가 완료되지 않았어요. 위 "배포 준비" 항목을 확인하고, 필요하면 다시 요청하세요.'}</div>
         <input type="text" data-field="live_url" placeholder="실제 배포된 사이트 주소" style="width:100%;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
         <input type="text" data-field="source_repo_url" placeholder="소스코드를 올린 고객 GitHub 저장소 주소 (선택)" style="width:100%;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
         <button class="save-btn" data-action="deploy" data-id="${p.id}">배포완료 처리</button>
@@ -803,6 +804,33 @@
           ${p.hosting_ack_at ? row('배포·요금제 안내 확인', fd(p.hosting_ack_at) + ' 확인함') : ''}
         </div>
       </details>`;
+    const dp = p.deploy_prep || {};
+    const prepActive = ['개발중','최종확인대기','배포완료'].includes(p.current_stage) && !p.deployed_at;
+    const prepDone = !!p.deploy_prep_done_at;
+    const prepDays = p.deploy_prep_requested_at ? Math.floor((Date.now() - new Date(p.deploy_prep_requested_at).getTime()) / 86400000) : null;
+    let prepWarn = '';
+    if(prepActive && !prepDone && prepDays !== null){
+      if(prepDays >= 60) prepWarn = '⚠ 준비 요청 후 ' + prepDays + '일 경과 — 약관 4-7의 60일 기준을 넘었어요(통지 후 계약 종료 검토 가능).';
+      else if(prepDays >= 14) prepWarn = '⚠ 준비 요청 후 ' + prepDays + '일 경과 — 약관 4-7의 14일 기준을 넘었어요. 이 건 배포는 보류하고 다른 작업을 먼저 해도 돼요.';
+      else if(prepDays >= 7) prepWarn = '준비 요청 후 ' + prepDays + '일 경과 — 재요청을 보내볼 시점이에요.';
+    }
+    const prepSection = (prepActive || p.deploy_prep) ? `
+      <details style="${secStyle}"${prepActive ? ' open' : ''}>
+        <summary style="${sumStyle}">배포 준비 (고객 준비 상태) ${prepDone ? '<span style="font-weight:400;color:#3B6B45;">· ✓ 준비 완료 제출</span>' : prepActive ? '<span style="font-weight:700;color:#B8452A;">· 아직 준비 안 됨</span>' : ''}</summary>
+        <div style="${bodyStyle}">
+          ${prepWarn ? '<div style="margin:6px 0;padding:8px 10px;border-radius:8px;background:#FDF1EC;color:#A4432A;font-weight:700;">' + prepWarn + '</div>' : ''}
+          ${row('준비 요청 시작', p.deploy_prep_requested_at ? fmtDT(p.deploy_prep_requested_at) + ' (경과 ' + prepDays + '일)' : '')}
+          ${row('재요청 기록', p.deploy_prep_reminded_at ? fmtDT(p.deploy_prep_reminded_at) + ' · 총 ' + (p.deploy_prep_remind_count || 1) + '회' : '아직 없음')}
+          ${row('호스팅(Cloudflare) 가입', dp.cloudflare_done ? '✓ 고객이 가입했다고 체크' : '아직')}
+          ${row('1마침 협업자 초대', dp.invited ? '✓ 고객이 초대 보냈다고 체크 (실제 초대는 이메일/계정에서 직접 확인하세요)' : '아직')}
+          ${row('도메인', dp.domain ? escapeHtmlA(dp.domain) + (dp.domain_bought ? ' (구매 완료)' : ' (아직 구매 전/희망 이름)') : '아직 입력 없음')}
+          ${row('도메인 구매처', escapeHtmlA(dp.registrar))}
+          ${row('일정 안내 확인', dp.ack_at ? fmtDT(dp.ack_at) + ' 확인' : '아직')}
+          ${row('마지막 저장', dp.saved_at ? fmtDT(dp.saved_at) : '')}
+          ${prepActive && !prepDone ? `<div style="margin-top:10px;"><button type="button" data-remind="${p.id}" style="border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 12px;font-size:12.5px;cursor:pointer;">배포 준비 다시 요청 (고객 마이페이지에 표시 · 기록)</button></div>` : ''}
+        </div>
+      </details>` : '';
+
     const sentAny = !!(brief || p.prototype_url || p.prototype_note || p.final_preview_url || (p.deliver_files && p.deliver_files.length) || p.live_url);
     const mineSection = `
       <details style="${secStyle}"${mineOpen}>
@@ -837,6 +865,7 @@
         </div>
         ${stepperHtml}
         ${turnHtml}
+        ${prepSection}
         ${custSection}
         ${mineSection}
         ${timelineSection}
@@ -911,6 +940,14 @@ function normUrl(u){
       a.href = URL.createObjectURL(blob);
       a.download = '증빙_' + (p.product_name || 'project').replace(/[^\w가-힣]+/g,'_') + '_' + new Date().toISOString().slice(0,10) + '.json';
       a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
+    });
+
+    const remindBtn = card.querySelector('[data-remind]');
+    if(remindBtn) remindBtn.addEventListener('click', async ()=>{
+      if(!confirm('고객 마이페이지에 "배포 준비를 다시 요청했어요"가 표시되고, 일시가 증빙으로 기록돼요. 진행할까요?')) return;
+      const { error } = await sb.from('machim_projects').update({ deploy_prep_reminded_at: new Date().toISOString() }).eq('id', p.id);
+      if(error){ alert('실패: ' + error.message); return; }
+      loadProjects();
     });
 
     const btn = card.querySelector('[data-action]');

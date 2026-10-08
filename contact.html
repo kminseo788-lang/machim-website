@@ -135,6 +135,7 @@
 (function(){
   var q = new URLSearchParams(location.search);
   var isHost = q.get('host') === '1';
+  var kind = q.get('kind') || '';
   var pKey = q.get('p') || '';
   var TEMPLATE = '[원하는 것]\n\n[서버/도메인 계획]\n\n[꼭 필요한 기능]\n\n[참고하는 사이트]\n\n[희망 시작 시기 / 예산]\n';
   var memo = document.getElementById('memo');
@@ -168,7 +169,7 @@
     var hostService = m ? m[1].trim() : null;
     var payload = {
       scope: text,
-      task_type: isHost ? '배포 서비스 문의' : '문의',
+      task_type: kind === 'deploy' ? '배포 준비 문의' : (isHost ? '배포 서비스 문의' : '문의'),
       product_key: pKey || null,
       host_service: hostService
     };
