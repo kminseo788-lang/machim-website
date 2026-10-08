@@ -79,6 +79,7 @@
     <a href="#" class="logout-btn" id="logoutBtn">로그아웃</a>
   </div>
 
+  <div id="inqBox"></div>
   <div id="content">
     <div class="center-loading">불러오는 중…</div>
   </div>
@@ -121,6 +122,7 @@
     if(!session){ location.href = 'mypage-login.html'; return; }
 
     const { data: { user } } = await sb.auth.getUser();
+    loadInquiries(user);
 
     // 혹시 아직 claim 안 된 프로젝트가 있으면 연결 시도
     await sb.from('machim_projects')
@@ -155,6 +157,29 @@
     await sb.auth.signOut();
     location.href = 'mypage-login.html';
   });
+
+
+  async function loadInquiries(u){
+    try{
+      const { data } = await sb.from('machim_inquiries').select('*').eq('customer_id', u.id).order('created_at', { ascending:false });
+      const box = document.getElementById('inqBox');
+      if(!data || !data.length){ box.innerHTML = ''; return; }
+      box.innerHTML = '<div class="card"><h2>내 문의 (' + data.length + ')</h2>' + data.map(function(q){
+        const d = new Date(q.created_at);
+        const when = (d.getMonth()+1) + '.' + d.getDate();
+        const replied = !!(q.admin_reply && q.admin_reply.trim());
+        let pay = '';
+        if(replied && q.payable && q.product_key){
+          pay = '<a href="order.html?p=' + encodeURIComponent(q.product_key) + '&inq=' + encodeURIComponent(q.id) + '" style="display:inline-block;margin-top:10px;padding:11px 18px;border-radius:10px;background:var(--brick);color:#fff;font-weight:700;text-decoration:none;">이 조건으로 결제하기</a>';
+        }
+        return '<div style="border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px;background:var(--paper);">' +
+          '<div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--ink-faint);"><span>' + when + ' 접수</span><b style="color:' + (replied ? 'var(--brick)' : 'var(--ink-faint)') + ';">' + (replied ? '답변 도착' : '확인 중') + '</b></div>' +
+          '<div style="white-space:pre-wrap;font-size:13.5px;margin-top:8px;color:var(--ink-soft);">' + escapeHtml(q.scope || '') + '</div>' +
+          (replied ? '<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:#fff;border:1.5px solid var(--brick);white-space:pre-wrap;font-size:14px;"><b>마침 답변</b><br>' + escapeHtml(q.admin_reply) + '</div>' + pay : '<div style="margin-top:8px;font-size:12.5px;color:var(--ink-faint);">영업일 기준 1~2일 안에 여기에 답변을 남겨드려요.</div>') +
+          '</div>';
+      }).join('') + '</div>';
+    }catch(e){ console.error(e); }
+  }
 
   function fmtDate(iso){
     if(!iso) return '';

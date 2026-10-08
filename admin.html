@@ -423,8 +423,8 @@
     data.forEach(q=>{
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${q.name || '-'}</td><td>${q.phone || '-'}</td><td>${q.task_type || '-'}</td>
-        <td>${q.frequency || '-'}</td><td style="max-width:220px;">${q.scope || '-'}</td>
+        <td>${q.name || '-'}${q.customer_id ? '<br><span style="font-size:11px;color:var(--brick);">로그인 고객</span>' : ''}</td><td>${q.phone || '-'}${q.email ? '<br><span style="font-size:11px;">'+q.email+'</span>' : ''}</td><td>${q.task_type || '-'}${q.product_key ? '<br><span style="font-size:11px;">'+q.product_key+'</span>' : ''}</td>
+        <td>${q.frequency || '-'}</td><td style="max-width:260px;white-space:pre-wrap;">${(q.scope || '-').replace(/</g,'&lt;')}</td>
         <td>
           <select class="status-select" data-id="${q.id}">
             <option ${q.status==='신규'?'selected':''}>신규</option>
@@ -433,6 +433,7 @@
           </select>
           <div style="margin-top:8px;">
             <textarea class="reply-input" data-id="${q.id}" placeholder="고객에게 보여줄 답변" style="width:100%;min-height:50px;font:inherit;font-size:12.5px;padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;">${q.admin_reply || ''}</textarea>
+            ${q.customer_id && q.product_key && q.host_service ? `<label style="display:block;font-size:12px;margin-top:4px;"><input type="checkbox" data-payable="${q.id}" ${q.payable?'checked':''}> 가능해요 → 고객 마이페이지에 "이 조건으로 결제하기" 표시 (${q.host_service})</label>` : ''}
             <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;" data-reply-save="${q.id}">답변 저장</button>
             <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;background:var(--gold);" data-add-order="${q.id}" data-name="${q.name || ''}">나도 작가도전 → 제작 일정에 추가</button>
           </div>
@@ -450,7 +451,7 @@
       btn.addEventListener('click', async ()=>{
         const id = btn.dataset.replySave;
         const val = inquiryTable.querySelector(`textarea[data-id="${id}"]`).value;
-        const { error } = await sb.from('machim_inquiries').update({ admin_reply: val, status: '답변완료' }).eq('id', id);
+        const { error } = await sb.from('machim_inquiries').update({ admin_reply: val, status: '답변완료', payable: !!(inquiryTable.querySelector(`[data-payable="${id}"]`) || {}).checked }).eq('id', id);
         if(error){ alert('저장 실패: ' + error.message); return; }
         btn.textContent = '저장됨';
         setTimeout(()=>{ btn.textContent = '답변 저장'; }, 1500);
@@ -573,6 +574,7 @@
     const days = dailyCapacity > 0 ? Math.ceil(totalHours / dailyCapacity) : 0;
     const suggestDate = new Date();
     suggestDate.setDate(suggestDate.getDate() + days);
+    while(suggestDate.getDay()===0 || suggestDate.getDay()===6){ suggestDate.setDate(suggestDate.getDate()+1); } // 주말이면 다음 월요일 (고객 캘린더와 동일)
     const suggestText = suggestDate.toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
 
     document.getElementById('statPendingHours').textContent = totalHours + '시간';

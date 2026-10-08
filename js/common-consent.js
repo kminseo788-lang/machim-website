@@ -21,7 +21,7 @@
        // orders.insert(...) 의 options 필드 등에 consent 를 같이 저장
    ========================================================= */
 
-const CONSENT_VERSION = '2026-10-08d';
+const CONSENT_VERSION = '2026-10-08e';
 
 // 1마침이 기본으로 안내하는 배포(호스팅) 서비스. 서비스를 바꾸고 싶으면 이 한 줄만 고치면
 // 동의 문구에 반영됩니다. (terms.html, guide-hosting-domain.html 의 문구도 같이 확인하세요)
@@ -99,7 +99,7 @@ const COMMON_CONSENT_ITEMS = [
 
 let _lastConsentPayload = { agreed: false };
 
-function renderConsent({ containerId, payBtnId, productName, extraItems, omitItems }) {
+function renderConsent({ containerId, payBtnId, productName, productKey, approvedHost, extraItems, omitItems }) {
   const baseItems = omitItems && omitItems.length
     ? COMMON_CONSENT_ITEMS.filter((it) => !omitItems.includes(it.title))
     : COMMON_CONSENT_ITEMS;
@@ -215,7 +215,7 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
 
   let hostAckAt = null;
   function refresh() {
-    const modeOk = hostChoice.mode === 'default' || hostChoice.screened === 'pass';
+    const modeOk = hostChoice.mode === 'default' || hostChoice.screened === 'pass' || hostChoice.screened === 'approved';
     const hostOk = !hostBox || (hostBox.checked && modeOk);
     const ok = checkbox.checked && hostOk;
     if (payBtn) payBtn.disabled = !ok;
@@ -244,9 +244,9 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
   }
   function applyChoice(choice) {
     hostChoice = choice;
-    if (choice.mode === 'other' && choice.screened === 'pass') {
+    if (choice.mode === 'other' && (choice.screened === 'pass' || choice.screened === 'approved')) {
       hostChoiceBox.style.display = 'block';
-      hostChoiceBox.innerHTML = '선택한 서비스: <strong>' + escapeCc(choice.service) + '</strong> · 확인 질문을 통과했어요. <button type="button" class="cc-linkbtn" id="cc-rechoose-' + containerId + '">다시 선택</button>';
+      hostChoiceBox.innerHTML = '선택한 서비스: <strong>' + escapeCc(choice.service) + '</strong> · ' + (choice.screened === 'approved' ? '마침이 가능하다고 답변드린 서비스예요.' : '확인 질문을 통과했어요.') + ' <button type="button" class="cc-linkbtn" id="cc-rechoose-' + containerId + '">다시 선택</button>';
       hostLabel.innerHTML = '배포 서비스는 <strong>' + escapeCc(choice.service) + '</strong>로 진행하며, 호스팅·도메인의 <strong>요금제와 약관은 제가 해당 회사와 직접 계약하는 내용</strong>이라는 점을 확인했어요.';
       const rb = document.getElementById('cc-rechoose-' + containerId);
       if (rb) rb.addEventListener('click', openModal);
@@ -262,6 +262,11 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
     else if (r.checked) applyChoice({ mode: 'default' });
   }));
 
+  if (approvedHost && approvedHost.service) {
+    setMode('other');
+    applyChoice({ mode: 'other', screened: 'approved', service: approvedHost.service, inquiry_id: approvedHost.inquiry_id || null, approved_at: new Date().toISOString() });
+  }
+
   function openModal() {
     const bg = document.createElement('div');
     bg.className = 'cc-modal-bg';
@@ -269,7 +274,7 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
     bg.innerHTML = `
       <div class="cc-modal" role="dialog" aria-modal="true">
         <div class="cc-modal-title">다른 배포 서비스, 먼저 확인할게요</div>
-        <p class="cc-modal-desc">마침이 안전하게 진행할 수 있는 범위인지 확인하기 위한 질문이에요. 모르는 부분은 "잘 모르겠어요"를 선택하셔도 돼요.</p>
+        <p class="cc-modal-desc">질문 2개만 답해주세요. 가능 여부는 확인 후 마이페이지로 알려드려요.</p>
         <label class="cc-q-label">1. 어떤 서비스를 쓰고 싶으세요?</label>
         <select id="cc-m-service"><option value="">선택해주세요</option>${hostOptions}<option value="__other">목록에 없어요 (직접 입력)</option></select>
         <input type="text" id="cc-m-service-text" placeholder="서비스 이름 (예: ○○ 호스팅)" style="display:none;margin-top:8px;">
@@ -279,16 +284,6 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
           <label><input type="radio" name="cc-m-collab" value="no"> 없어요</label>
           <label><input type="radio" name="cc-m-collab" value="unknown"> 잘 모르겠어요</label>
         </div>
-        <label class="cc-q-label">3. 사이트에 꼭 필요한 기능이 있나요? (해당되는 것 모두 선택)</label>
-        <div class="cc-checks">
-          <label><input type="checkbox" value="회원가입·로그인"> 회원가입·로그인</label>
-          <label><input type="checkbox" value="결제"> 결제</label>
-          <label><input type="checkbox" value="게시판·글쓰기"> 게시판·글쓰기</label>
-          <label><input type="checkbox" value="자동 실행"> 정해진 시간에 자동으로 돌아가는 기능</label>
-          <label><input type="checkbox" value="none"> 해당 없어요 (소개·안내 위주)</label>
-        </div>
-        <label class="cc-q-label">4. 그 서비스를 원하시는 이유는요?</label>
-        <select id="cc-m-reason"><option value="">선택해주세요</option><option>이미 계약해서 쓰고 있어요</option><option>비용 때문이에요</option><option>익숙해서요</option><option>기타</option></select>
         <div id="cc-m-result" style="display:none;"></div>
         <div class="cc-modal-btns">
           <button type="button" class="cc-btn-ghost" id="cc-m-cancel">취소 (기본 서비스로 진행)</button>
@@ -300,7 +295,7 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
     const close = () => bg.remove();
     q('#cc-m-service').addEventListener('change', (e) => { q('#cc-m-service-text').style.display = e.target.value === '__other' ? 'block' : 'none'; });
     // '해당 없어요'는 다른 기능 선택과 동시에 고를 수 없게
-    const checks = Array.from(bg.querySelectorAll('.cc-checks input'));
+    const checks = [];
     checks.forEach((c) => c.addEventListener('change', () => {
       if (c.checked && c.value === 'none') checks.forEach((o) => { if (o !== c) o.checked = false; });
       else if (c.checked) checks.forEach((o) => { if (o.value === 'none') o.checked = false; });
@@ -312,33 +307,31 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
       const sv = q('#cc-m-service').value;
       const service = sv === '__other' ? q('#cc-m-service-text').value.trim() : sv;
       const collabEl = bg.querySelector('input[name="cc-m-collab"]:checked');
-      const features = checks.filter((c) => c.checked).map((c) => c.value);
-      const reason = q('#cc-m-reason').value;
-      const res = q('#cc-m-result');
-      const missing = !service || !collabEl || !features.length;
+            const res = q('#cc-m-result');
+      const missing = !service || !collabEl;
       if (missing) {
         res.style.display = 'block'; res.className = 'cc-m-res cc-m-bad';
-        res.textContent = '1, 2, 3번 질문에 답해주세요.';
+        res.textContent = '1, 2번 질문에 답해주세요.';
         return;
       }
       const collab = collabEl.value;
       const reasons = [];
       if (!OTHER_HOSTS_ALLOWED.includes(service)) reasons.push('선택하신 서비스는 아직 마침이 바로 진행할 수 있는 목록에 없어서, 먼저 가능 여부를 확인해야 해요.');
       if (collab !== 'yes') reasons.push('공동관리자(협업자) 초대가 확인되어야 해요. 고객님의 비밀번호를 받지 않는 방식이라 꼭 필요한 조건이에요.');
-      const needDyn = features.filter((f) => f !== 'none');
       if (needDyn.length) reasons.push('회원가입·결제·글쓰기·자동 실행 같은 기능이 들어가는 사이트는 기본 서비스에서만 제작해요.');
-      const answers = { service, collaborator_invite: collab, features, reason, answered_at: new Date().toISOString() };
+      const answers = { service, collaborator_invite: collab, answered_at: new Date().toISOString() };
 
       if (!reasons.length) {
         applyChoice(Object.assign({ mode: 'other', screened: 'pass' }, answers));
         close();
         return;
       }
-      const msg = '[배포 서비스 문의] 상품: ' + (productName || '-') + ' / 원하는 서비스: ' + service + ' / 협업자 초대: ' + ({ yes: '있음', no: '없음', unknown: '모름' }[collab]) + ' / 필요 기능: ' + features.map((f) => f === 'none' ? '없음' : f).join(', ') + ' / 이유: ' + (reason || '-');
+      const msg = '[배포 서비스 문의]\n상품: ' + (productName || '-') + '\n원하는 서비스: ' + service + '\n협업자 초대: ' + ({ yes: '가능', no: '어려움', unknown: '모르겠음' }[collab]) + '\n\n[추가로 알려주실 내용]\n- 이 서비스를 쓰려는 이유:\n- 꼭 필요한 기능(회원가입·결제 등):\n- 그 밖에 궁금하신 점:';
+      const link = 'contact.html?host=1&p=' + encodeURIComponent(productKey || '') + '&msg=' + encodeURIComponent(msg);
       res.style.display = 'block'; res.className = 'cc-m-res cc-m-bad';
-      res.innerHTML = '<strong>지금은 바로 결제로 진행하기 어려워요.</strong><ul>' + reasons.map((r) => '<li>' + r + '</li>').join('') + '</ul>' +
-        '<div class="cc-m-res-btns"><button type="button" class="cc-btn-main" id="cc-m-default">기본 서비스로 진행할게요</button> <a class="cc-btn-ghost" href="contact.html?host=1&msg=' + encodeURIComponent(msg) + '" style="text-decoration:none;display:inline-block;">이 서비스로 가능한지 문의하기</a></div>' +
-        '<div style="font-size:12px;margin-top:6px;color:#8a5a4a;">문의하시면 위 답변이 그대로 전달돼서 따로 다시 설명하실 필요가 없어요.</div>';
+      res.innerHTML = '<strong>다른 서비스는 가능 여부를 먼저 확인해야 해요.</strong>' +
+        '<div style="font-size:13px;margin-top:6px;">문의를 남겨주시면 확인 후 <b>마이페이지 → 내 문의</b>로 답변드려요. 가능하면 거기서 바로 결제하실 수 있어요. (로그인이 필요해요)</div>' +
+        '<div class="cc-m-res-btns"><button type="button" class="cc-btn-main" id="cc-m-default">기본 서비스로 진행할게요</button> <a class="cc-btn-ghost" href="' + link + '" style="text-decoration:none;display:inline-block;">이 서비스로 문의하기</a></div>';
       q('#cc-m-check').style.display = 'none';
       q('#cc-m-default').addEventListener('click', () => { setMode('default'); applyChoice({ mode: 'default' }); close(); });
     });

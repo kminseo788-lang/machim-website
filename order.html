@@ -352,7 +352,17 @@
     document.getElementById('goLogin').href = 'mypage-login.html?next=order.html';
     if(currentUser){
       document.getElementById('custEmail').value = currentUser.email;
-      renderConsent({ containerId:'consentBox', payBtnId:'payBtn', productName: PRODUCTS[state.key].name });
+      var approvedHost = null;
+      try{
+        var inqId = new URLSearchParams(location.search).get('inq');
+        if(inqId){
+          var ir = await sb.from('machim_inquiries').select('id,product_key,host_service,payable').eq('id', inqId).maybeSingle();
+          if(ir.data && ir.data.payable && ir.data.host_service && ir.data.product_key === state.key){
+            approvedHost = { service: ir.data.host_service, inquiry_id: ir.data.id };
+          }
+        }
+      }catch(e){ console.error(e); }
+      renderConsent({ containerId:'consentBox', payBtnId:'payBtn', productName: PRODUCTS[state.key].name, productKey: state.key, approvedHost: approvedHost });
     }
   }
 

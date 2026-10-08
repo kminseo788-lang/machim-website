@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>맞춤 자동화 문의 | 1마침</title>
+<title>문의하기 | 1마침</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -83,66 +83,40 @@
 
 <div class="container">
   <div class="head">
-    <h1>맞춤 자동화 문의</h1>
-    <p>경쟁사 가격·재고 모니터링, 공고·지원사업 모니터링, 엑셀 자동화, 문의 분류, 홈페이지 기본형은 <a href="index.html#catalog" style="color:var(--brick);">카탈로그에서 바로 일정을 확인하고 결제</a>하실 수 있습니다. 그 외 표준상품에 없는 방식이 필요하시면 아래 내용을 남겨주세요. 순차적으로 검토하다 보니 회신까지 영업일 기준 1~2일 정도 걸릴 수 있습니다.</p>
+    <h1>문의하기</h1>
+    <p id="headDesc">할 수 있는 상품은 <a href="order.html" style="color:var(--brick);">상품 선택 화면</a>에서 바로 결제하실 수 있어요. 결제 전에 확인하고 싶은 게 있으시면 아래에 편하게 남겨주세요.</p>
+  </div>
+
+  <div class="confirm" id="needLogin" style="display:none;padding:30px 0 60px;text-align:left;">
+    <div style="background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:22px;">
+      <h2 style="font-size:19px;margin-bottom:10px;">로그인(회원가입) 후 문의를 남겨주세요</h2>
+      <p style="font-size:14px;">남겨주신 문의의 <b>답변은 마이페이지 → 내 문의</b>에서 확인하실 수 있어요. 가능하다는 답변이 오면 같은 화면에서 바로 결제로 이어져요. 쓰던 내용은 로그인 후 그대로 이어집니다.</p>
+      <a href="mypage-login.html?next=contact.html" id="goLoginInq" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">로그인 / 회원가입하고 이어서 쓰기</a>
+    </div>
   </div>
 
   <form id="consultForm">
-
     <div class="field-group">
-      <label class="q">지금 가장 없애고 싶은 반복 업무는 무엇인가요?</label>
-      <div class="options" id="taskOptions">
-        <label class="opt"><input type="radio" name="task" value="사이트 확인/검색">사이트 확인/검색</label>
-        <label class="opt"><input type="radio" name="task" value="Excel/문서 작업">Excel/문서 작업</label>
-        <label class="opt"><input type="radio" name="task" value="고객 문의/상담">고객 문의/상담</label>
-        <label class="opt"><input type="radio" name="task" value="고객 관리">고객 관리</label>
-        <label class="opt"><input type="radio" name="task" value="자료 수집/정리">자료 수집/정리</label>
-        <label class="opt"><input type="radio" name="task" value="알림/보고">알림/보고</label>
-      </div>
-      <label class="opt" style="margin-top:10px;">
-        <input type="radio" name="task" value="기타" id="taskEtcRadio">기타 (직접 입력)
-      </label>
-      <input type="text" id="taskEtc" placeholder="어떤 업무인지 적어주세요" style="margin-top:10px;display:none;">
+      <label class="q">궁금하신 점, 원하시는 것을 편하게 적어주세요</label>
+      <div class="hint">아래 틀을 지우거나 고쳐서 쓰셔도 돼요. 모르는 부분은 비워두셔도 괜찮아요.</div>
+      <textarea name="scope" id="memo" style="min-height:240px;" required></textarea>
     </div>
 
-    <div class="field-group">
-      <label class="q">지금 그 일을 얼마나 자주 하시나요?</label>
-      <div class="options">
-        <label class="opt"><input type="radio" name="freq" value="매일">매일</label>
-        <label class="opt"><input type="radio" name="freq" value="매주 몇 번">매주 몇 번</label>
-        <label class="opt"><input type="radio" name="freq" value="한 달에 몇 번">한 달에 몇 번</label>
-        <label class="opt"><input type="radio" name="freq" value="비정기적">비정기적</label>
-      </div>
-    </div>
-
-    <div class="field-group">
-      <label class="q">현재 어떤 사이트/프로그램을 사용하고 계신가요? (선택)</label>
-      <div class="hint">예: 스마트스토어, 나라장터, 엑셀, 카카오톡 채널 등</div>
-      <input type="text" placeholder="사용 중인 사이트/프로그램" name="tools">
-    </div>
-
-    <div class="field-group">
-      <label class="q">자동화되면 어디까지 되었으면 하나요? (선택)</label>
-      <textarea name="scope" placeholder="예: 매일 아침 가격이 바뀌면 카톡으로 알려줬으면 좋겠어요"></textarea>
-    </div>
-
-    <div class="field-group">
-      <label class="q">참고 화면·엑셀·문서가 있다면 첨부해주세요 (선택)</label>
-      <div class="file-drop">파일을 여기로 드래그하거나 클릭해서 첨부하세요</div>
-    </div>
-
-    <div class="field-group">
+    <div class="field-group" id="guestBox">
       <label class="q">연락 받으실 정보</label>
       <div class="row2" style="margin-bottom:12px;">
-        <input type="text" placeholder="이름" name="name" required>
-        <input type="tel" placeholder="연락처" name="phone" required>
+        <input type="text" placeholder="이름" name="name">
+        <input type="tel" placeholder="연락처" name="phone">
       </div>
       <input type="email" placeholder="이메일 (선택)" name="email">
+    </div>
+    <div class="field-group" id="memberBox" style="display:none;font-size:14px;color:var(--ink-soft);">
+      <span id="memberEmail"></span> 계정으로 접수돼요. 답변은 마이페이지 → 내 문의에서 확인하세요.
     </div>
 
     <label class="consent">
       <input type="checkbox" required>
-      개인정보 수집·이용에 동의합니다. 상담 응대 목적으로만 사용하며 처리 완료 후 파기됩니다. <a href="privacy.html">자세히 보기</a>
+      개인정보 수집·이용에 동의합니다. 문의 응대 목적으로만 사용하며 처리 완료 후 파기됩니다. <a href="privacy.html">자세히 보기</a>
     </label>
 
     <button type="submit" class="submit-btn">문의 남기기</button>
@@ -151,75 +125,78 @@
   <div class="confirm" id="confirmBox">
     <div class="stamp-icon">접수<br>완료</div>
     <h2>문의가 접수되었습니다</h2>
-    <p>순차적으로 검토 후 영업일 기준 1~2일 내에 남겨주신 연락처로 안내드리겠습니다.</p>
-    <p style="margin-top:14px;"><a href="check.html" style="color:var(--brick);text-decoration:underline;">여기서 답변 확인하기 →</a></p>
+    <p id="confirmMember" style="display:none;">순차적으로 확인 후 <b>마이페이지 → 내 문의</b>에 답변을 남겨드려요.</p>
+    <p id="confirmGuest">순차적으로 검토 후 영업일 기준 1~2일 내에 남겨주신 연락처로 안내드리겠습니다.</p>
+    <p style="margin-top:14px;"><a href="mypage-project.html" id="confirmLink" style="color:var(--brick);text-decoration:underline;">마이페이지에서 확인하기 →</a></p>
   </div>
 </div>
 
 <script>
-  const taskEtcRadio = document.getElementById('taskEtcRadio');
-  const taskEtc = document.getElementById('taskEtc');
-  document.querySelectorAll('input[name=task]').forEach(r=>{
-    r.addEventListener('change', ()=>{
-      taskEtc.style.display = taskEtcRadio.checked ? 'block' : 'none';
-    });
-  });
+(function(){
+  var q = new URLSearchParams(location.search);
+  var isHost = q.get('host') === '1';
+  var pKey = q.get('p') || '';
+  var TEMPLATE = '[원하는 것]\n\n[서버/도메인 계획]\n\n[꼭 필요한 기능]\n\n[참고하는 사이트]\n\n[희망 시작 시기 / 예산]\n';
+  var memo = document.getElementById('memo');
+  var msg = q.get('msg');
+  try{
+    if(msg){ sessionStorage.setItem('machim_inq_msg', msg); sessionStorage.setItem('machim_inq_p', pKey); }
+    else { msg = sessionStorage.getItem('machim_inq_msg'); if(!pKey) pKey = sessionStorage.getItem('machim_inq_p') || ''; }
+  }catch(e){}
+  memo.value = msg || TEMPLATE;
+  var user = null;
 
-  document.querySelectorAll('.opt').forEach(opt=>{
-    const input = opt.querySelector('input');
-    input.addEventListener('change', ()=>{
-      document.querySelectorAll(`input[name=${input.name}]`).forEach(i=>{
-        i.closest('.opt')?.classList.remove('checked');
-      });
-      opt.classList.add('checked');
-    });
-  });
+  (async function(){
+    try{ var r = await sb.auth.getSession(); user = r.data && r.data.session ? r.data.session.user : null; }catch(e){}
+    if(user){
+      document.getElementById('guestBox').style.display = 'none';
+      document.getElementById('memberBox').style.display = 'block';
+      document.getElementById('memberEmail').textContent = user.email;
+    } else if(isHost){
+      document.getElementById('needLogin').style.display = 'block';
+      document.getElementById('consultForm').style.display = 'none';
+    }
+  })();
 
-  document.getElementById('consultForm').addEventListener('submit', async (e)=>{
+  document.getElementById('consultForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    const form = e.target;
-    const submitBtn = form.querySelector('.submit-btn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = '접수 중…';
-
-    const taskChecked = form.querySelector('input[name=task]:checked');
-    const task_type = taskChecked ? (taskChecked.value === '기타' ? (taskEtc.value.trim() || '기타') : taskChecked.value) : null;
-    const freqChecked = form.querySelector('input[name=freq]:checked');
-
-    const payload = {
-      name: form.name.value.trim(),
-      phone: form.phone.value.trim(),
-      email: form.email.value.trim() || null,
-      task_type: task_type,
-      frequency: freqChecked ? freqChecked.value : null,
-      tools: form.tools.value.trim() || null,
-      scope: form.scope.value.trim() || null,
+    var form = e.target;
+    var btn = form.querySelector('.submit-btn');
+    btn.disabled = true; btn.textContent = '접수 중…';
+    var text = memo.value.trim();
+    var m = text.match(/원하는 서비스:\s*(.+)/);
+    var hostService = m ? m[1].trim() : null;
+    var payload = {
+      scope: text,
+      task_type: isHost ? '배포 서비스 문의' : '문의',
+      product_key: pKey || null,
+      host_service: hostService
     };
-
+    if(user){
+      payload.customer_id = user.id;
+      payload.email = user.email;
+      payload.name = (user.user_metadata && user.user_metadata.name) || user.email.split('@')[0];
+      payload.phone = '-';
+    } else {
+      payload.name = form.name.value.trim();
+      payload.phone = form.phone.value.trim();
+      payload.email = form.email.value.trim() || null;
+      if(!payload.name || !payload.phone){ btn.disabled = false; btn.textContent = '문의 남기기'; alert('이름과 연락처를 입력해주세요.'); return; }
+    }
     try{
-      const { error } = await sb.from('machim_inquiries').insert(payload);
-      if(error) throw error;
+      var res = await sb.from('machim_inquiries').insert(payload);
+      if(res.error) throw res.error;
+      try{ sessionStorage.removeItem('machim_inq_msg'); sessionStorage.removeItem('machim_inq_p'); }catch(e){}
       form.style.display = 'none';
       document.getElementById('confirmBox').classList.add('show');
+      if(user){ document.getElementById('confirmMember').style.display = 'block'; document.getElementById('confirmGuest').style.display = 'none'; }
+      else { document.getElementById('confirmLink').href = 'check.html'; document.getElementById('confirmLink').textContent = '여기서 답변 확인하기 →'; }
     }catch(err){
       console.error(err);
-      submitBtn.disabled = false;
-      submitBtn.textContent = '문의 남기기';
+      btn.disabled = false; btn.textContent = '문의 남기기';
       alert('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   });
-</script>
-
-<script>
-(function(){
-  try{
-    var q = new URLSearchParams(location.search);
-    var msg = q.get('msg'); if(!msg) return;
-    var ta = document.querySelector('textarea[name="scope"]'); if(ta) ta.value = msg;
-    var etc = document.getElementById('taskEtcRadio');
-    if(etc){ etc.checked = true; etc.dispatchEvent(new Event('change', { bubbles:true })); }
-    var te = document.getElementById('taskEtc'); if(te){ te.style.display = 'block'; te.value = '배포 서비스 문의'; }
-  }catch(e){}
 })();
 </script>
 </body>

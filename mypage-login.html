@@ -187,7 +187,7 @@
     }catch(e){ console.error(e); }
     // 주문 페이지에서 로그인하러 온 경우 주문 화면으로 되돌려 보냄 (허용된 주소만)
     var next = new URLSearchParams(location.search).get('next');
-    location.href = (next === 'order.html') ? 'order.html' : 'mypage-project.html';
+    location.href = (next === 'order.html') ? 'order.html' : (next === 'contact.html') ? 'contact.html?host=1&resume=1' : 'mypage-project.html';
   }
 
   document.getElementById('authForm').addEventListener('submit', async (e)=>{
