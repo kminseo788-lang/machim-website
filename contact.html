@@ -210,5 +210,17 @@
   });
 </script>
 
+<script>
+(function(){
+  try{
+    var q = new URLSearchParams(location.search);
+    var msg = q.get('msg'); if(!msg) return;
+    var ta = document.querySelector('textarea[name="scope"]'); if(ta) ta.value = msg;
+    var etc = document.getElementById('taskEtcRadio');
+    if(etc){ etc.checked = true; etc.dispatchEvent(new Event('change', { bubbles:true })); }
+    var te = document.getElementById('taskEtc'); if(te){ te.style.display = 'block'; te.value = '배포 서비스 문의'; }
+  }catch(e){}
+})();
+</script>
 </body>
 </html>

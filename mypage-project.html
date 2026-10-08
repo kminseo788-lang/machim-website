@@ -340,15 +340,14 @@
 
     else if(stage === '방향서승인대기'){
       const b = project.direction_brief || {};
+      const BRIEF_LABELS = [['purpose','목적·대상'],['pages','페이지 구성'],['features','들어가는 기능'],['color','색상/디자인 톤'],['images','이미지·사진'],['texts','문구·글'],['excluded','포함되지 않는 사항'],['customer_prep','고객님이 준비하실 것'],['schedule','예상 일정'],['revisions','수정 범위'],['extra','기타 확인사항']];
       box.innerHTML = `
         <p class="desc">아래 내용으로 제작 방향을 안내드려요. 확인 후 승인해주시면 디자인 시안 작업을 시작합니다.\n내용 수정이 필요하면 수정요청을 남겨주세요.</p>
         <div id="deliverFiles"></div>
         <div class="brief-box">
-          ${b.purpose ? `<div><b>목적</b>${escapeHtml(b.purpose)}</div>`:''}
-          ${b.pages ? `<div><b>페이지 구성</b>${escapeHtml(b.pages)}</div>`:''}
-          ${b.color ? `<div><b>색상/톤</b>${escapeHtml(b.color)}</div>`:''}
-          ${b.excluded ? `<div><b>포함 안 되는 사항</b>${escapeHtml(b.excluded)}</div>`:''}
+          ${BRIEF_LABELS.map(([k,l]) => b[k] ? `<div style="margin-bottom:10px;white-space:pre-line;"><b style="display:block;">${l}</b>${escapeHtml(b[k])}</div>` : '').join('')}
         </div>
+        <p class="desc" style="font-size:12.5px;">이 방향서에 적힌 내용이 제작 범위의 기준이에요. 승인해주시면 이 내용대로 진행하고, 승인 후 범위를 벗어나는 변경은 수정 횟수와 추가 비용 기준에 따라요. 다르게 이해하신 부분은 승인 전에 알려주세요.</p>
         <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
         <div class="btn-row">
           <button class="btn btn-primary" id="approveBtn">위 내용으로 제작을 승인합니다</button>
@@ -434,6 +433,7 @@
       box.innerHTML = `
         <p class="desc">배포가 완료되었습니다. 그동안 이용해주셔서 감사합니다!</p>
         ${project.live_url ? `<a class="view-link" href="${escapeHtml(project.live_url)}" target="_blank" rel="noopener">사이트 바로가기 →</a>` : ''}
+        ${project.source_repo_url ? `<div style="font-size:13px;color:var(--ink-soft);">소스코드는 고객님 저장소에 전달했어요: <a class="view-link" href="${escapeHtml(project.source_repo_url)}" target="_blank" rel="noopener">${escapeHtml(project.source_repo_url)}</a></div>` : ''}
       `;
     }
 

@@ -679,8 +679,13 @@
     return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
+  const BRIEF_FIELDS = [{"k": "purpose", "label": "목적·대상", "ph": "예: 작가 본인의 전자책을 소개하고 구매 페이지로 연결하는 개인 브랜드 사이트. 방문자는 책에 관심 있는 독자.", "def": ""}, {"k": "pages", "label": "페이지 구성", "ph": "페이지 이름과 핵심 내용을 한 줄씩 (예: 메인 / 책 소개 / 작가 소개 / 문의)", "def": ""}, {"k": "features", "label": "들어가는 기능", "ph": "예: 문의 폼 1개, 외부 구매 링크 버튼, 모바일 대응", "def": ""}, {"k": "color", "label": "색상/디자인 톤", "ph": "예: 초록 계열, 차분하고 따뜻한 느낌, 이름과 책 제목을 크게", "def": ""}, {"k": "images", "label": "이미지·사진", "ph": "", "def": "고객님이 보내주신 이미지를 우선 사용합니다. 제공되지 않은 이미지는 마침이 사용 가능한 이미지로 대체하며, 스타일은 [실사 / 일러스트 / 애니메이션 중 선택]으로 통일합니다."}, {"k": "texts", "label": "문구·글", "ph": "", "def": "고객님이 제공한 문구를 기본으로 사용합니다. 제공되지 않은 문구는 마침이 짧은 안내 문구 범위에서 작성하며, 긴 글·상세 설명·번역은 포함하지 않습니다."}, {"k": "excluded", "label": "포함되지 않는 사항", "ph": "", "def": "이 방향서에 적히지 않은 기능·페이지는 제작 범위에 포함되지 않습니다. (예: 다국어, 회원가입·결제, 관리자 화면, 검색엔진 최적화(SEO) 작업, 사진·영상 촬영)"}, {"k": "customer_prep", "label": "고객이 준비할 것", "ph": "예: 프로필 사진, 소개글, 로고, 도메인·호스팅 계정(고객 명의)", "def": ""}, {"k": "schedule", "label": "예상 일정", "ph": "예: 자료 제출 완료 후 O영업일 이내 시안 전달, 승인 후 O영업일 이내 개발 완료", "def": ""}, {"k": "revisions", "label": "수정 범위", "ph": "", "def": "상품에 명시된 수정 횟수 안에서 진행합니다. 방향서 승인 후 범위를 벗어나는 변경은 추가 비용과 일정 연장이 발생할 수 있습니다."}, {"k": "extra", "label": "기타 확인사항", "ph": "선택 입력", "def": ""}];
+  function briefFormHtml(){
+    return BRIEF_FIELDS.map(f => `<div style="margin-bottom:6px;"><div style="font-size:12px;font-weight:700;color:var(--ink-faint);margin-bottom:2px;">${f.label}</div><textarea data-field="${f.k}" placeholder="${f.ph}" style="width:100%;min-height:${f.def?'64':'40'}px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;font-size:13px;">${f.def ? escapeHtmlA(f.def) : ''}</textarea></div>`).join('');
+  }
+
   function deliverInputHtml(){
-    return `<div style="margin:2px 0 10px;"><div style="font-size:12.5px;color:var(--ink-faint);margin-bottom:4px;">파일 첨부 (PDF·이미지 등, 최대 10개, 파일당 10MB · 선택사항)</div><input type="file" multiple data-deliver-files style="font-size:13px;width:100%;"></div>`;
+    return `<div style="margin:2px 0 10px;"><div style="font-size:12.5px;color:var(--ink-faint);margin-bottom:4px;">파일 첨부 (PDF·이미지 등, 최대 10개, 파일당 10MB · 선택사항)</div><input type="file" multiple data-deliver-files style="font-size:13px;width:100%;"><div data-deliver-list style="font-size:12.5px;margin-top:6px;"></div></div>`;
   }
 
   function projectCardHtml(p){
@@ -692,10 +697,7 @@
     }
     else if(p.current_stage === '방향서대기'){
       actionHtml = `
-        <textarea data-field="purpose" placeholder="목적 (예: 전자책 판매 + 작가 소개)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
-        <textarea data-field="pages" placeholder="페이지 구성 (예: 메인, 작품 목록, 작가 소개, 문의)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
-        <textarea data-field="color" placeholder="색상/디자인 톤 (예: 베이지+그린, 차분한 느낌)" style="width:100%;min-height:36px;margin-bottom:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
-        <textarea data-field="excluded" placeholder="포함되지 않는 사항 (예: 다국어 지원 제외)" style="width:100%;min-height:36px;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;"></textarea>
+        ${briefFormHtml()}
         ${deliverInputHtml()}
         <button class="save-btn" data-action="sendBrief" data-id="${p.id}">방향서 올리기 (고객 승인 요청)</button>
       `;
@@ -727,6 +729,7 @@
     else if(p.current_stage === '배포완료' && !p.deployed_at){
       actionHtml = `
         <input type="text" data-field="live_url" placeholder="실제 배포된 사이트 주소" style="width:100%;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
+        <input type="text" data-field="source_repo_url" placeholder="소스코드를 올린 고객 GitHub 저장소 주소 (선택)" style="width:100%;margin-bottom:8px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;">
         <button class="save-btn" data-action="deploy" data-id="${p.id}">배포완료 처리</button>
       `;
     }
@@ -775,10 +778,7 @@
     const bodyStyle = 'padding:2px 14px 12px;font-size:13.5px;line-height:1.7;';
     const row = (label, html)=> html ? `<div style="margin-top:8px;"><div style="font-size:12px;color:var(--ink-faint);font-weight:700;">${label}</div><div style="white-space:pre-line;">${html}</div></div>` : '';
     const brief = p.direction_brief || null;
-    const briefHtml = brief ? [
-      row('목적', escapeHtmlA(brief.purpose)), row('페이지 구성', escapeHtmlA(brief.pages)),
-      row('색상/톤', escapeHtmlA(brief.color)), row('포함 안 되는 사항', escapeHtmlA(brief.excluded))
-    ].join('') : '';
+    const briefHtml = brief ? BRIEF_FIELDS.map(f => row(f.label, escapeHtmlA(brief[f.k]))).join('') : '';
     const hasDeliver = (st)=> (p.deliver_files || []).some(f => f.stage === st);
     const slot = (st)=> hasDeliver(st) ? `<div style="margin-top:8px;"><div style="font-size:12px;color:var(--ink-faint);font-weight:700;">첨부 파일</div><div data-dstage="${p.id}|${st}">불러오는 중…</div></div>` : '';
 
@@ -804,6 +804,7 @@
           ${brief || hasDeliver('방향서') ? `<div style="margin-top:6px;font-weight:800;">방향서 ${sentBrief ? '<span style="font-weight:400;color:var(--ink-faint);">· ' + fmtDT(sentBrief) + ' 발송</span>' : ''} ${p.direction_approved_at ? '<span style="font-weight:400;color:#3B6B45;">· ' + fmtDT(evAt('고객 방향서 승인') || p.direction_approved_at) + ' 고객 승인</span>' : '<span style="font-weight:400;color:var(--ink-faint);">· 승인 대기</span>'}</div>${briefHtml}${slot('방향서')}` : ''}
           ${(p.prototype_url || p.prototype_note || hasDeliver('프로토타입')) ? `<div style="margin-top:12px;font-weight:800;">시안 ${sentProto ? '<span style="font-weight:400;color:var(--ink-faint);">· ' + fmtDT(sentProto) + ' 발송</span>' : ''} ${p.prototype_approved_at ? '<span style="font-weight:400;color:#3B6B45;">· ' + fmtDT(evAt('고객 시안 승인') || p.prototype_approved_at) + ' 고객 승인</span>' : '<span style="font-weight:400;color:var(--ink-faint);">· 승인 대기</span>'}</div>${row('링크', p.prototype_url ? `<a href="${escapeHtmlA(p.prototype_url)}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(p.prototype_url)}</a>` : '')}${row('전달 메모', escapeHtmlA(p.prototype_note))}${slot('프로토타입')}` : ''}
           ${(p.final_preview_url || hasDeliver('최종')) ? `<div style="margin-top:12px;font-weight:800;">최종 결과물 ${sentFinal ? '<span style="font-weight:400;color:var(--ink-faint);">· ' + fmtDT(sentFinal) + ' 발송</span>' : ''} ${p.final_approved_at ? '<span style="font-weight:400;color:#3B6B45;">· ' + fmtDT(evAt('고객 최종 승인') || p.final_approved_at) + ' 고객 승인</span>' : '<span style="font-weight:400;color:var(--ink-faint);">· 승인 대기</span>'}</div>${row('링크', p.final_preview_url ? `<a href="${escapeHtmlA(p.final_preview_url)}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(p.final_preview_url)}</a>` : '')}${slot('최종')}` : ''}
+          ${p.source_repo_url ? `<div style="margin-top:12px;font-weight:800;">소스코드 전달</div>${row('고객 저장소', `<a href="${escapeHtmlA(p.source_repo_url)}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(p.source_repo_url)}</a>`)}` : ''}
           ${p.live_url ? `<div style="margin-top:12px;font-weight:800;">배포 ${p.deployed_at ? '<span style="font-weight:400;color:#3B6B45;">· ' + fd(p.deployed_at) + ' 완료</span>' : ''}</div>${row('사이트 주소', `<a href="${escapeHtmlA(p.live_url)}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(p.live_url)}</a>`)}` : ''}
         </div>
       </details>`;
@@ -863,6 +864,30 @@
       m.style.display='block'; m.style.color = ok ? 'var(--green)' : 'var(--brick)'; m.textContent = text;
     };
 
+    // 첨부 파일 선택: 고를 때마다 목록에 쌓이고, 개별 삭제 가능
+    let pickedDeliver = [];
+    const dInput = card.querySelector('[data-deliver-files]');
+    const dList = card.querySelector('[data-deliver-list]');
+    const renderDeliver = ()=>{
+      if(!dList) return;
+      dList.innerHTML = pickedDeliver.map((f,i) =>
+        '<div style="display:flex;gap:8px;align-items:center;padding:2px 0;"><span style="flex:1;word-break:break-all;">' + escapeHtmlA(f.name) + ' (' + (f.size/1024/1024).toFixed(1) + 'MB)</span>' +
+        '<button type="button" data-drm="' + i + '" style="border:1px solid var(--line);background:#fff;border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;">삭제</button></div>'
+      ).join('') + (pickedDeliver.length ? '<div style="margin-top:4px;color:var(--ink-faint);">' + pickedDeliver.length + '/10개 선택됨 · 파일 선택을 다시 누르면 추가돼요</div>' : '');
+    };
+    if(dList) dList.addEventListener('click', (e)=>{ const b = e.target.closest('[data-drm]'); if(!b) return; pickedDeliver.splice(Number(b.dataset.drm),1); renderDeliver(); });
+    if(dInput) dInput.addEventListener('change', ()=>{
+      const skipped = [];
+      Array.from(dInput.files || []).forEach(f=>{
+        if(pickedDeliver.some(x => x.name===f.name && x.size===f.size && x.lastModified===f.lastModified)) return;
+        if(pickedDeliver.length >= 10){ skipped.push(f.name); return; }
+        pickedDeliver.push(f);
+      });
+      dInput.value = '';
+      renderDeliver();
+      if(skipped.length) dList.insertAdjacentHTML('beforeend', '<div style="margin-top:6px;padding:8px 10px;border-radius:8px;background:#fdf1ec;color:#a4432a;">최대 10개까지라 담기지 않은 파일: ' + skipped.map(escapeHtmlA).join(', ') + '</div>');
+    });
+
     const exp = card.querySelector('[data-export]');
     if(exp) exp.addEventListener('click', ()=>{
       const payload = { exported_at: new Date().toISOString(), project: p, events: projectEvents[p.id] || [] };
@@ -878,7 +903,7 @@
     btn.addEventListener('click', async ()=>{
       const action = btn.dataset.action;
       let update = {};
-      const picked = Array.from((card.querySelector('[data-deliver-files]') || {}).files || []);
+      const picked = pickedDeliver.slice();
       const stageTag = { sendBrief:'방향서', sendPrototype:'프로토타입', sendFinal:'최종' }[action];
       if(picked.length > 10){ showCardMsg('첨부파일은 최대 10개까지 올릴 수 있어요.'); return; }
       const big = picked.find(f => f.size > 10*1024*1024);
@@ -897,8 +922,9 @@
         return out;
       };
       if(action === 'sendBrief'){
-        const brief = { purpose: getField('purpose'), pages: getField('pages'), color: getField('color'), excluded: getField('excluded') };
-        if(!brief.purpose && !brief.pages && !brief.color && !brief.excluded && !picked.length){ showCardMsg('방향서 내용을 적거나 파일을 첨부해주세요.'); return; }
+        const brief = {};
+        BRIEF_FIELDS.forEach(f => { brief[f.k] = getField(f.k); });
+        if((!brief.purpose || !brief.pages) && !picked.length){ showCardMsg('목적·대상과 페이지 구성은 꼭 적어주세요. (또는 방향서 파일을 첨부해주세요)'); return; }
         update = { direction_brief: brief, current_stage: '방향서승인대기' };
       } else if(action === 'sendPrototype'){
         const url = getField('prototype_url');
@@ -912,6 +938,7 @@
         const url = getField('live_url');
         if(!url){ showCardMsg('배포 주소를 입력해주세요.'); return; }
         update = { live_url: url, deployed_at: new Date().toISOString() };
+        const repo = getField('source_repo_url'); if(repo) update.source_repo_url = repo;
       }
       btn.disabled = true;
       if(stageTag && picked.length){

@@ -21,11 +21,14 @@
        // orders.insert(...) 의 options 필드 등에 consent 를 같이 저장
    ========================================================= */
 
-const CONSENT_VERSION = '2026-10-08';
+const CONSENT_VERSION = '2026-10-08d';
 
 // 1마침이 기본으로 안내하는 배포(호스팅) 서비스. 서비스를 바꾸고 싶으면 이 한 줄만 고치면
 // 동의 문구에 반영됩니다. (terms.html, guide-hosting-domain.html 의 문구도 같이 확인하세요)
 const DEFAULT_HOSTING_NAME = 'Cloudflare Pages';
+// 기본 서비스 외에 '결제 전에 바로 진행'을 허용할 서비스 목록. 마침이 직접 구축·운영해본 서비스만 넣으세요.
+// 비어 있으면 다른 서비스 요청은 모두 '문의 접수'로 안내됩니다. 예) ['GitHub Pages']
+const OTHER_HOSTS_ALLOWED = [];
 const HOSTING_ITEM_TITLE = '도메인 · 서버(호스팅) 안내';
 
 // 모든 상품 공통 유의사항 (서버/도메인 정책: 호스팅 계정·도메인은 고객이 직접 가입/구매)
@@ -36,7 +39,7 @@ const COMMON_CONSENT_ITEMS = [
       <ul>
         <li>사이트가 실제로 돌아가는 <strong>호스팅 계정과 도메인은 고객님 명의로 직접 만들고 소유</strong>하세요. 그래야 사이트가 온전히 고객님의 것이 되고, 저(1마침)와 계약이 끝난 뒤에도 언제든 직접 관리하거나 다른 곳에 맡기실 수 있어요.</li>
         <li><strong>고객님의 아이디·비밀번호는 받지 않아요.</strong> 계정에 <strong>공동관리자(협업자)로 초대</strong>해주시면 그 권한 안에서만 작업해요. 고객님의 개인정보를 지키기 위한 방식이에요.</li>
-        <li>배포 서비스는 <strong>${DEFAULT_HOSTING_NAME}</strong>로 통일해서 제작해요. 모든 고객님께 같은 방식으로 만들어야 일정과 품질을 안정적으로 지킬 수 있기 때문이에요. 다른 서비스를 원하시면 <strong>결제 전에</strong> 문의해주세요. 가능 여부와 추가 비용을 안내드려요. 결제 후에 바꾸시는 경우는 별도 유지보수(유료)로 진행돼요.</li>
+        <li>배포 서비스는 <strong>${DEFAULT_HOSTING_NAME}</strong>로 통일해서 제작해요. 모든 고객님께 같은 방식으로 만들어야 일정과 품질을 안정적으로 지킬 수 있기 때문이에요. 다른 서비스를 원하시면 <strong>결제 전에</strong> 문의해주세요. 가능 여부와 추가 비용을 안내드려요. 결제 화면에서 다른 서비스를 선택하시면 몇 가지 확인 질문에 답해주셔야 하고, <strong>마침이 진행할 수 있는 범위일 때만</strong> 결제로 넘어가요. 혹시 결제 후에 그 서비스로 만들기 어려운 사정이 확인되면 기본 서비스로 진행하시거나 전액 환불받으실 수 있어요. 제작이 끝난 뒤에 서비스를 바꾸는 것은 별도 유지보수(유료)로 진행돼요.</li>
         <li>호스팅·도메인의 <strong>요금제, 사용량 한도, 갱신 비용</strong>은 고객님이 해당 회사와 직접 맺는 계약이라 그 회사의 약관과 요금표가 적용돼요. 제가 대신 정하거나 바꿀 수 없는 부분이라, 가입하실 때 요금제를 꼭 확인해주세요. 나중에 예상치 못한 요금으로 서로 곤란해지는 일을 막기 위해 미리 분명히 해두는 내용이에요.</li>
         <li>상품·서비스 판매나 광고 수익처럼 <strong>영리 목적으로 운영</strong>하신다면, 선택한 요금제가 영리 이용을 허용하는지 가입할 때 함께 확인해주세요. 서비스 회사의 정책은 바뀔 수 있고, 바뀐 뒤의 요금이나 제한은 그 회사의 기준이 적용돼요.</li>
         <li>호스팅 회사의 장애·정책 변경·계정 정지 등으로 사이트가 멈추거나 옮겨야 할 때는, 복구·이전 작업을 별도 유지보수로 도와드려요. 비용과 일정은 건별로 협의해요.</li>
@@ -65,6 +68,7 @@ const COMMON_CONSENT_ITEMS = [
         <li>안내된 제작 기간은 필요한 자료를 모두 받은 <strong>착수일부터 세는 예상 일정</strong>이에요.</li>
         <li>자료 제출이나 확인·승인이 늦어지거나, 기본 범위를 넘는 수정을 요청하시면 <strong>그만큼 일정이 뒤로 밀려요.</strong> 서로 일정을 정확히 맞추기 위해 미리 안내드리는 내용이에요.</li>
         <li>마침 쪽 사정으로 안내한 기간보다 늦어질 것 같으면 <strong>먼저 알려드리고</strong>, 새 일정으로 계속 진행할지 계약을 끝낼지 고객님이 선택하실 수 있어요. 마침 쪽 사유로 늦어진 경우의 환불은 위 환불 기준의 '마침 쪽 사유' 검토 절차로 안내해드려요.</li>
+        <li>디자인 시안은 <strong>방향을 확인하고 승인받기 위한 자료</strong>예요. 상품 규모에 맞게 이미지·PDF·미리보기 링크 등 알맞은 형태로 보내드리고, 시안을 만드는 데 쓴 <strong>원본 작업 파일은 제공하지 않아요.</strong> 최종 결과물로는 완성된 사이트와 소스코드를 드려요. 특정 형태의 시안이 꼭 필요하시면 결제 전에 문의해주세요.</li>
         <li>마침이 책임을 져야 하는 경우, 그 범위는 <strong>결제하신 금액을 한도</strong>로 해요. 사이트가 늦어지거나 오류가 난 것 때문에 생기는 매출 감소 같은 간접적인 손해까지는 책임지기 어려운 점을 미리 말씀드려요. 다만 마침의 고의 또는 중대한 과실로 생긴 손해에는 이 한도가 적용되지 않고, 법에서 정한 고객님의 권리도 이 내용으로 제한되지 않아요.</li>
       </ul>
     `
@@ -117,12 +121,19 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
       <div class="cc-sub">서로 오해 없이 끝까지 가기 위한 약속이에요. 항목을 눌러 펼쳐보시고, 아래에 체크하면 결제하실 수 있어요.</div>
       ${itemsHtml}
       ${hasHosting ? `
-      <div class="cc-agree-row">
-        <input type="checkbox" id="cc-host-${containerId}">
-        <label for="cc-host-${containerId}">
-          배포 서비스는 <strong>${DEFAULT_HOSTING_NAME}</strong>로 통일되며, 호스팅·도메인의 <strong>요금제와 약관은 제가 해당 회사와 직접 계약하는 내용</strong>이라는 점을 확인했어요.
-          <span class="cc-fine">다른 서비스를 원하면 결제 전에 문의해야 하고, 결제 후 변경은 유료 유지보수라는 점도 이해했어요.</span>
-        </label>
+      <div class="cc-agree-row" style="flex-direction:column;align-items:stretch;gap:12px;">
+        <div class="cc-hostmode" style="display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.8px;font-weight:600;">
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;"><input type="radio" name="cc-hostmode-${containerId}" value="default" checked style="width:17px;height:17px;accent-color:var(--brick);"> 기본 서비스(${DEFAULT_HOSTING_NAME})로 진행할게요</label>
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;"><input type="radio" name="cc-hostmode-${containerId}" value="other" style="width:17px;height:17px;accent-color:var(--brick);"> 다른 배포 서비스를 원해요</label>
+        </div>
+        <div id="cc-hostchoice-${containerId}" style="display:none;font-size:13px;background:#F3F6F1;border-radius:10px;padding:10px 12px;"></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <input type="checkbox" id="cc-host-${containerId}" style="width:19px;height:19px;flex:0 0 19px;margin-top:2px;accent-color:var(--brick);">
+          <label for="cc-host-${containerId}" id="cc-hostlabel-${containerId}" style="font-size:13.8px;color:var(--ink);font-weight:600;line-height:1.6;">
+            배포 서비스는 <strong>${DEFAULT_HOSTING_NAME}</strong>로 통일되며, 호스팅·도메인의 <strong>요금제와 약관은 제가 해당 회사와 직접 계약하는 내용</strong>이라는 점을 확인했어요.
+            <span class="cc-fine">결제 후 배포 서비스를 바꾸는 것은 유료 유지보수라는 점도 이해했어요.</span>
+          </label>
+        </div>
       </div>` : ''}
       <div class="cc-agree-row">
         <input type="checkbox" id="cc-agree-${containerId}">
@@ -156,6 +167,22 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
       .cc-agree-row label{font-size:13.8px;color:var(--ink);font-weight:600;line-height:1.6;}
       .cc-agree-row .cc-fine{display:block;margin-top:4px;font-size:12.3px;color:var(--ink-faint);font-weight:400;}
       .btn-primary[disabled]{opacity:.45;pointer-events:none;}
+      .cc-linkbtn{background:none;border:none;color:var(--brick);text-decoration:underline;cursor:pointer;font:inherit;font-size:12.5px;margin-left:6px;}
+      .cc-modal-bg{position:fixed;inset:0;background:rgba(20,30,25,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;}
+      .cc-modal{background:#fff;border-radius:16px;max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:24px 22px;font-size:14px;color:var(--ink);}
+      .cc-modal-title{font-size:17px;font-weight:800;margin-bottom:6px;}
+      .cc-modal-desc{font-size:13px;color:var(--ink-soft);margin-bottom:6px;line-height:1.6;}
+      .cc-q-label{display:block;font-weight:700;font-size:13.8px;margin:16px 0 6px;}
+      .cc-modal select,.cc-modal input[type=text]{width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:14px;background:#fff;}
+      .cc-radios,.cc-checks{display:flex;flex-direction:column;gap:6px;font-size:13.6px;}
+      .cc-radios label,.cc-checks label{display:flex;gap:8px;align-items:center;cursor:pointer;}
+      .cc-m-res{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.65;}
+      .cc-m-bad{background:#FBEFEA;color:#8a3a22;}
+      .cc-m-res ul{padding-left:18px;margin:6px 0 10px;}
+      .cc-modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+      .cc-btn-main{background:var(--brick);color:#fff;border:none;border-radius:10px;padding:11px 16px;font:inherit;font-weight:700;font-size:13.6px;cursor:pointer;}
+      .cc-btn-ghost{background:#fff;color:var(--ink-soft);border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;font:inherit;font-weight:600;font-size:13.6px;cursor:pointer;}
+      .cc-m-res-btns{display:flex;gap:8px;flex-wrap:wrap;}
     `;
     document.head.appendChild(style);
   }
@@ -172,6 +199,10 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
 
   const checkbox = document.getElementById('cc-agree-' + containerId);
   const hostBox = document.getElementById('cc-host-' + containerId);
+  const hostChoiceBox = document.getElementById('cc-hostchoice-' + containerId);
+  const hostLabel = document.getElementById('cc-hostlabel-' + containerId);
+  const modeRadios = container.querySelectorAll('input[name="cc-hostmode-' + containerId + '"]');
+  let hostChoice = { mode: 'default' };
   const payBtn = payBtnId ? document.getElementById(payBtnId) : null;
   if (payBtn) payBtn.disabled = true;
 
@@ -184,7 +215,8 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
 
   let hostAckAt = null;
   function refresh() {
-    const hostOk = !hostBox || hostBox.checked;
+    const modeOk = hostChoice.mode === 'default' || hostChoice.screened === 'pass';
+    const hostOk = !hostBox || (hostBox.checked && modeOk);
     const ok = checkbox.checked && hostOk;
     if (payBtn) payBtn.disabled = !ok;
     _lastConsentPayload = {
@@ -194,7 +226,8 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
       product_name: productName || null,
       items_shown: items.map((it) => it.title),
       text_snapshot: textSnapshot,
-      hosting_ack: hostBox ? { agreed: hostBox.checked, at: hostAckAt, hosting_service: DEFAULT_HOSTING_NAME } : null,
+      hosting_ack: hostBox ? { agreed: hostBox.checked, at: hostAckAt, hosting_service: hostChoice.mode === 'other' ? (hostChoice.service || '') : DEFAULT_HOSTING_NAME } : null,
+      hosting_choice: hostBox ? hostChoice : null,
       page_url: location.href,
       user_agent: navigator.userAgent
     };
@@ -204,6 +237,118 @@ function renderConsent({ containerId, payBtnId, productName, extraItems, omitIte
     hostAckAt = hostBox.checked ? new Date().toISOString() : null;
     refresh();
   });
+
+  // ── 다른 배포 서비스 선택 시: 확인 질문 팝업 ──
+  function setMode(mode) {
+    modeRadios.forEach((r) => { r.checked = (r.value === mode); });
+  }
+  function applyChoice(choice) {
+    hostChoice = choice;
+    if (choice.mode === 'other' && choice.screened === 'pass') {
+      hostChoiceBox.style.display = 'block';
+      hostChoiceBox.innerHTML = '선택한 서비스: <strong>' + escapeCc(choice.service) + '</strong> · 확인 질문을 통과했어요. <button type="button" class="cc-linkbtn" id="cc-rechoose-' + containerId + '">다시 선택</button>';
+      hostLabel.innerHTML = '배포 서비스는 <strong>' + escapeCc(choice.service) + '</strong>로 진행하며, 호스팅·도메인의 <strong>요금제와 약관은 제가 해당 회사와 직접 계약하는 내용</strong>이라는 점을 확인했어요.';
+      const rb = document.getElementById('cc-rechoose-' + containerId);
+      if (rb) rb.addEventListener('click', openModal);
+    } else {
+      hostChoiceBox.style.display = 'none';
+      hostChoiceBox.innerHTML = '';
+      hostLabel.innerHTML = '배포 서비스는 <strong>' + DEFAULT_HOSTING_NAME + '</strong>로 통일되며, 호스팅·도메인의 <strong>요금제와 약관은 제가 해당 회사와 직접 계약하는 내용</strong>이라는 점을 확인했어요. <span class="cc-fine">결제 후 배포 서비스를 바꾸는 것은 유료 유지보수라는 점도 이해했어요.</span>';
+    }
+    refresh();
+  }
+  modeRadios.forEach((r) => r.addEventListener('change', () => {
+    if (r.checked && r.value === 'other') openModal();
+    else if (r.checked) applyChoice({ mode: 'default' });
+  }));
+
+  function openModal() {
+    const bg = document.createElement('div');
+    bg.className = 'cc-modal-bg';
+    const hostOptions = OTHER_HOSTS_ALLOWED.map((h) => '<option value="' + escapeCc(h) + '">' + escapeCc(h) + '</option>').join('');
+    bg.innerHTML = `
+      <div class="cc-modal" role="dialog" aria-modal="true">
+        <div class="cc-modal-title">다른 배포 서비스, 먼저 확인할게요</div>
+        <p class="cc-modal-desc">마침이 안전하게 진행할 수 있는 범위인지 확인하기 위한 질문이에요. 모르는 부분은 "잘 모르겠어요"를 선택하셔도 돼요.</p>
+        <label class="cc-q-label">1. 어떤 서비스를 쓰고 싶으세요?</label>
+        <select id="cc-m-service"><option value="">선택해주세요</option>${hostOptions}<option value="__other">목록에 없어요 (직접 입력)</option></select>
+        <input type="text" id="cc-m-service-text" placeholder="서비스 이름 (예: ○○ 호스팅)" style="display:none;margin-top:8px;">
+        <label class="cc-q-label">2. 그 서비스에 다른 사람을 공동관리자(협업자)로 초대하는 기능이 있나요?</label>
+        <div class="cc-radios">
+          <label><input type="radio" name="cc-m-collab" value="yes"> 있어요</label>
+          <label><input type="radio" name="cc-m-collab" value="no"> 없어요</label>
+          <label><input type="radio" name="cc-m-collab" value="unknown"> 잘 모르겠어요</label>
+        </div>
+        <label class="cc-q-label">3. 사이트에 꼭 필요한 기능이 있나요? (해당되는 것 모두 선택)</label>
+        <div class="cc-checks">
+          <label><input type="checkbox" value="회원가입·로그인"> 회원가입·로그인</label>
+          <label><input type="checkbox" value="결제"> 결제</label>
+          <label><input type="checkbox" value="게시판·글쓰기"> 게시판·글쓰기</label>
+          <label><input type="checkbox" value="자동 실행"> 정해진 시간에 자동으로 돌아가는 기능</label>
+          <label><input type="checkbox" value="none"> 해당 없어요 (소개·안내 위주)</label>
+        </div>
+        <label class="cc-q-label">4. 그 서비스를 원하시는 이유는요?</label>
+        <select id="cc-m-reason"><option value="">선택해주세요</option><option>이미 계약해서 쓰고 있어요</option><option>비용 때문이에요</option><option>익숙해서요</option><option>기타</option></select>
+        <div id="cc-m-result" style="display:none;"></div>
+        <div class="cc-modal-btns">
+          <button type="button" class="cc-btn-ghost" id="cc-m-cancel">취소 (기본 서비스로 진행)</button>
+          <button type="button" class="cc-btn-main" id="cc-m-check">확인하기</button>
+        </div>
+      </div>`;
+    document.body.appendChild(bg);
+    const q = (sel) => bg.querySelector(sel);
+    const close = () => bg.remove();
+    q('#cc-m-service').addEventListener('change', (e) => { q('#cc-m-service-text').style.display = e.target.value === '__other' ? 'block' : 'none'; });
+    // '해당 없어요'는 다른 기능 선택과 동시에 고를 수 없게
+    const checks = Array.from(bg.querySelectorAll('.cc-checks input'));
+    checks.forEach((c) => c.addEventListener('change', () => {
+      if (c.checked && c.value === 'none') checks.forEach((o) => { if (o !== c) o.checked = false; });
+      else if (c.checked) checks.forEach((o) => { if (o.value === 'none') o.checked = false; });
+    }));
+    q('#cc-m-cancel').addEventListener('click', () => { setMode('default'); applyChoice({ mode: 'default' }); close(); });
+    bg.addEventListener('click', (e) => { if (e.target === bg) { setMode('default'); applyChoice({ mode: 'default' }); close(); } });
+
+    q('#cc-m-check').addEventListener('click', () => {
+      const sv = q('#cc-m-service').value;
+      const service = sv === '__other' ? q('#cc-m-service-text').value.trim() : sv;
+      const collabEl = bg.querySelector('input[name="cc-m-collab"]:checked');
+      const features = checks.filter((c) => c.checked).map((c) => c.value);
+      const reason = q('#cc-m-reason').value;
+      const res = q('#cc-m-result');
+      const missing = !service || !collabEl || !features.length;
+      if (missing) {
+        res.style.display = 'block'; res.className = 'cc-m-res cc-m-bad';
+        res.textContent = '1, 2, 3번 질문에 답해주세요.';
+        return;
+      }
+      const collab = collabEl.value;
+      const reasons = [];
+      if (!OTHER_HOSTS_ALLOWED.includes(service)) reasons.push('선택하신 서비스는 아직 마침이 바로 진행할 수 있는 목록에 없어서, 먼저 가능 여부를 확인해야 해요.');
+      if (collab !== 'yes') reasons.push('공동관리자(협업자) 초대가 확인되어야 해요. 고객님의 비밀번호를 받지 않는 방식이라 꼭 필요한 조건이에요.');
+      const needDyn = features.filter((f) => f !== 'none');
+      if (needDyn.length) reasons.push('회원가입·결제·글쓰기·자동 실행 같은 기능이 들어가는 사이트는 기본 서비스에서만 제작해요.');
+      const answers = { service, collaborator_invite: collab, features, reason, answered_at: new Date().toISOString() };
+
+      if (!reasons.length) {
+        applyChoice(Object.assign({ mode: 'other', screened: 'pass' }, answers));
+        close();
+        return;
+      }
+      const msg = '[배포 서비스 문의] 상품: ' + (productName || '-') + ' / 원하는 서비스: ' + service + ' / 협업자 초대: ' + ({ yes: '있음', no: '없음', unknown: '모름' }[collab]) + ' / 필요 기능: ' + features.map((f) => f === 'none' ? '없음' : f).join(', ') + ' / 이유: ' + (reason || '-');
+      res.style.display = 'block'; res.className = 'cc-m-res cc-m-bad';
+      res.innerHTML = '<strong>지금은 바로 결제로 진행하기 어려워요.</strong><ul>' + reasons.map((r) => '<li>' + r + '</li>').join('') + '</ul>' +
+        '<div class="cc-m-res-btns"><button type="button" class="cc-btn-main" id="cc-m-default">기본 서비스로 진행할게요</button> <a class="cc-btn-ghost" href="contact.html?host=1&msg=' + encodeURIComponent(msg) + '" style="text-decoration:none;display:inline-block;">이 서비스로 가능한지 문의하기</a></div>' +
+        '<div style="font-size:12px;margin-top:6px;color:#8a5a4a;">문의하시면 위 답변이 그대로 전달돼서 따로 다시 설명하실 필요가 없어요.</div>';
+      q('#cc-m-check').style.display = 'none';
+      q('#cc-m-default').addEventListener('click', () => { setMode('default'); applyChoice({ mode: 'default' }); close(); });
+    });
+  }
+}
+
+function escapeCc(s) {
+  const d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
 }
 
 // 결제 제출 시 호출해서 동의 기록을 가져다 씁니다.
