@@ -187,6 +187,11 @@
     }catch(e){ console.error(e); }
   }
 
+  function fmtDateTime(iso){
+    if(!iso) return '';
+    const d = new Date(iso);
+    return (d.getMonth()+1) + '.' + d.getDate() + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
   function fmtDate(iso){
     if(!iso) return '';
     const d = new Date(iso);
@@ -224,7 +229,7 @@
           const need = NEED_ME.includes(x.current_stage);
           const on = x.id === project.id;
           return '<button type="button" data-pid="' + x.id + '" style="display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;text-align:left;padding:11px 14px;margin-bottom:8px;border-radius:10px;border:1.5px solid ' + (on ? 'var(--brick)' : 'var(--line)') + ';background:' + (on ? '#fff' : 'var(--paper)') + ';font:inherit;cursor:pointer;">' +
-            '<span style="font-weight:' + (on ? '800' : '600') + ';">' + escapeHtml(x.product_name) + '</span>' +
+            '<span style="font-weight:' + (on ? '800' : '600') + ';">' + escapeHtml(x.product_name) + '<span style="font-weight:500;font-size:12px;color:var(--ink-faint);margin-left:8px;">' + fmtDateTime(x.payment_confirmed_at || x.created_at) + ' 결제</span></span>' +
             '<span style="font-size:12px;white-space:nowrap;color:' + (need ? 'var(--brick)' : 'var(--ink-faint)') + ';font-weight:700;">' + (x.current_stage === '배포완료' ? '완료' : (need ? '확인 필요' : '진행 중')) + '</span></button>';
         }).join('') + '</div>';
     }
