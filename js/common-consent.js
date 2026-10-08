@@ -307,7 +307,7 @@ function renderConsent({ containerId, payBtnId, productName, productKey, approve
       const sv = q('#cc-m-service').value;
       const service = sv === '__other' ? q('#cc-m-service-text').value.trim() : sv;
       const collabEl = bg.querySelector('input[name="cc-m-collab"]:checked');
-            const res = q('#cc-m-result');
+      const res = q('#cc-m-result');
       const missing = !service || !collabEl;
       if (missing) {
         res.style.display = 'block'; res.className = 'cc-m-res cc-m-bad';
@@ -318,7 +318,6 @@ function renderConsent({ containerId, payBtnId, productName, productKey, approve
       const reasons = [];
       if (!OTHER_HOSTS_ALLOWED.includes(service)) reasons.push('선택하신 서비스는 아직 마침이 바로 진행할 수 있는 목록에 없어서, 먼저 가능 여부를 확인해야 해요.');
       if (collab !== 'yes') reasons.push('공동관리자(협업자) 초대가 확인되어야 해요. 고객님의 비밀번호를 받지 않는 방식이라 꼭 필요한 조건이에요.');
-      if (needDyn.length) reasons.push('회원가입·결제·글쓰기·자동 실행 같은 기능이 들어가는 사이트는 기본 서비스에서만 제작해요.');
       const answers = { service, collaborator_invite: collab, answered_at: new Date().toISOString() };
 
       if (!reasons.length) {
