@@ -330,7 +330,7 @@ function renderConsent({ containerId, payBtnId, productName, productKey, approve
       const link = 'contact.html?host=1&p=' + encodeURIComponent(productKey || '') + '&msg=' + encodeURIComponent(msg);
       res.style.display = 'block'; res.className = 'cc-m-res cc-m-bad';
       res.innerHTML = '<strong>다른 서비스는 가능 여부를 먼저 확인해야 해요.</strong>' +
-        '<div style="font-size:13px;margin-top:6px;">문의를 남겨주시면 확인 후 <b>마이페이지 → 내 문의</b>로 답변드려요. 가능하면 거기서 바로 결제하실 수 있어요. (로그인이 필요해요)</div>' +
+        '<div style="font-size:13px;margin-top:6px;">문의를 남겨주시면 확인 후 <b>마이페이지 → 서버·결제 전 문의</b>로 답변드려요. 가능하면 거기서 바로 결제하실 수 있어요. (로그인이 필요해요)</div>' +
         '<div class="cc-m-res-btns"><button type="button" class="cc-btn-main" id="cc-m-default">기본 서비스로 진행할게요</button> <a class="cc-btn-ghost" href="' + link + '" style="text-decoration:none;display:inline-block;">이 서비스로 문의하기</a></div>';
       q('#cc-m-check').style.display = 'none';
       q('#cc-m-default').addEventListener('click', () => { setMode('default'); applyChoice({ mode: 'default' }); close(); });

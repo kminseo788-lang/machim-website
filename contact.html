@@ -90,7 +90,7 @@
   <div class="confirm" id="needLogin" style="display:none;padding:30px 0 60px;text-align:left;">
     <div style="background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:22px;">
       <h2 style="font-size:19px;margin-bottom:10px;">로그인(회원가입) 후 문의를 남겨주세요</h2>
-      <p style="font-size:14px;">남겨주신 문의의 <b>답변은 마이페이지 → 내 문의</b>에서 확인하실 수 있어요. 가능하다는 답변이 오면 같은 화면에서 바로 결제로 이어져요. 쓰던 내용은 로그인 후 그대로 이어집니다.</p>
+      <p style="font-size:14px;">남겨주신 문의의 <b>답변은 마이페이지 → 서버·결제 전 문의</b>에서 확인하실 수 있어요. 가능하다는 답변이 오면 같은 화면에서 바로 결제로 이어져요. 쓰던 내용은 로그인 후 그대로 이어집니다.</p>
       <a href="mypage-login.html?next=contact.html" id="goLoginInq" class="submit-btn" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">로그인 / 회원가입하고 이어서 쓰기</a>
     </div>
   </div>
@@ -111,7 +111,7 @@
       <input type="email" placeholder="이메일 (선택)" name="email">
     </div>
     <div class="field-group" id="memberBox" style="display:none;font-size:14px;color:var(--ink-soft);">
-      <span id="memberEmail"></span> 계정으로 접수돼요. 답변은 마이페이지 → 내 문의에서 확인하세요.
+      <span id="memberEmail"></span> 계정으로 접수돼요. 답변은 마이페이지 → 서버·결제 전 문의에서 확인하세요.
     </div>
 
     <label class="consent">
@@ -125,8 +125,8 @@
   <div class="confirm" id="confirmBox">
     <div class="stamp-icon">접수<br>완료</div>
     <h2>문의가 접수되었습니다</h2>
-    <p id="confirmMember" style="display:none;">순차적으로 확인 후 <b>마이페이지 → 내 문의</b>에 답변을 남겨드려요.</p>
-    <p id="confirmGuest">순차적으로 검토 후 영업일 기준 1~2일 내에 남겨주신 연락처로 안내드리겠습니다.</p>
+    <p id="confirmMember" style="display:none;">평일 9시~18시에 확인하고 <b>마이페이지 → 서버·결제 전 문의</b>에 답변을 남겨드려요.</p>
+    <p id="confirmGuest">평일 9시~18시에 확인하고 남겨주신 연락처로 안내드리겠습니다. (18시 이후·주말·공휴일 접수는 다음 영업일에 확인해요.)</p>
     <p style="margin-top:14px;"><a href="mypage-project.html" id="confirmLink" style="color:var(--brick);text-decoration:underline;">마이페이지에서 확인하기 →</a></p>
   </div>
 </div>
@@ -149,6 +149,12 @@
 
   (async function(){
     try{ var r = await sb.auth.getSession(); user = r.data && r.data.session ? r.data.session.user : null; }catch(e){}
+    // 배포 준비 단계 문의는 마이페이지 1:1 문의로 보냅니다 (옛 링크 호환)
+    if(user && kind === 'deploy'){
+      try{ sessionStorage.setItem('machim_chat_prefill', JSON.stringify({ msg: memo.value, tag: '배포 준비 단계에서 보낸 문의', pid: null })); }catch(e){}
+      location.replace('mypage-project.html#chatCard');
+      return;
+    }
     if(user){
       document.getElementById('guestBox').style.display = 'none';
       document.getElementById('memberBox').style.display = 'block';

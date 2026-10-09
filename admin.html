@@ -98,6 +98,26 @@
   #loginGate .err{color:#c0392b;font-size:13px;margin-top:10px;display:none;}
   #adminShell{display:none;}
   .logout-btn{margin-top:16px;font-size:12.5px;color:var(--ink-faint);text-decoration:underline;cursor:pointer;background:none;border:none;padding:0;}
+
+  .menu-badge{background:var(--brick);color:#fff;border-radius:999px;font-size:11.5px;padding:1px 8px;margin-left:6px;font-weight:800;}
+  .inbox-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start;}
+  @media(max-width:860px){.inbox-grid{grid-template-columns:1fr;}}
+  .ibox-item{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;background:var(--paper);}
+  .ibox-item.sel{border-color:var(--brick);background:#fff;}
+  .ibox-item .nm{font-weight:700;font-size:14px;}
+  .ibox-item .sub{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+  .ibox-item .wait{font-size:12px;font-weight:700;color:var(--brick);margin-top:4px;}
+  .ibox-item .wait.late{color:#b3261e;}
+  .ibox-item .ok{font-size:12px;color:#3B6B45;margin-top:4px;}
+  .ibox-msgs{max-height:380px;overflow-y:auto;border:1.5px solid var(--line);border-radius:10px;padding:14px 12px 8px;background:var(--paper);margin:10px 0;}
+  .ib-row{display:flex;flex-direction:column;margin:10px 0;}
+  .ib-row.cust{align-items:flex-start;} .ib-row.adm{align-items:flex-end;}
+  .ib-bub{max-width:90%;padding:9px 12px;border-radius:12px;font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;}
+  .ib-row.cust .ib-bub{background:#fff;border:1.5px solid var(--line);}
+  .ib-row.adm .ib-bub{background:var(--brick);color:#fff;}
+  .ib-meta{font-size:11.5px;color:var(--ink-faint);margin:2px 3px 0;}
+  .ib-tag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--brick);background:#fdf1ec;border-radius:6px;padding:2px 8px;margin-bottom:3px;}
+  .ibox-info{font-size:12.5px;color:var(--ink-soft);background:var(--paper);border-radius:8px;padding:9px 12px;line-height:1.7;}
 </style>
 </head>
 <body>
@@ -123,7 +143,7 @@
       <button data-view="schedule">제작 일정</button>
       <button data-view="orders">주문 관리</button>
       <button data-view="projects">프로젝트 관리</button>
-      <button data-view="inquiries">문의 관리</button>
+      <button data-view="inquiries">문의 관리<span class="menu-badge" id="menuBadge" style="display:none;"></span></button>
       <button data-view="products">상품 설정</button>
     </div>
     <button class="logout-btn" onclick="sb.auth.signOut().then(()=>location.reload())">로그아웃</button>
@@ -140,7 +160,7 @@
       <div class="stat-grid">
         <div class="stat-card"><div class="label">진행 중</div><div class="value" id="statInProgress">-</div></div>
         <div class="stat-card"><div class="label">대기 중</div><div class="value" id="statWaiting">-</div></div>
-        <div class="stat-card"><div class="label">신규 문의</div><div class="value brick" id="statNewInquiries">-</div></div>
+        <div class="stat-card"><div class="label">답변 필요 문의</div><div class="value brick" id="statNewInquiries">-</div></div>
       </div>
       <div class="panel">
         <h3>최근 주문</h3>
@@ -167,7 +187,7 @@
 
         <div class="stat-grid" style="margin-top:22px;">
           <div class="stat-card"><div class="label">현재 밀린 작업</div><div class="value" id="statPendingHours">-</div></div>
-          <div class="stat-card"><div class="label">예상 소요 일수</div><div class="value" id="statPendingDays">-</div></div>
+          <div class="stat-card"><div class="label">예상 소요 일수 (평일 기준)</div><div class="value" id="statPendingDays">-</div></div>
           <div class="stat-card"><div class="label">추천 다음 착수일</div><div class="value brick" id="statSuggestedDate">-</div></div>
         </div>
 
@@ -176,6 +196,17 @@
           <thead><tr><th>고객</th><th>상품</th><th>상태</th><th>예상 소요시간</th></tr></thead>
           <tbody id="capacityOrderTable"><tr><td colspan="4">불러오는 중…</td></tr></tbody>
         </table>
+      </div>
+    
+      <div class="panel" style="margin-top:20px;">
+        <h3>공휴일 설정</h3>
+        <div class="desc">착수 가능일은 <b>평일만</b> 세고, 여기 등록한 공휴일도 건너뜁니다. 대체공휴일 포함, 날짜를 직접 추가해 주세요. (고객이 보는 착수 가능일에 바로 반영돼요)</div>
+        <div class="field-row" style="gap:10px;flex-wrap:wrap;">
+          <input type="date" id="holDate" style="width:170px;">
+          <input type="text" id="holName" placeholder="이름 (예: 설날 연휴)" style="width:200px;">
+          <button class="save-btn" onclick="addHoliday()">추가</button>
+        </div>
+        <div id="holList" style="margin-top:14px;font-size:13.5px;">불러오는 중…</div>
       </div>
     </section>
 
@@ -215,8 +246,22 @@
     <!-- INQUIRIES -->
     <section class="view" data-view="inquiries">
       <div class="panel">
-        <h3>문의 관리</h3>
-        <div class="desc">contact.html을 통해 접수된 상담 문의입니다.</div>
+        <h3>1:1 문의함 <span id="inboxTitleCount" style="font-size:13px;color:var(--brick);"></span></h3>
+        <div class="desc">결제한 고객이 마이페이지에서 보낸 문의입니다. 고객 한 명당 대화 하나로 모이고, 단계별 문의도 꼬리표와 함께 여기로 들어와요. 답변 안 한 고객이 위에, 오래 기다린 순서로 보여요.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;" id="inboxTabs">
+          <button class="group-tab active" data-ibox="need">답변 필요</button>
+          <button class="group-tab" data-ibox="done">답변 완료</button>
+          <button class="group-tab" data-ibox="all">전체</button>
+        </div>
+        <div class="inbox-grid">
+          <div id="inboxList">불러오는 중…</div>
+          <div id="inboxDetail"><div class="desc">왼쪽에서 고객을 선택하세요.</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>결제 전 문의 (서버·상담)</h3>
+        <div class="desc">결제 전 고객이나 비로그인 방문자가 contact.html로 보낸 문의입니다. (결제한 고객의 문의는 위 1:1 문의함에 들어와요)</div>
         <table>
           <thead><tr><th>이름</th><th>연락처</th><th>업무</th><th>빈도</th><th>내용</th><th>상태 / 고객에게 보여줄 답변</th></tr></thead>
           <tbody id="inquiryTable"><tr><td colspan="6">불러오는 중…</td></tr></tbody>
@@ -304,7 +349,8 @@
       const v = btn.dataset.view;
       document.querySelectorAll('.view').forEach(sec=>sec.classList.remove('active'));
       document.querySelector(`.view[data-view="${v}"]`).classList.add('active');
-      document.getElementById('viewTitle').textContent = btn.textContent;
+      document.getElementById('viewTitle').textContent = btn.childNodes[0].textContent.trim();
+      if(v === 'inquiries'){ loadInbox(); }
     });
   });
 
@@ -410,7 +456,150 @@
     document.getElementById('statWaiting').textContent = waiting + '건';
 
     const { count } = await sb.from('machim_inquiries').select('*', { count: 'exact', head: true }).eq('status','신규');
-    document.getElementById('statNewInquiries').textContent = (count ?? 0) + '건';
+    const { count: c2 } = await sb.from('machim_threads').select('*', { count: 'exact', head: true }).eq('needs_reply', true);
+    const needN = (count ?? 0) + (c2 ?? 0);
+    document.getElementById('statNewInquiries').textContent = needN + '건';
+    setInquiryBadge(needN);
+  }
+
+  // ================= 1:1 문의함 (고객 단위) =================
+  let inboxFilter = 'need', inboxSel = null, inboxThreads = [], inboxMsgKey = '';
+  const LATE_MS = 3 * 3600 * 1000; // 3시간 넘게 대기하면 빨갛게
+
+  function setInquiryBadge(n){
+    const b = document.getElementById('menuBadge');
+    if(b){ b.textContent = n; b.style.display = n > 0 ? 'inline-block' : 'none'; }
+    document.title = (n > 0 ? '(' + n + ') ' : '') + '1마침 관리자';
+  }
+  function waitText(iso){
+    const m = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000));
+    if(m < 60) return m + '분';
+    const h = Math.floor(m / 60);
+    if(h < 24) return h + '시간 ' + (m % 60) + '분';
+    return Math.floor(h / 24) + '일 ' + (h % 24) + '시간';
+  }
+  function fmtMD(iso){
+    const d = new Date(iso), p = n => String(n).padStart(2,'0');
+    return (d.getMonth()+1) + '.' + d.getDate() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  async function loadInbox(quiet){
+    const list = document.getElementById('inboxList');
+    const { data, error } = await sb.from('machim_threads').select('*');
+    if(error){ console.error(error); if(!quiet) list.innerHTML = '<div class="desc">불러오지 못했어요. add-messages.sql을 실행했는지 확인해주세요.</div>'; return; }
+    inboxThreads = data || [];
+    renderInboxList();
+    const need = inboxThreads.filter(t => t.needs_reply).length;
+    const tc = document.getElementById('inboxTitleCount'); if(tc) tc.textContent = need ? '· 답변 필요 ' + need + '건' : '';
+    refreshDashboardStats();
+    if(inboxSel) refreshInboxMessages(inboxSel, true);
+  }
+
+  function renderInboxList(){
+    const list = document.getElementById('inboxList');
+    const need = inboxThreads.filter(t => t.needs_reply).sort((a,b) => new Date(a.last_customer_at) - new Date(b.last_customer_at));
+    const done = inboxThreads.filter(t => !t.needs_reply).sort((a,b) => new Date(b.last_message_at) - new Date(a.last_message_at));
+    document.querySelectorAll('#inboxTabs [data-ibox]').forEach(b => {
+      const k = b.dataset.ibox;
+      const label = k === 'need' ? '답변 필요 (' + need.length + ')' : k === 'done' ? '답변 완료 (' + done.length + ')' : '전체 (' + inboxThreads.length + ')';
+      b.textContent = label; b.classList.toggle('active', k === inboxFilter);
+    });
+    const rows = inboxFilter === 'need' ? need : inboxFilter === 'done' ? done : need.concat(done);
+    if(!rows.length){ list.innerHTML = '<div class="desc">' + (inboxFilter === 'need' ? '답변할 문의가 없어요. 👍' : '문의가 없어요.') + '</div>'; return; }
+    list.innerHTML = rows.map(t => {
+      const late = t.needs_reply && (Date.now() - new Date(t.last_customer_at).getTime()) > LATE_MS;
+      return '<div class="ibox-item ' + (inboxSel === t.customer_id ? 'sel' : '') + '" data-cid="' + t.customer_id + '">' +
+        '<div class="nm">' + escapeHtmlA(t.customer_name || '-') + '</div>' +
+        '<div class="sub">' + escapeHtmlA(t.customer_email || '') + '</div>' +
+        (t.needs_reply
+          ? '<div class="wait ' + (late ? 'late' : '') + '">답변 대기 ' + waitText(t.last_customer_at) + '째</div>'
+          : '<div class="ok">✓ 답변함 · ' + fmtMD(t.last_admin_at || t.last_message_at) + '</div>') +
+        '</div>';
+    }).join('');
+    list.querySelectorAll('.ibox-item').forEach(el => el.addEventListener('click', () => openInboxThread(el.dataset.cid)));
+  }
+
+  document.querySelectorAll('#inboxTabs [data-ibox]').forEach(b => b.addEventListener('click', () => { inboxFilter = b.dataset.ibox; renderInboxList(); }));
+
+  async function openInboxThread(cid){
+    inboxSel = cid; inboxMsgKey = '';
+    renderInboxList();
+    const t = inboxThreads.find(x => x.customer_id === cid) || {};
+    const det = document.getElementById('inboxDetail');
+    det.innerHTML = '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;"><div><b style="font-size:16px;">' + escapeHtmlA(t.customer_name || '-') + '</b> <span style="font-size:12.5px;color:var(--ink-faint);">' + escapeHtmlA(t.customer_email || '') + '</span></div></div>' +
+      '<div class="ibox-info" id="inboxInfo" style="margin-top:8px;">불러오는 중…</div>' +
+      '<div class="ibox-msgs" id="inboxMsgs"></div>' +
+      '<textarea id="inboxReply" placeholder="고객에게 보여줄 답변 (Ctrl+Enter로 보내기)" style="width:100%;min-height:90px;padding:10px;border:1.5px solid var(--line);border-radius:8px;font:inherit;font-size:13.5px;"></textarea>' +
+      '<div style="margin-top:8px;"><button class="save-btn" id="inboxSend">답변 보내기</button> <span id="inboxSendMsg" style="font-size:12.5px;margin-left:8px;"></span></div>';
+    document.getElementById('inboxSend').addEventListener('click', () => sendInboxReply(cid));
+    document.getElementById('inboxReply').addEventListener('keydown', e => { if((e.ctrlKey || e.metaKey) && e.key === 'Enter') sendInboxReply(cid); });
+    loadInboxInfo(cid, t.customer_email);
+    refreshInboxMessages(cid, false);
+  }
+
+  async function loadInboxInfo(cid, email){
+    const box = document.getElementById('inboxInfo'); if(!box) return;
+    const { data: ps } = await sb.from('machim_projects').select('id,product_name,current_stage,deployed_at,created_at').eq('customer_id', cid).order('created_at', { ascending:false });
+    let os = [];
+    if(email){ const r = await sb.from('machim_orders').select('product_name,status,amount,created_at').eq('customer_email', email).order('created_at', { ascending:false }); os = r.data || []; }
+    const pl = (ps || []).map(p => '· ' + escapeHtmlA(p.product_name) + ' (#' + String(p.id).slice(0,4) + ') — ' + (p.deployed_at ? '배포 완료' : escapeHtmlA(p.current_stage))).join('<br>');
+    const ol = os.map(o => '· ' + escapeHtmlA(o.product_name || '-') + ' — ' + escapeHtmlA(o.status || '') + (o.amount ? ' · ' + Number(o.amount).toLocaleString() + '원' : '')).join('<br>');
+    box.innerHTML = '<b>프로젝트 ' + (ps || []).length + '건</b><br>' + (pl || '없음') + '<br><b>주문 ' + os.length + '건</b><br>' + (ol || '없음');
+  }
+
+  async function refreshInboxMessages(cid, auto){
+    const { data, error } = await sb.from('machim_messages').select('*').eq('customer_id', cid).order('created_at', { ascending:true });
+    const box = document.getElementById('inboxMsgs');
+    if(error || !box || inboxSel !== cid){ if(error) console.error(error); return; }
+    const key = (data || []).length + ':' + ((data || []).slice(-1)[0] || {}).id;
+    if(auto && key === inboxMsgKey) return;
+    inboxMsgKey = key;
+    box.innerHTML = (data || []).map(m => {
+      const cust = m.sender === 'customer';
+      return '<div class="ib-row ' + (cust ? 'cust' : 'adm') + '">' +
+        (m.tag ? '<span class="ib-tag">' + escapeHtmlA(m.tag) + '</span>' : '') +
+        '<div class="ib-bub">' + escapeHtmlA(m.body) + '</div>' +
+        '<div class="ib-meta">' + (cust ? '고객' : '내 답변') + ' · ' + fmtMD(m.created_at) + '</div></div>';
+    }).join('') || '<div class="desc">대화가 없어요.</div>';
+    box.scrollTop = box.scrollHeight;
+  }
+
+  async function sendInboxReply(cid){
+    const ta = document.getElementById('inboxReply'), btn = document.getElementById('inboxSend'), msg = document.getElementById('inboxSendMsg');
+    const body = ta.value.trim();
+    if(!body){ msg.style.color = 'var(--brick)'; msg.textContent = '답변 내용을 적어주세요.'; return; }
+    btn.disabled = true; btn.textContent = '보내는 중…';
+    const { error } = await sb.from('machim_messages').insert({ customer_id: cid, sender: 'admin', body: body });
+    btn.disabled = false; btn.textContent = '답변 보내기';
+    if(error){ console.error(error); alert('답변 저장 실패: ' + error.message); return; }
+    ta.value = ''; msg.style.color = '#3B6B45'; msg.textContent = '보냈어요.';
+    setTimeout(() => { msg.textContent = ''; }, 3000);
+    await loadInbox(true);
+    await refreshInboxMessages(cid, false);
+  }
+
+  // ================= 공휴일 =================
+  async function loadHolidays(){
+    const box = document.getElementById('holList'); if(!box) return;
+    const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0,10);
+    const { data, error } = await sb.from('machim_holidays').select('*').gte('day', today).order('day');
+    if(error){ box.textContent = '불러오지 못했어요. add-messages.sql을 실행했는지 확인해주세요.'; return; }
+    box.innerHTML = (data || []).length
+      ? data.map(h => '<div style="display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);"><span>' + escapeHtmlA(h.day) + ' · ' + escapeHtmlA(h.name || '') + '</span><button class="save-btn" style="font-size:12px;padding:3px 10px;background:#999;" data-del-hol="' + h.day + '">삭제</button></div>').join('')
+      : '<span style="color:var(--ink-faint);">앞으로 등록된 공휴일이 없어요.</span>';
+    box.querySelectorAll('[data-del-hol]').forEach(b => b.addEventListener('click', async () => {
+      const { error: e2 } = await sb.from('machim_holidays').delete().eq('day', b.dataset.delHol);
+      if(e2){ alert('삭제 실패: ' + e2.message); return; }
+      loadHolidays(); refreshCapacityPlanner();
+    }));
+  }
+  async function addHoliday(){
+    const d = document.getElementById('holDate').value, n = document.getElementById('holName').value.trim();
+    if(!d){ alert('날짜를 선택해주세요.'); return; }
+    const { error } = await sb.from('machim_holidays').upsert({ day: d, name: n || '공휴일' });
+    if(error){ alert('추가 실패: ' + error.message); return; }
+    document.getElementById('holDate').value = ''; document.getElementById('holName').value = '';
+    loadHolidays(); refreshCapacityPlanner();
   }
 
   // inquiries
@@ -493,6 +682,9 @@
     loadInquiries();
     loadProductHours();
     loadProjects();
+    loadInbox();
+    loadHolidays();
+    setInterval(()=>{ if(!document.hidden){ loadInbox(true); } }, 60000);
   }
 
   async function enforceAdminEmail(){
@@ -572,13 +764,15 @@
 
     const totalHours = capOrders.reduce((sum,o)=> sum + (o.estimated_hours || 0), 0);
     const days = dailyCapacity > 0 ? Math.ceil(totalHours / dailyCapacity) : 0;
-    const suggestDate = new Date();
-    suggestDate.setDate(suggestDate.getDate() + days);
-    while(suggestDate.getDay()===0 || suggestDate.getDay()===6){ suggestDate.setDate(suggestDate.getDate()+1); } // 주말이면 다음 월요일 (고객 캘린더와 동일)
-    const suggestText = suggestDate.toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
+    // 고객에게 보이는 착수 가능일과 같은 계산(평일만 세고 공휴일 제외)을 서버 함수로 가져옵니다.
+    let suggestText = '-';
+    try{
+      const { data: sd } = await sb.rpc('machim_get_earliest_start_date');
+      if(sd){ suggestText = new Date(sd + 'T00:00:00').toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' }); }
+    }catch(e){ console.error(e); }
 
     document.getElementById('statPendingHours').textContent = totalHours + '시간';
-    document.getElementById('statPendingDays').textContent = days + '일';
+    document.getElementById('statPendingDays').textContent = days + '영업일';
     document.getElementById('statSuggestedDate').textContent = suggestText;
 
     const capTable = document.getElementById('capacityOrderTable');
@@ -701,6 +895,7 @@
       actionHtml = `
         ${briefFormHtml()}
         ${deliverInputHtml()}
+        <div data-brief-warn style="display:none;margin:6px 0 8px;padding:9px 12px;border-radius:8px;background:#FDF1EC;color:#A4432A;font-weight:700;font-size:13px;">목적·대상과 페이지 구성은 꼭 적어주세요. (또는 방향서 파일을 첨부해주세요)</div>
         <button class="save-btn" data-action="sendBrief" data-id="${p.id}">방향서 올리기 (고객 승인 요청)</button>
       `;
     }
@@ -977,7 +1172,19 @@ function normUrl(u){
       if(action === 'sendBrief'){
         const brief = {};
         BRIEF_FIELDS.forEach(f => { brief[f.k] = getField(f.k); });
-        if((!brief.purpose || !brief.pages) && !picked.length){ showCardMsg('목적·대상과 페이지 구성은 꼭 적어주세요. (또는 방향서 파일을 첨부해주세요)'); return; }
+        if((!brief.purpose || !brief.pages) && !picked.length){
+          const warn = card.querySelector('[data-brief-warn]');
+          if(warn){ warn.style.display = 'block'; warn.scrollIntoView({ block:'center', behavior:'smooth' }); }
+          ['purpose','pages'].forEach(k => {
+            const el = card.querySelector('[data-field="' + k + '"]');
+            if(!el) return;
+            if(!el.value.trim()){
+              el.style.borderColor = '#D9462B';
+              el.addEventListener('input', ()=>{ el.style.borderColor = ''; if(warn) warn.style.display = 'none'; }, { once:true });
+            }
+          });
+          return;
+        }
         update = { direction_brief: brief, current_stage: '방향서승인대기' };
       } else if(action === 'sendPrototype'){
         const url = normUrl(getField('prototype_url'));

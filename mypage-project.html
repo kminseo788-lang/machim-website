@@ -63,6 +63,19 @@
 
   .empty{text-align:center;padding:60px 20px;color:var(--ink-soft);font-size:14px;}
   .center-loading{text-align:center;padding:80px 20px;color:var(--ink-faint);font-size:13.5px;}
+
+  .chat-list{max-height:420px;overflow-y:auto;padding:4px 2px;margin-bottom:12px;}
+  .chat-empty{text-align:center;color:var(--ink-faint);font-size:13.5px;padding:26px 10px;line-height:1.7;}
+  .bub-row{display:flex;flex-direction:column;margin:10px 0;}
+  .bub-row.me{align-items:flex-end;}
+  .bub-row.admin{align-items:flex-start;}
+  .bub{max-width:88%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.65;white-space:pre-wrap;word-break:break-word;}
+  .bub-row.me .bub{background:var(--brick);color:#fff;border-bottom-right-radius:4px;}
+  .bub-row.admin .bub{background:#fff;border:1.5px solid var(--line);border-bottom-left-radius:4px;}
+  .bub-meta{font-size:11.5px;color:var(--ink-faint);margin:3px 4px 0;}
+  .bub-tag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--brick);background:#fdf1ec;border-radius:6px;padding:2px 8px;margin-bottom:4px;}
+  .chat-notice{font-size:12.8px;color:var(--ink-soft);background:var(--paper);border-radius:10px;padding:11px 14px;line-height:1.65;margin-bottom:14px;}
+  .reply-banner{display:block;margin-bottom:16px;padding:14px 18px;border-radius:12px;background:var(--brick);color:#fff;font-weight:800;font-size:15px;text-align:center;text-decoration:none;box-shadow:0 8px 20px rgba(217,119,87,.28);}
 </style>
 </head>
 <body>
@@ -80,10 +93,12 @@
     <a href="#" class="logout-btn" id="logoutBtn">로그아웃</a>
   </div>
 
+  <div id="replyBanner"></div>
   <div id="inqBox"></div>
   <div id="content">
     <div class="center-loading">불러오는 중…</div>
   </div>
+  <div id="chatBox"></div>
 </div>
 
 <script>
@@ -147,6 +162,7 @@
     }
 
     allProjects = data;
+    initChat(user);
     // 열 프로젝트 선택: 주소의 ?id= → 고객 확인이 필요한 것 → 최신
     const wantId = new URLSearchParams(location.search).get('id');
     project = data.find(x => x.id === wantId) || data.find(x => NEED_ME.includes(x.current_stage)) || data[0];
@@ -165,7 +181,7 @@
       const { data } = await sb.from('machim_inquiries').select('*').eq('customer_id', u.id).order('created_at', { ascending:false });
       const box = document.getElementById('inqBox');
       if(!data || !data.length){ box.innerHTML = ''; return; }
-      box.innerHTML = '<div class="card"><h2>내 문의 (' + data.length + ')</h2>' + data.map(function(q){
+      box.innerHTML = '<div class="card"><h2>서버·결제 전 문의 (' + data.length + ')</h2>' + data.map(function(q){
         const d = new Date(q.created_at);
         const when = (d.getMonth()+1) + '.' + d.getDate();
         const replied = !!(q.admin_reply && q.admin_reply.trim());
@@ -182,10 +198,139 @@
         return '<div style="border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px;background:var(--paper);">' +
           '<div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--ink-faint);"><span>' + when + ' 접수</span><b style="color:' + (replied ? 'var(--brick)' : 'var(--ink-faint)') + ';">' + (replied ? '답변 도착' : '확인 중') + '</b></div>' +
           '<div style="white-space:pre-wrap;font-size:13.5px;margin-top:8px;color:var(--ink-soft);">' + escapeHtml(q.scope || '') + '</div>' +
-          (replied ? '<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:#fff;border:1.5px solid var(--brick);white-space:pre-wrap;font-size:14px;"><b>마침 답변</b><br>' + escapeHtml(q.admin_reply) + '</div>' + pay : '<div style="margin-top:8px;font-size:12.5px;color:var(--ink-faint);">영업일 기준 1~2일 안에 여기에 답변을 남겨드려요.</div>') +
+          (replied ? '<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:#fff;border:1.5px solid var(--brick);white-space:pre-wrap;font-size:14px;"><b>마침 답변</b><br>' + escapeHtml(q.admin_reply) + '</div>' + pay : '<div style="margin-top:8px;font-size:12.5px;color:var(--ink-faint);">평일 9시~18시에 확인하고 여기에 답변을 남겨드려요.</div>') +
           '</div>';
       }).join('') + '</div>';
     }catch(e){ console.error(e); }
+  }
+
+
+  // ================= 1:1 문의 (결제한 고객 전용, 고객 단위 대화) =================
+  let chatUser = null, chatTag = null, chatProjectId = null, chatTimer = null, chatSeenKey = '', chatReadObs = null;
+  const CHAT_NOTICE = '궁금한 점은 여기로 남겨주세요. <b>평일 9시~18시</b>에 확인하고 이곳에 답변을 남겨드려요. (18시 이후·주말·공휴일에 남기신 문의는 다음 영업일에 답변드려요.) 모든 문의와 답변은 이 화면에서만 진행돼요.';
+
+  function chatProjectLabel(x){ return x.product_name + ' (#' + String(x.id).slice(0,4) + ')'; }
+
+  function initChat(user){
+    chatUser = user;
+    const box = document.getElementById('chatBox');
+    if(!box) return;
+    let opts = '';
+    if(allProjects.length > 1){
+      opts = '<div style="margin-bottom:10px;font-size:13px;color:var(--ink-soft);">관련 프로젝트 (선택) <select id="chatProj" style="margin-left:6px;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font:inherit;font-size:13px;background:#fff;"><option value="">선택 안 함</option>' +
+        allProjects.map(x => '<option value="' + x.id + '">' + escapeHtml(chatProjectLabel(x)) + '</option>').join('') + '</select></div>';
+    }
+    box.innerHTML = '<div class="card" id="chatCard"><h2>💬 1:1 문의</h2>' +
+      '<div class="chat-notice">' + CHAT_NOTICE + '</div>' +
+      '<div class="chat-list" id="chatList"><div class="chat-empty">불러오는 중…</div></div>' +
+      '<div id="chatTagRow"></div>' + opts +
+      '<textarea id="chatInput" placeholder="궁금한 점을 적어주세요. (비밀번호·인증번호는 적지 마세요)" style="min-height:90px;"></textarea>' +
+      '<div class="btn-row"><button class="btn btn-primary" id="chatSend">보내기</button></div>' +
+      '<div class="msg" id="chatMsg"></div></div>';
+    document.getElementById('chatSend').addEventListener('click', sendChat);
+    document.getElementById('chatInput').addEventListener('keydown', e => { if((e.ctrlKey || e.metaKey) && e.key === 'Enter') sendChat(); });
+    // 예전 링크(contact.html?kind=deploy)로 들어온 경우 미리 채움
+    try{
+      const pre = sessionStorage.getItem('machim_chat_prefill');
+      if(pre){ sessionStorage.removeItem('machim_chat_prefill'); const o = JSON.parse(pre); openChatWith(o.msg, o.tag, o.pid, true); }
+    }catch(e){}
+    loadChat(true);
+    chatTimer = setInterval(()=>{ if(!document.hidden) loadChat(false); }, 30000);
+  }
+
+  function renderChatTag(){
+    const row = document.getElementById('chatTagRow');
+    if(!row) return;
+    row.innerHTML = chatTag
+      ? '<div style="margin-bottom:8px;font-size:12.8px;"><span class="bub-tag">' + escapeHtml(chatTag) + '</span> <button type="button" id="chatTagX" style="border:none;background:none;color:var(--ink-faint);cursor:pointer;font-size:12.5px;">꼬리표 빼기 ✕</button></div>'
+      : '';
+    const x = document.getElementById('chatTagX');
+    if(x) x.addEventListener('click', ()=>{ chatTag = null; renderChatTag(); });
+  }
+
+  function openChatWith(text, tag, pid, silent){
+    const input = document.getElementById('chatInput');
+    if(!input) return;
+    input.value = text || '';
+    chatTag = tag || null; chatProjectId = pid || null;
+    renderChatTag();
+    const sel = document.getElementById('chatProj');
+    if(sel && pid) sel.value = pid;
+    if(!silent){ document.getElementById('chatCard').scrollIntoView({ behavior:'smooth', block:'center' }); }
+    input.focus();
+  }
+
+  async function loadChat(first){
+    const list = document.getElementById('chatList');
+    if(!list || !chatUser) return;
+    const { data: msgs, error } = await sb.from('machim_messages').select('*').eq('customer_id', chatUser.id).order('created_at', { ascending:true });
+    if(error){ if(first) list.innerHTML = '<div class="chat-empty">문의 내역을 불러오지 못했어요. 새로고침해 주세요.</div>'; console.error(error); return; }
+    const { data: thr } = await sb.from('machim_threads').select('customer_last_read_at').eq('customer_id', chatUser.id).maybeSingle();
+    const lastRead = thr && thr.customer_last_read_at ? new Date(thr.customer_last_read_at) : new Date(0);
+    const unread = (msgs || []).filter(m => m.sender === 'admin' && new Date(m.created_at) > lastRead).length;
+
+    const key = (msgs || []).length + ':' + ((msgs || []).slice(-1)[0] || {}).id;
+    if(key !== chatSeenKey){
+      chatSeenKey = key;
+      if(!msgs.length){
+        list.innerHTML = '<div class="chat-empty">아직 주고받은 문의가 없어요.<br>궁금한 점이 있으면 아래에 편하게 남겨주세요.</div>';
+      } else {
+        const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+        list.innerHTML = msgs.map(m => {
+          const mine = m.sender === 'customer';
+          return '<div class="bub-row ' + (mine ? 'me' : 'admin') + '">' +
+            (m.tag ? '<span class="bub-tag">' + escapeHtml(m.tag) + '</span>' : '') +
+            '<div class="bub">' + escapeHtml(m.body) + '</div>' +
+            '<div class="bub-meta">' + (mine ? '내가 보냄' : '마침 답변') + ' · ' + fmtDateTime(m.created_at) + '</div></div>';
+        }).join('');
+        if(first || nearBottom) list.scrollTop = list.scrollHeight;
+      }
+    }
+
+    // 새 답변 알림 배너 + 읽음 처리 (화면에 보일 때)
+    const banner = document.getElementById('replyBanner');
+    if(banner){
+      banner.innerHTML = unread > 0 ? '<a class="reply-banner" href="#chatCard" id="replyBannerA">💬 1:1 문의에 새 답변이 도착했어요 (' + unread + ')</a>' : '';
+      const a = document.getElementById('replyBannerA');
+      if(a) a.addEventListener('click', e => { e.preventDefault(); document.getElementById('chatCard').scrollIntoView({ behavior:'smooth', block:'center' }); });
+    }
+    if(unread > 0 && !chatReadObs && 'IntersectionObserver' in window){
+      chatReadObs = new IntersectionObserver(async (ents) => {
+        if(ents.some(en => en.isIntersecting)){
+          await sb.rpc('machim_mark_read');
+          chatReadObs.disconnect(); chatReadObs = null;
+          const b = document.getElementById('replyBanner'); if(b) b.innerHTML = '';
+        }
+      }, { threshold: 0.4 });
+      chatReadObs.observe(document.getElementById('chatCard'));
+    }
+  }
+
+  async function sendChat(){
+    const input = document.getElementById('chatInput');
+    const btn = document.getElementById('chatSend');
+    const m = document.getElementById('chatMsg');
+    const body = input.value.trim();
+    if(!body){ m.className = 'msg err'; m.textContent = '내용을 적어주세요.'; return; }
+    if(body.length > 4000){ m.className = 'msg err'; m.textContent = '4000자 이내로 적어주세요.'; return; }
+    btn.disabled = true; btn.textContent = '보내는 중…';
+    const sel = document.getElementById('chatProj');
+    const pid = (sel && sel.value) || chatProjectId || null;
+    let tag = chatTag;
+    if(!tag && sel && sel.value){ const px = allProjects.find(x => x.id === sel.value); if(px) tag = chatProjectLabel(px) + ' 관련'; }
+    const { error } = await sb.from('machim_messages').insert({ customer_id: chatUser.id, sender: 'customer', body: body, tag: tag, project_id: pid });
+    btn.disabled = false; btn.textContent = '보내기';
+    if(error){
+      console.error(error);
+      m.className = 'msg err';
+      m.textContent = '보내지 못했어요. 잠시 후 다시 시도해 주세요. (' + (error.message || '') + ')';
+      return;
+    }
+    input.value = ''; chatTag = null; chatProjectId = null; renderChatTag();
+    m.className = 'msg ok'; m.textContent = '보냈어요. 평일 9시~18시에 확인하고 이곳에 답변을 남겨드릴게요.';
+    chatSeenKey = '';
+    await loadChat(true);
+    setTimeout(()=>{ m.className = 'msg'; }, 6000);
   }
 
 
@@ -205,12 +350,11 @@
     const chk = (id, label, on) => '<label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:8px 0;line-height:1.5;"><input type="checkbox" id="' + id + '" ' + (on ? 'checked' : '') + ' style="width:18px;height:18px;flex:0 0 18px;margin-top:2px;accent-color:var(--brick);"><span>' + label + '</span></label>';
     const inp = (id, ph, val) => '<input type="text" id="' + id + '" placeholder="' + ph + '" value="' + escapeHtml(val || '') + '" style="width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;font:inherit;margin:4px 0 10px;box-sizing:border-box;">';
     const msg = '[배포 준비 문의]\n프로젝트: ' + project.product_name + ' (#' + String(project.id).slice(0,4) + ')\n막힌 단계: (호스팅 가입 / 협업자 초대 / 도메인 구매 / 기타 중 적어주세요)\n막힌 내용:\n(화면 캡처가 있다면 설명으로 적어주세요. 비밀번호·인증번호는 가려주세요)';
-    const askHref = 'contact.html?host=1&kind=deploy&msg=' + encodeURIComponent(msg);
     box.innerHTML = '<div class="card" style="border:1.5px solid ' + (done ? '#CFE0CF' : 'var(--brick)') + ';">' +
       '<h2>배포 준비 ' + (done ? '<span style="font-size:13px;color:#3B6B45;">· ✓ 준비 완료 제출함</span>' : '<span style="font-size:13px;color:var(--brick);">· 고객님이 해주실 일</span>') + '</h2>' +
       '<p class="desc" style="margin-bottom:10px;">사이트를 올릴 "집(호스팅)"과 "주소(도메인)"를 고객님 명의로 준비해주세요. 보통 20~30분이면 끝나고, <b>개발이 진행되는 동안 해주시면 일정이 늦어지지 않아요.</b>' + (req ? ' (준비 요청일 ' + req + ')' : '') + '</p>' +
       (remind ? '<div style="font-size:13px;color:#a4432a;background:#fdf1ec;border-radius:8px;padding:9px 12px;margin-bottom:10px;">마침이 ' + remind + '에 배포 준비를 다시 요청했어요.</div>' : '') +
-      '<a href="guide-hosting-domain.html" target="_blank" rel="noopener" class="view-link" style="display:inline-block;margin-bottom:12px;">단계별 준비 방법 자세히 보기 →</a>' +
+      '<a href="guide-hosting-domain.html" target="_blank" rel="noopener" style="display:block;text-align:center;margin:4px 0 14px;padding:15px 18px;border-radius:12px;background:var(--brick);color:#fff;font-size:17px;font-weight:800;text-decoration:none;box-shadow:0 8px 20px rgba(217,119,87,.28);">📖 단계별 준비 방법 자세히 보기 →</a>' +
       '<div style="background:var(--paper);border-radius:10px;padding:12px 14px;font-size:13.5px;line-height:1.7;margin-bottom:12px;">' +
       '<b>협업자로 초대할 마침 이메일</b><br><span id="inviteMail" style="font-weight:800;user-select:all;">' + escapeHtml(invite) + '</span> <button type="button" id="copyInvite" style="border:1px solid var(--line);background:#fff;border-radius:6px;padding:2px 8px;font-size:12px;cursor:pointer;">복사</button><br>' +
       '<span style="color:var(--ink-faint);font-size:12.5px;">아이디·비밀번호는 절대 보내지 마세요. 초대만 해주시면 됩니다.</span></div>' +
@@ -222,10 +366,13 @@
       inp('prepRegistrar', '예: 가비아, 후이즈, Namecheap · 아직이라면 비워두세요', dp.registrar) +
       chk('prepDomainBought', '도메인을 구매했어요 (아직이면 체크하지 마세요)', dp.domain_bought) +
       '<label style="display:flex;gap:10px;align-items:flex-start;font-size:12.8px;color:var(--ink-soft);margin:12px 0;line-height:1.6;"><input type="checkbox" id="prepAck" ' + (dp.ack_at ? 'checked' : '') + ' style="width:18px;height:18px;flex:0 0 18px;margin-top:2px;accent-color:var(--brick);"><span>' + PREP_ACK_TEXT + '</span></label>' +
-      '<div class="btn-row"><button class="btn btn-primary" id="prepSave">배포 준비 정보 저장</button> <a class="btn btn-ghost" href="' + askHref + '" style="text-decoration:none;display:inline-block;">막혔어요, 문의하기</a></div>' +
+      '<div style="font-size:12.5px;color:var(--ink-faint);margin-bottom:8px;">안내 화면과 실제 화면이 다르거나 막히면 아래 "막혔어요, 문의하기"로 알려주세요. 답변은 이 화면 아래 "1:1 문의"에 남겨드려요.</div>' +
+      '<div class="btn-row"><button class="btn btn-primary" id="prepSave">배포 준비 정보 저장</button> <button type="button" class="btn btn-ghost" id="prepAsk">막혔어요, 문의하기</button></div>' +
       '<div class="msg" id="prepMsg"></div>' +
       (dp.saved_at ? '<div style="font-size:12px;color:var(--ink-faint);margin-top:8px;">마지막 저장: ' + fmtDateTime(dp.saved_at) + '</div>' : '') +
       '</div>';
+    const ask = document.getElementById('prepAsk');
+    if(ask) ask.addEventListener('click', ()=> openChatWith(msg, '배포 준비 단계에서 보낸 문의', project.id));
     const cp = document.getElementById('copyInvite');
     if(cp) cp.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(invite); cp.textContent = '복사됨'; }catch(e){ cp.textContent = '직접 선택해 복사해주세요'; } });
     document.getElementById('prepSave').addEventListener('click', async ()=>{

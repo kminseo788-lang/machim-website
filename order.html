@@ -284,10 +284,11 @@
   }
 
   // ----- 3단계: 달력 (착수 가능일 = 현재 일정 반영 날짜 이후의 평일) -----
-  var earliest = null, viewY, viewM;
+  var earliest = null, viewY, viewM, holSet = {};
   async function loadEarliest(){
     var d = new Date(); d.setDate(d.getDate()+7); d.setHours(0,0,0,0); // 조회 실패 시 임시값
     try{ var r = await sb.rpc('machim_get_earliest_start_date'); if(r.data){ d = new Date(r.data+'T00:00:00'); } }catch(e){ console.error(e); }
+    try{ var hr = await sb.from('machim_holidays').select('day'); holSet = {}; (hr.data||[]).forEach(function(h){ holSet[h.day] = true; }); }catch(e){}
     var tmr = new Date(); tmr.setDate(tmr.getDate()+1); tmr.setHours(0,0,0,0);
     if(d < tmr) d = tmr;
     earliest = d;
@@ -304,7 +305,7 @@
     var limit = new Date(earliest); limit.setDate(limit.getDate()+75);
     for(var d=1; d<=days; d++){
       var dt = new Date(viewY, viewM, d), c = document.createElement('div'), wk = dt.getDay()===0||dt.getDay()===6;
-      var ok = !wk && dt >= earliest && dt <= limit;
+      var ok = !wk && !holSet[iso(dt)] && dt >= earliest && dt <= limit;
       c.textContent = d; c.className = 'cell' + (ok?' ok':' no') + (state.date===iso(dt)?' pick':'');
       if(ok){ (function(dt,c){ c.addEventListener('click', function(){ state.date = iso(dt); save(); renderCal(); refresh(); }); })(dt,c); }
       cg.appendChild(c);
