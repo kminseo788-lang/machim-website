@@ -199,14 +199,16 @@
       </div>
     
       <div class="panel" style="margin-top:20px;">
-        <h3>공휴일 설정</h3>
-        <div class="desc">착수 가능일은 <b>평일만</b> 세고, 여기 등록한 공휴일도 건너뜁니다. 대체공휴일 포함, 날짜를 직접 추가해 주세요. (고객이 보는 착수 가능일에 바로 반영돼요)</div>
-        <div class="field-row" style="gap:10px;flex-wrap:wrap;">
-          <input type="date" id="holDate" style="width:170px;">
-          <input type="text" id="holName" placeholder="이름 (예: 설날 연휴)" style="width:200px;">
-          <button class="save-btn" onclick="addHoliday()">추가</button>
+        <h3>쉬는 날 설정 (공휴일·개인 휴무)</h3>
+        <div class="desc">쉬는 날을 눌러 표시하세요. 다시 누르면 해제돼요. 착수 가능일은 <b>평일만</b> 세고, 여기 표시한 날도 건너뛰어요. 일정이 바뀌면 언제든 고치면 되고, 고객이 보는 착수 가능일에 바로 반영돼요.</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <button class="save-btn" id="holPrev" style="padding:5px 12px;background:#888;">‹</button>
+          <b id="holMonth" style="min-width:110px;text-align:center;"></b>
+          <button class="save-btn" id="holNext" style="padding:5px 12px;background:#888;">›</button>
+          <span style="font-size:12px;color:var(--ink-faint);margin-left:8px;"><span style="display:inline-block;width:10px;height:10px;background:var(--brick);border-radius:3px;"></span> 쉬는 날 &nbsp;<span style="display:inline-block;width:10px;height:10px;background:#ddd;border-radius:3px;"></span> 주말</span>
         </div>
-        <div id="holList" style="margin-top:14px;font-size:13.5px;">불러오는 중…</div>
+        <div id="holCal" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:420px;"></div>
+        <div id="holList" style="margin-top:14px;font-size:13px;color:var(--ink-soft);">불러오는 중…</div>
       </div>
     </section>
 
@@ -578,29 +580,53 @@
     await refreshInboxMessages(cid, false);
   }
 
-  // ================= 공휴일 =================
+  // ================= 쉬는 날 (공휴일·개인 휴무) 달력 =================
+  let holMap = {}, holY = new Date().getFullYear(), holM = new Date().getMonth();
+  const pad2 = n => String(n).padStart(2,'0');
+  const kstToday = () => new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0,10);
+
   async function loadHolidays(){
-    const box = document.getElementById('holList'); if(!box) return;
-    const today = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0,10);
-    const { data, error } = await sb.from('machim_holidays').select('*').gte('day', today).order('day');
-    if(error){ box.textContent = '불러오지 못했어요. add-messages.sql을 실행했는지 확인해주세요.'; return; }
-    box.innerHTML = (data || []).length
-      ? data.map(h => '<div style="display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);"><span>' + escapeHtmlA(h.day) + ' · ' + escapeHtmlA(h.name || '') + '</span><button class="save-btn" style="font-size:12px;padding:3px 10px;background:#999;" data-del-hol="' + h.day + '">삭제</button></div>').join('')
-      : '<span style="color:var(--ink-faint);">앞으로 등록된 공휴일이 없어요.</span>';
-    box.querySelectorAll('[data-del-hol]').forEach(b => b.addEventListener('click', async () => {
-      const { error: e2 } = await sb.from('machim_holidays').delete().eq('day', b.dataset.delHol);
-      if(e2){ alert('삭제 실패: ' + e2.message); return; }
-      loadHolidays(); refreshCapacityPlanner();
-    }));
+    const { data, error } = await sb.from('machim_holidays').select('*').order('day');
+    const list = document.getElementById('holList');
+    if(error){ if(list) list.textContent = '불러오지 못했어요. add-messages.sql을 실행했는지 확인해주세요.'; return; }
+    holMap = {}; (data || []).forEach(h => { holMap[h.day] = h.name || '휴무'; });
+    renderHolCal();
   }
-  async function addHoliday(){
-    const d = document.getElementById('holDate').value, n = document.getElementById('holName').value.trim();
-    if(!d){ alert('날짜를 선택해주세요.'); return; }
-    const { error } = await sb.from('machim_holidays').upsert({ day: d, name: n || '공휴일' });
-    if(error){ alert('추가 실패: ' + error.message); return; }
-    document.getElementById('holDate').value = ''; document.getElementById('holName').value = '';
-    loadHolidays(); refreshCapacityPlanner();
+  function renderHolCal(){
+    const cal = document.getElementById('holCal'); if(!cal) return;
+    document.getElementById('holMonth').textContent = holY + '년 ' + (holM + 1) + '월';
+    const today = kstToday();
+    let h = ['일','월','화','수','목','금','토'].map((d,i) => '<div style="text-align:center;font-size:12px;color:' + (i===0||i===6 ? '#b3261e' : 'var(--ink-faint)') + ';padding:4px 0;">' + d + '</div>').join('');
+    const first = new Date(holY, holM, 1).getDay(), days = new Date(holY, holM + 1, 0).getDate();
+    for(let i = 0; i < first; i++) h += '<div></div>';
+    for(let d = 1; d <= days; d++){
+      const iso = holY + '-' + pad2(holM + 1) + '-' + pad2(d);
+      const wk = [0,6].includes(new Date(holY, holM, d).getDay());
+      const off = !!holMap[iso], past = iso < today;
+      const st = off ? 'background:var(--brick);color:#fff;font-weight:800;' : wk ? 'background:#e6e6e6;color:#888;' : 'background:#fff;border:1px solid var(--line);';
+      h += '<button type="button" data-hday="' + iso + '" ' + (wk || past ? 'disabled' : '') + ' title="' + escapeHtmlA(holMap[iso] || '') + '" style="' + st + 'border-radius:8px;padding:9px 0;font:inherit;font-size:13.5px;cursor:' + (wk || past ? 'default' : 'pointer') + ';' + (past && !off ? 'opacity:.45;' : '') + '">' + d + '</button>';
+    }
+    cal.innerHTML = h;
+    cal.querySelectorAll('[data-hday]:not([disabled])').forEach(b => b.addEventListener('click', () => toggleHoliday(b.dataset.hday)));
+    const up = Object.keys(holMap).filter(k => k >= today).sort();
+    document.getElementById('holList').innerHTML = up.length
+      ? '<b>앞으로 쉬는 날</b> · ' + up.map(k => k.slice(5).replace('-','/') + (holMap[k] && holMap[k] !== '휴무' ? '(' + escapeHtmlA(holMap[k]) + ')' : '')).join(', ')
+      : '앞으로 표시한 쉬는 날이 없어요.';
   }
+  async function toggleHoliday(iso){
+    if(holMap[iso]){
+      const { error } = await sb.from('machim_holidays').delete().eq('day', iso);
+      if(error){ alert('해제 실패: ' + error.message); return; }
+      delete holMap[iso];
+    } else {
+      const { error } = await sb.from('machim_holidays').upsert({ day: iso, name: '휴무' });
+      if(error){ alert('저장 실패: ' + error.message); return; }
+      holMap[iso] = '휴무';
+    }
+    renderHolCal(); refreshCapacityPlanner();
+  }
+  document.getElementById('holPrev').addEventListener('click', () => { holM--; if(holM < 0){ holM = 11; holY--; } renderHolCal(); });
+  document.getElementById('holNext').addEventListener('click', () => { holM++; if(holM > 11){ holM = 0; holY++; } renderHolCal(); });
 
   // inquiries
   const inquiryTable = document.getElementById('inquiryTable');

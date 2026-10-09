@@ -334,6 +334,17 @@
   }
 
 
+  // 단계 화면에서 쓴 메모/수정요청을 1:1 문의(증빙 포함)로 전달
+  async function sendStageNote(tag, text){
+    const { error } = await sb.from('machim_messages').insert({
+      customer_id: chatUser.id, sender: 'customer', body: text,
+      tag: tag + ' · ' + project.product_name + ' (#' + String(project.id).slice(0,4) + ')', project_id: project.id
+    });
+    if(error){ console.error(error); return error; }
+    chatSeenKey = ''; try{ loadChat(true); }catch(e){}
+    return null;
+  }
+
   const PREP_STAGES = ['개발중','최종확인대기','배포완료'];
   function needsPrep(x){ return PREP_STAGES.includes(x.current_stage) && !x.deployed_at && !x.deploy_prep_done_at; }
   const PREP_ACK_TEXT = '배포 준비 요청일로부터 14일이 지나도 준비가 완료되지 않으면 마침이 다른 고객님 작업을 먼저 진행할 수 있고, 준비가 끝나면 가장 빠른 일정으로 이어서 배포한다는 점(약관 제4조 4-7)을 확인했습니다.';
@@ -604,7 +615,7 @@ function normUrl(u){
           ${BRIEF_LABELS.map(([k,l]) => b[k] ? `<div style="margin-bottom:10px;white-space:pre-line;"><b style="display:block;">${l}</b>${escapeHtml(b[k])}</div>` : '').join('')}
         </div>
         <p class="desc" style="font-size:12.5px;">이 방향서에 적힌 내용이 제작 범위의 기준이에요. 승인해주시면 이 내용대로 진행하고, 승인 후 범위를 벗어나는 변경은 수정 횟수와 추가 비용 기준에 따라요. 다르게 이해하신 부분은 승인 전에 알려주세요.</p>
-        <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
+        <textarea id="requestInput" placeholder="전달할 말씀이나 수정요청 사항이 있으면 적어주세요. 승인하실 때 함께 전달돼요. (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
         <div class="btn-row">
           <button class="btn btn-primary" id="approveBtn">위 내용으로 제작을 승인합니다</button>
           <button class="btn btn-ghost" id="requestBtn">수정요청</button>
@@ -612,16 +623,27 @@ function normUrl(u){
         <div class="msg" id="actionMsg"></div>
       `;
       document.getElementById('approveBtn').addEventListener('click', async ()=>{
+        const ab = document.getElementById('approveBtn'); ab.disabled = true;
+        const memo = document.getElementById('requestInput').value.trim();
+        if(memo){
+          const er = await sendStageNote('방향서 승인 시 남긴 메모', memo);
+          if(er){ ab.disabled = false; showActionMsg('메모를 전달하지 못했어요. 잠시 후 다시 시도해주세요. (승인은 아직 되지 않았어요)'); return; }
+        }
         await sb.from('machim_projects').update({
           direction_approved_at: new Date().toISOString(),
           current_stage: '프로토타입대기'
         }).eq('id', project.id);
         location.href = 'mypage-project.html?id=' + project.id;
       });
-      document.getElementById('requestBtn').addEventListener('click', ()=>{
+      document.getElementById('requestBtn').addEventListener('click', async ()=>{
         const note = document.getElementById('requestInput').value.trim();
         if(!note){ showActionMsg('수정요청 내용을 입력해주세요.'); return; }
-        showActionMsg('수정요청 접수 기능은 준비 중이에요. 우선 채팅/메일로 말씀해주세요.', true);
+        const rb = document.getElementById('requestBtn'); rb.disabled = true;
+        const er = await sendStageNote('방향서 수정요청', note);
+        rb.disabled = false;
+        if(er){ showActionMsg('수정요청을 접수하지 못했어요. 잠시 후 다시 시도해주세요.'); return; }
+        document.getElementById('requestInput').value = '';
+        showActionMsg('수정요청이 접수됐어요. 확인 후 수정본을 보내드릴게요. 아래 "1:1 문의"에서도 확인할 수 있어요.', true);
       });
     }
 
@@ -634,7 +656,7 @@ function normUrl(u){
         <p class="desc">디자인 시안이 준비됐어요. 아래에서 확인해주세요.</p>
         <div id="deliverFiles"></div>
         ${project.prototype_url ? `<a class="view-link" href="${escapeHtml(normUrl(project.prototype_url))}" target="_blank" rel="noopener">시안 확인하기 →</a>` : ''}
-        <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
+        <textarea id="requestInput" placeholder="전달할 말씀이나 수정요청 사항이 있으면 적어주세요. 승인하실 때 함께 전달돼요. (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
         <div class="btn-row">
           <button class="btn btn-primary" id="approveBtn">위 시안으로 제작을 승인합니다</button>
           <button class="btn btn-ghost" id="requestBtn">수정요청</button>
@@ -642,16 +664,27 @@ function normUrl(u){
         <div class="msg" id="actionMsg"></div>
       `;
       document.getElementById('approveBtn').addEventListener('click', async ()=>{
+        const ab = document.getElementById('approveBtn'); ab.disabled = true;
+        const memo = document.getElementById('requestInput').value.trim();
+        if(memo){
+          const er = await sendStageNote('시안 승인 시 남긴 메모', memo);
+          if(er){ ab.disabled = false; showActionMsg('메모를 전달하지 못했어요. 잠시 후 다시 시도해주세요. (승인은 아직 되지 않았어요)'); return; }
+        }
         await sb.from('machim_projects').update({
           prototype_approved_at: new Date().toISOString(),
           current_stage: '개발중'
         }).eq('id', project.id);
         location.href = 'mypage-project.html?id=' + project.id;
       });
-      document.getElementById('requestBtn').addEventListener('click', ()=>{
+      document.getElementById('requestBtn').addEventListener('click', async ()=>{
         const note = document.getElementById('requestInput').value.trim();
         if(!note){ showActionMsg('수정요청 내용을 입력해주세요.'); return; }
-        showActionMsg('수정요청 접수 기능은 준비 중이에요. 우선 채팅/메일로 말씀해주세요.', true);
+        const rb = document.getElementById('requestBtn'); rb.disabled = true;
+        const er = await sendStageNote('시안 수정요청', note);
+        rb.disabled = false;
+        if(er){ showActionMsg('수정요청을 접수하지 못했어요. 잠시 후 다시 시도해주세요.'); return; }
+        document.getElementById('requestInput').value = '';
+        showActionMsg('수정요청이 접수됐어요. 확인 후 수정본을 보내드릴게요. 아래 "1:1 문의"에서도 확인할 수 있어요.', true);
       });
     }
 
@@ -664,7 +697,7 @@ function normUrl(u){
         <p class="desc">제작이 완료되었어요. 최종 결과물을 확인해주세요.</p>
         <div id="deliverFiles"></div>
         ${project.final_preview_url ? `<a class="view-link" href="${escapeHtml(normUrl(project.final_preview_url))}" target="_blank" rel="noopener">최종 결과물 확인하기 →</a>` : ''}
-        <textarea id="requestInput" placeholder="수정요청 사항이 있다면 적어주세요 (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
+        <textarea id="requestInput" placeholder="전달할 말씀이나 수정요청 사항이 있으면 적어주세요. 승인하실 때 함께 전달돼요. (없으면 비워두고 바로 승인하셔도 됩니다)"></textarea>
         <div class="btn-row">
           <button class="btn btn-primary" id="approveBtn">위 내용으로 최종 승인합니다</button>
           <button class="btn btn-ghost" id="requestBtn">수정요청</button>
@@ -672,16 +705,27 @@ function normUrl(u){
         <div class="msg" id="actionMsg"></div>
       `;
       document.getElementById('approveBtn').addEventListener('click', async ()=>{
+        const ab = document.getElementById('approveBtn'); ab.disabled = true;
+        const memo = document.getElementById('requestInput').value.trim();
+        if(memo){
+          const er = await sendStageNote('최종 결과물 승인 시 남긴 메모', memo);
+          if(er){ ab.disabled = false; showActionMsg('메모를 전달하지 못했어요. 잠시 후 다시 시도해주세요. (승인은 아직 되지 않았어요)'); return; }
+        }
         await sb.from('machim_projects').update({
           final_approved_at: new Date().toISOString(),
           current_stage: '배포완료'
         }).eq('id', project.id);
         location.href = 'mypage-project.html?id=' + project.id;
       });
-      document.getElementById('requestBtn').addEventListener('click', ()=>{
+      document.getElementById('requestBtn').addEventListener('click', async ()=>{
         const note = document.getElementById('requestInput').value.trim();
         if(!note){ showActionMsg('수정요청 내용을 입력해주세요.'); return; }
-        showActionMsg('수정요청 접수 기능은 준비 중이에요. 우선 채팅/메일로 말씀해주세요.', true);
+        const rb = document.getElementById('requestBtn'); rb.disabled = true;
+        const er = await sendStageNote('최종 결과물 수정요청', note);
+        rb.disabled = false;
+        if(er){ showActionMsg('수정요청을 접수하지 못했어요. 잠시 후 다시 시도해주세요.'); return; }
+        document.getElementById('requestInput').value = '';
+        showActionMsg('수정요청이 접수됐어요. 확인 후 수정본을 보내드릴게요. 아래 "1:1 문의"에서도 확인할 수 있어요.', true);
       });
     }
 
