@@ -72,6 +72,18 @@
   .cell.ok{background:#EAF2EA;border:1px solid var(--green);color:var(--green);font-weight:700;cursor:pointer;}
   .cell.ok:hover{transform:translateY(-2px);}
   .cell.pick{background:var(--green);color:#fff;}
+  .cell.span{background:#FBF1E0;border:1px solid #E7C98F;color:#8a5a00;font-weight:700;text-decoration:none;opacity:1;}
+  .cell.span.pick{background:var(--green);border-color:var(--green);color:#fff;}
+  .cell.span.endday{background:#8a5a00;border-color:#8a5a00;color:#fff;}
+  .sched{display:none;margin-top:16px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:#fff;}
+  .sched.show{display:block;}
+  .sched h3{font-size:15px;margin-bottom:10px;}
+  .sched ul{list-style:none;padding:0;margin:0 0 12px;}
+  .sched li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px;}
+  .sched li span:last-child{font-weight:700;white-space:nowrap;}
+  .sched .done{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;background:#8a5a00;color:#fff;font-size:15px;}
+  .sched .done b{font-size:17px;}
+  .sched .note{margin-top:10px;font-size:12.8px;color:var(--ink-soft);line-height:1.6;}
   .cell.no{color:var(--ink-faint);text-decoration:line-through;opacity:.5;}
   .legend{font-size:12.5px;color:var(--ink-soft);margin-top:12px;}
   .picked{margin-top:14px;padding:13px 16px;border-radius:12px;background:#EAF2EA;border:1px solid var(--green);font-size:14px;color:var(--green);font-weight:700;display:none;}
@@ -160,11 +172,12 @@
       <div class="panel" data-p="3">
         <div class="card">
           <h2>언제부터 시작할까요?</h2>
-          <div class="hint">초록색 날짜 중에서 고르세요. 현재 작업 일정이 반영된 날짜만 선택할 수 있어요.</div>
+          <div class="hint">초록색 날짜 중에서 고르세요. 현재 작업 일정이 반영된 날짜만 선택할 수 있어요. 날짜를 고르면 아래에 <b>단계별 예상 일정과 배포 예상일</b>이 나와요.</div>
           <div class="calhead"><button id="prevM">‹ 이전 달</button><b id="monthLbl"></b><button id="nextM">다음 달 ›</button></div>
           <div class="dow"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
           <div class="cg" id="cg"></div>
-          <div class="legend">🟢 착수 가능 · 클릭해서 선택 &nbsp; 주말·일정이 찬 날짜는 선택할 수 없어요.</div>
+          <div class="legend">🟢 착수 가능 · 클릭해서 선택 &nbsp; <span style="color:#8a5a00;">■</span> 제작 예상 기간 &nbsp; 쉬는 날·일정이 찬 날짜는 선택할 수 없어요.</div>
+          <div class="sched" id="schedBox"></div>
           <div class="picked" id="pickedBox"></div>
           <div class="nav2"><span class="back" data-go="2">← 구성 다시 보기</span><button class="btn btn-primary" id="n3" disabled>다음: 확인 · 결제</button></div>
         </div>
@@ -288,7 +301,11 @@
   async function loadEarliest(){
     var d = new Date(); d.setDate(d.getDate()+7); d.setHours(0,0,0,0); // 조회 실패 시 임시값
     try{ var r = await sb.rpc('machim_get_earliest_start_date'); if(r.data){ d = new Date(r.data+'T00:00:00'); } }catch(e){ console.error(e); }
-    try{ var hr = await sb.from('machim_holidays').select('day'); holSet = {}; (hr.data||[]).forEach(function(h){ holSet[h.day] = true; }); }catch(e){}
+    try{
+      var hr = await sb.from('machim_holidays').select('day,kind'); holSet = {};
+      if(hr.error){ hr = await sb.from('machim_holidays').select('day'); }
+      (hr.data||[]).forEach(function(h){ holSet[h.day] = h.kind || 'off'; });
+    }catch(e){}
     var tmr = new Date(); tmr.setDate(tmr.getDate()+1); tmr.setHours(0,0,0,0);
     if(d < tmr) d = tmr;
     earliest = d;
@@ -297,6 +314,46 @@
     viewY = base.getFullYear(); viewM = base.getMonth();
   }
   function iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  // 영업일: 일하는 주말(work) > 주말 > 쉬는 날(off) 순으로 판정
+  function isBiz(d){ var k = holSet[iso(d)]; if(k==='work') return true; if(d.getDay()===0||d.getDay()===6) return false; return k!=='off'; }
+  function nextBiz(d){ var x = new Date(d); while(!isBiz(x)) x.setDate(x.getDate()+1); return x; }
+  function addBiz(d, n){ var x = nextBiz(d); for(var i=0;i<n;i++){ x.setDate(x.getDate()+1); x = nextBiz(x); } return x; }
+  var STAGES = ['방향서','시안','개발','최종 확인','배포'], stageCache = {};
+  async function loadStageDays(key){
+    if(stageCache[key] !== undefined) return stageCache[key];
+    var res = null;
+    try{
+      var r = await sb.from('machim_site_settings').select('value').eq('key','stage_days_'+key).maybeSingle();
+      if(r.data && r.data.value){ var a = String(r.data.value).split(',').map(function(n){ return parseInt(n,10); }); if(a.length===5 && a.every(function(n){ return !isNaN(n) && n>=0; }) && a.some(function(n){ return n>0; })) res = a; }
+    }catch(e){}
+    stageCache[key] = res; return res;
+  }
+  // 착수일 + 단계별 영업일 → 단계별 기간과 배포 예상일
+  async function computeSched(){
+    state.sched = null;
+    if(!state.date || !state.key) return;
+    var days = await loadStageDays(state.key); if(!days) return;
+    var cur = nextBiz(new Date(state.date+'T00:00:00')), rows = [], last = null;
+    for(var i=0;i<5;i++){
+      if(days[i] < 1) continue;
+      var st = new Date(cur), en = addBiz(st, days[i]-1);
+      rows.push({ stage: STAGES[i], days: days[i], start: iso(st), end: iso(en) });
+      last = en; cur = nextBiz(new Date(en.getFullYear(), en.getMonth(), en.getDate()+1));
+    }
+    if(!rows.length) return;
+    state.sched = { stage_days: days, rows: rows, deploy: iso(last), start: iso(nextBiz(new Date(state.date+'T00:00:00'))) };
+  }
+  function md(s){ var d = new Date(s+'T00:00:00'); return (d.getMonth()+1)+'/'+d.getDate()+'('+'일월화수목금토'[d.getDay()]+')'; }
+  function renderSched(){
+    var box = document.getElementById('schedBox'); if(!box) return;
+    var sc = state.sched;
+    if(!sc){ box.className = 'sched'; box.innerHTML = ''; return; }
+    box.className = 'sched show';
+    box.innerHTML = '<h3>예상 제작 일정</h3><ul>' + sc.rows.map(function(r){
+      return '<li><span>'+r.stage+' <small style="color:var(--ink-faint);">'+r.days+'영업일</small></span><span>'+(r.start===r.end ? md(r.start) : md(r.start)+' ~ '+md(r.end))+'</span></li>';
+    }).join('') + '</ul><div class="done"><span>배포 예상일</span><b>'+fmtDate(sc.deploy)+'</b></div>'
+      + '<div class="note">평일(쉬는 날 제외) 기준의 <b>예상 일정</b>이에요. 자료 제출이나 승인이 늦어지면 그만큼 뒤로 밀려요. 작업 상황에 따라 앞당겨질 수도 있어요.</div>';
+  }
   function renderCal(){
     var cg = document.getElementById('cg'); cg.innerHTML = '';
     document.getElementById('monthLbl').textContent = viewY+'년 '+(viewM+1)+'월';
@@ -304,10 +361,11 @@
     for(var i=0;i<first.getDay();i++){ cg.appendChild(document.createElement('div')); }
     var limit = new Date(earliest); limit.setDate(limit.getDate()+75);
     for(var d=1; d<=days; d++){
-      var dt = new Date(viewY, viewM, d), c = document.createElement('div'), wk = dt.getDay()===0||dt.getDay()===6;
-      var ok = !wk && !holSet[iso(dt)] && dt >= earliest && dt <= limit;
-      c.textContent = d; c.className = 'cell' + (ok?' ok':' no') + (state.date===iso(dt)?' pick':'');
-      if(ok){ (function(dt,c){ c.addEventListener('click', function(){ state.date = iso(dt); save(); renderCal(); refresh(); }); })(dt,c); }
+      var dt = new Date(viewY, viewM, d), c = document.createElement('div'), ds = iso(dt);
+      var ok = isBiz(dt) && dt >= earliest && dt <= limit;
+      var inSpan = state.sched && ds >= state.sched.start && ds <= state.sched.deploy;
+      c.textContent = d; c.className = 'cell' + (ok?' ok':' no') + (inSpan?' span':'') + (state.date===ds?' pick':'') + (state.sched && ds===state.sched.deploy ? ' endday':'');
+      if(ok){ (function(dt,c){ c.addEventListener('click', async function(){ state.date = iso(dt); save(); await computeSched(); renderCal(); renderSched(); refresh(); }); })(dt,c); }
       cg.appendChild(c);
     }
     var minM = new Date(earliest.getFullYear(), earliest.getMonth(), 1), maxM = new Date(limit.getFullYear(), limit.getMonth(), 1), cur = new Date(viewY, viewM, 1);
@@ -325,7 +383,7 @@
     (p.addons||[]).forEach(function(a){ if(state.addons[a.id]) li += '<li><span>'+a.title+'</span><span>+'+won(a.price)+'</span></li>'; });
     body.innerHTML = '<div class="nm">'+p.name+'</div><ul>'+li+'</ul>';
     document.getElementById('sumTotal').textContent = won(calcTotal());
-    document.getElementById('sumMeta').innerHTML = p.dur + (state.date ? '<br>착수일: <b>'+fmtDate(state.date)+'</b>' : '');
+    document.getElementById('sumMeta').innerHTML = p.dur + (state.date ? '<br>착수일: <b>'+fmtDate(state.date)+'</b>' : '') + (state.sched ? '<br>배포 예상일: <b>'+fmtDate(state.sched.deploy)+'</b>' : '');
     var pk = document.getElementById('pickedBox');
     if(state.date){ pk.textContent = '선택한 착수일: '+fmtDate(state.date)+' ('+p.dur.replace('제작기간 ','')+')'; pk.classList.add('show'); } else { pk.classList.remove('show'); }
     document.getElementById('n3').disabled = !state.date;
@@ -339,7 +397,7 @@
     document.querySelectorAll('.panel').forEach(function(x){ x.classList.toggle('on', x.dataset.p==n); });
     document.querySelectorAll('.stp').forEach(function(s){ var i = Number(s.dataset.s); s.classList.toggle('on', i===n); s.classList.toggle('done', i<n); });
     if(n===2) renderOptions();
-    if(n===3){ if(!earliest) await loadEarliest(); renderCal(); }
+    if(n===3){ if(!earliest) await loadEarliest(); await computeSched(); renderCal(); renderSched(); refresh(); }
     if(n===4) await prepareStep4();
     refresh();
     window.scrollTo({top:0,behavior:'smooth'});
@@ -437,7 +495,7 @@
     var row = {
       id: orderId, product_name: p.orderName, amount: total, customer_name: name, customer_phone: phone, customer_email: currentUser.email,
       start_date: state.date, estimated_hours: estHours, status: '결제확인중',
-      options: { product: state.key, pages: state.qty, addons: state.addons, picked_start_date: state.date, consent: consent }
+      options: { product: state.key, pages: state.qty, addons: state.addons, picked_start_date: state.date, expected_schedule: state.sched || null, consent: consent }
     };
     var ins = await sb.from('machim_orders').insert(row);
     if(ins.error){ console.error(ins.error); resetBtn(); alert('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'); return; }
