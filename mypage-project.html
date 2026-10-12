@@ -456,6 +456,18 @@
         }).join('') + '</div>';
     }
 
+    if(project.refunded_at){
+      el.innerHTML = switcherHtml + `
+        <div class="card">
+          <div class="proj-name">${escapeHtml(project.product_name)}</div>
+          <p class="proj-amount">${project.amount ? Number(project.amount).toLocaleString()+'원' : ''}</p>
+          <div style="margin-top:10px;padding:14px 16px;border-radius:12px;background:var(--paper);font-size:14px;line-height:1.7;color:var(--ink-soft);">
+            <b style="color:var(--ink);">취소·환불이 처리되었어요.</b><br>환불은 결제 취소 후 카드사 사정에 따라 영업일 기준 3~5일 안에 반영돼요. 궁금한 점은 1:1 문의로 남겨주세요.
+          </div>
+        </div>`;
+      el.querySelectorAll('[data-pid]').forEach(b => b.addEventListener('click', ()=>{ project = allProjects.find(x => x.id === b.dataset.pid) || project; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
+      return;
+    }
     el.innerHTML = switcherHtml + `
       <div class="card">
         <div class="proj-name">${escapeHtml(project.product_name)}</div>
@@ -467,6 +479,7 @@
         <ul class="timeline">${timelineHtml}</ul>
         <div class="action-box" id="actionBox"></div>
       </div>
+      <div id="refundBox"></div>
     `;
 
     el.querySelectorAll('[data-pid]').forEach(b => b.addEventListener('click', ()=>{
@@ -477,6 +490,54 @@
 
     renderPrepCard();
     renderAction();
+    renderRefundCard();
+  }
+
+  // ===== 취소·환불 =====
+  // 환불 가능 여부와 금액은 서버(machim-cancel-order)가 판단합니다. 화면은 안내와 신청만 합니다.
+  const REFUND_REASONS = ['단순 변심', '일정이 맞지 않아요', '다른 곳에 맡기기로 했어요', '제작 방향이 맞지 않아요', '마침 쪽 사유 (지연·약속과 다른 진행 등)', '기타'];
+  async function renderRefundCard(){
+    const box = document.getElementById('refundBox'); if(!box) return;
+    box.innerHTML = '';
+    if(!project || project.refunded_at || project.deployed_at) return;
+    const pid = project.id;
+    let d = null;
+    try{ const r = await sb.functions.invoke('machim-cancel-order', { body: { action: 'preview', projectId: pid } }); d = r.data; }catch(e){ console.error(e); }
+    if(!d || !d.ok || d.done || !project || project.id !== pid) return;
+    const money = n => Number(n).toLocaleString() + '원';
+    const infoLine = d.mode === 'auto' ? '지금 취소하면 <b>' + money(d.amount) + '</b>이 바로 환불 처리돼요.'
+      : d.mode === 'manual' ? '환불 예정 금액 <b>' + money(d.amount) + '</b> (확인 후 안내드려요)'
+      : '환불 신청을 남기시면 내용을 확인해 안내드려요.';
+    box.innerHTML = `
+      <div class="card">
+        <h2>취소 · 환불</h2>
+        <p class="desc" style="margin-bottom:10px;">${d.label}</p>
+        <p class="desc" style="margin-bottom:12px;">${infoLine}</p>
+        ${d.pending
+          ? '<div style="padding:12px 14px;border-radius:10px;background:var(--paper);font-size:13.5px;color:var(--ink-soft);">환불 신청이 접수되어 확인 중이에요. 결과는 1:1 문의나 이메일로 안내드려요.</div>'
+          : `<select id="refundReason" style="width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font:inherit;margin-bottom:10px;">
+               <option value="">사유를 선택해주세요</option>${REFUND_REASONS.map(x => '<option>' + x + '</option>').join('')}
+             </select>
+             <div class="btn-row"><button class="btn" id="refundBtn" style="background:#fff;color:var(--brick);border:1.5px solid var(--brick);">${d.mode === 'auto' ? '취소하고 환불받기' : '환불 신청하기'}</button></div>
+             <div class="msg" id="refundMsg"></div>`}
+      </div>`;
+    const btn = document.getElementById('refundBtn'); if(!btn) return;
+    btn.addEventListener('click', async () => {
+      const reason = document.getElementById('refundReason').value, msg = document.getElementById('refundMsg');
+      if(!reason){ msg.textContent = '사유를 선택해주세요.'; return; }
+      if(!confirm(d.mode === 'auto' ? '정말 취소하시겠어요?\n바로 전액 환불 처리되며 되돌릴 수 없어요.' : '환불을 신청할까요?')) return;
+      btn.disabled = true; msg.textContent = '처리 중…';
+      try{
+        const r = await sb.functions.invoke('machim-cancel-order', { body: { action: 'cancel', projectId: pid, reason } });
+        const x = r.data;
+        if(x && x.ok && x.mode === 'auto'){
+          const { data } = await sb.from('machim_projects').select('*').eq('id', pid).maybeSingle();
+          if(data){ project = data; const i = allProjects.findIndex(y => y.id === pid); if(i >= 0) allProjects[i] = data; }
+          render(); window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if(x && x.ok){ msg.textContent = '환불 신청이 접수되었어요. 확인 후 안내드릴게요.'; setTimeout(renderRefundCard, 600); }
+        else { let m = (x && x.error) || '처리하지 못했어요. 잠시 후 다시 시도해주세요.'; try{ const b = await r.error.context.json(); if(b && b.error) m = b.error; }catch(e){} msg.textContent = m; btn.disabled = false; }
+      }catch(e){ console.error(e); msg.textContent = '처리하지 못했어요. 잠시 후 다시 시도해주세요.'; btn.disabled = false; }
+    });
   }
 
   async function fillDeliverFiles(stageTag){

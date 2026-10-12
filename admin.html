@@ -224,7 +224,7 @@
 
       <div class="panel" style="margin-top:20px;">
         <h3>선착순 현황 · 나도 작가도전</h3>
-        <div class="desc">결제가 <b>완료된</b> 신청만 센 인원이에요. 한도에 도달하면 신청 페이지와 서버에서 자동으로 마감돼요. 한도를 바꾸고 저장하면 바로 반영돼요.</div>
+        <div class="desc"><b>실결제로 완료된</b> 신청만 센 인원이에요. 테스트 결제와 관리자 점검은 세지 않아요. 한도에 도달하면 신청 페이지와 서버에서 자동으로 마감돼요. 한도를 바꾸고 저장하면 바로 반영돼요.</div>
         <div id="campBox" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;">불러오는 중…</div>
         <div id="campList" style="font-size:13px;color:var(--ink-soft);"></div>
       </div>
@@ -232,6 +232,11 @@
 
     <!-- ORDERS -->
     <section class="view" data-view="orders">
+      <div class="panel" style="margin-bottom:20px;">
+        <h3>환불 신청</h3>
+        <div class="desc">제작 착수 전 취소는 서버가 <b>자동으로 전액 환불</b>해요(여기엔 기록만 남아요). 착수 후(70% 기준)나 시안 이후 신청은 아래에서 확인하고 승인·거절하세요. 승인하면 포트원에 결제 취소가 요청돼요.</div>
+        <div id="refundList" style="font-size:13.5px;">불러오는 중…</div>
+      </div>
       <div class="panel">
         <h3>주문 관리</h3>
         <div class="desc">상태를 바꾸면 바로 저장됩니다. "완료"로 바꾸면 이후 고객 알림 자동화가 연결될 예정입니다.</div>
@@ -655,6 +660,42 @@
     ['auto_excel','엑셀 반복업무 자동화',[1,2,4,1,1]], ['auto_inq','문의 분류 자동화',[1,2,5,2,1]]
   ];
 
+
+  async function loadRefunds(){
+    const box = document.getElementById('refundList'); if(!box) return;
+    const { data, error } = await sb.from('machim_refund_requests').select('*').order('created_at', { ascending: false }).limit(50);
+    if(error){ box.textContent = '불러오지 못했어요: ' + error.message + ' (add-refund.sql을 실행했는지 확인하세요)'; return; }
+    if(!data || !data.length){ box.textContent = '환불 신청이 없어요.'; return; }
+    const won = n => (n == null ? '-' : Number(n).toLocaleString() + '원');
+    const modeLbl = { auto: '자동(착수 전)', manual: '착수 후 · 70% 대상', blocked: '시안 이후' };
+    box.innerHTML = data.map(r => {
+      const open = r.status === '접수';
+      return '<div style="border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:8px;' + (open ? 'background:#FFF8F0;' : '') + '">'
+        + '<div><b>' + escapeHtmlA(r.customer_email || '-') + '</b> · ' + (modeLbl[r.mode] || r.mode) + ' · <b style="color:' + (open ? 'var(--brick)' : 'var(--ink-faint)') + ';">' + r.status + '</b> <span style="color:var(--ink-faint);font-size:12px;">' + escapeHtmlA(String(r.created_at).slice(0, 16).replace('T', ' ')) + '</span></div>'
+        + '<div style="margin-top:4px;color:var(--ink-soft);">사유: ' + escapeHtmlA(r.reason || '-') + ' · 기준 금액 ' + won(r.suggested_amount) + (r.refund_amount != null ? ' · 환불 ' + won(r.refund_amount) : '') + (r.admin_note ? ' · ' + escapeHtmlA(r.admin_note) : '') + '</div>'
+        + (open ? '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label style="font-size:12.5px;">환불 금액 <input type="number" min="1" value="' + (r.suggested_amount || '') + '" data-ramt="' + r.id + '" style="width:120px;"></label>'
+          + '<button class="save-btn" data-rok="' + r.id + '" style="padding:5px 12px;">승인 · 환불 실행</button><button class="save-btn" data-rno="' + r.id + '" style="padding:5px 12px;background:#888;">거절</button></div>' : '')
+        + '</div>';
+    }).join('');
+    const call = async (body) => {
+      const r = await sb.functions.invoke('machim-cancel-order', { body });
+      let m = r.data && r.data.error; if(!m && r.error){ try{ const b = await r.error.context.json(); m = b && b.error; }catch(e){} }
+      return { ok: !!(r.data && r.data.ok), msg: m || '처리하지 못했어요.' };
+    };
+    box.querySelectorAll('[data-rok]').forEach(b => b.addEventListener('click', async () => {
+      const amt = Number(box.querySelector('[data-ramt="' + b.dataset.rok + '"]').value);
+      if(!confirm('실제로 ' + amt.toLocaleString() + '원을 환불(결제 취소)합니다. 계속할까요?')) return;
+      b.disabled = true; const x = await call({ action: 'approve', requestId: b.dataset.rok, amount: amt });
+      if(!x.ok){ alert(x.msg); b.disabled = false; return; }
+      loadRefunds();
+    }));
+    box.querySelectorAll('[data-rno]').forEach(b => b.addEventListener('click', async () => {
+      const note = prompt('거절 사유(고객에게 안내할 내용 메모):', ''); if(note === null) return;
+      const x = await call({ action: 'reject', requestId: b.dataset.rno, note });
+      if(!x.ok){ alert(x.msg); return; }
+      loadRefunds();
+    }));
+  }
   async function loadCampaignAdmin(){
     const box = document.getElementById('campBox'); if(!box) return;
     const st = await sb.rpc('machim_campaign_status', { p_key: 'writer_campaign' });
@@ -670,11 +711,11 @@
       document.getElementById('campMsg').textContent = r.error ? '저장 실패: ' + r.error.message : '저장됨';
       if(!r.error) loadCampaignAdmin();
     });
-    const ol = await sb.from('machim_orders').select('created_at,customer_name,customer_email,status').like('product_name', '%작가도전%').order('created_at', { ascending: false }).limit(60);
+    const ol = await sb.from('machim_orders').select('created_at,customer_name,customer_email,status,options').like('product_name', '%작가도전%').order('created_at', { ascending: false }).limit(60);
     const list = document.getElementById('campList');
     if(ol.error){ list.textContent = ''; return; }
-    const paid = (ol.data || []).filter(x => x.status === '결제완료');
-    list.innerHTML = paid.length ? '<b>결제 완료</b><br>' + paid.map((x, i) => (paid.length - i) + '. ' + escapeHtmlA(x.customer_name || '-') + ' · ' + escapeHtmlA(x.customer_email || '') + ' · ' + fmtMD(String(x.created_at).slice(0, 10))).join('<br>') : '아직 결제 완료된 신청이 없어요.';
+    const paid = (ol.data || []).filter(x => x.status === '결제완료' && x.options && x.options.payment && x.options.payment.channelType === 'LIVE');
+    list.innerHTML = paid.length ? '<b>결제 완료</b><br>' + paid.map((x, i) => (paid.length - i) + '. ' + escapeHtmlA(x.customer_name || '-') + ' · ' + escapeHtmlA(x.customer_email || '') + ' · ' + fmtMD(String(x.created_at).slice(0, 10))).join('<br>') : '아직 실결제로 완료된 신청이 없어요. (테스트 결제는 인원에 세지 않아요)';
   }
   async function loadStageDays(){
     const body = document.getElementById('stageBody'); if(!body) return;
@@ -789,6 +830,7 @@
     loadHolidays();
     loadStageDays();
     loadCampaignAdmin();
+    loadRefunds();
     setInterval(()=>{ if(!document.hidden){ loadInbox(true); } }, 60000);
   }
 
