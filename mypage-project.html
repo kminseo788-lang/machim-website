@@ -596,14 +596,26 @@
           : `<select id="refundReason" style="width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font:inherit;margin-bottom:10px;">
                <option value="">사유를 선택해주세요</option>${REFUND_REASONS.map(x => '<option>' + x + '</option>').join('')}
              </select>
+             <div id="refundHint" style="display:none;padding:12px 14px;border-radius:10px;background:var(--paper);font-size:13.5px;line-height:1.7;color:var(--ink-soft);margin-bottom:10px;"></div>
              <div class="btn-row"><button class="btn" id="refundBtn" style="background:#fff;color:var(--brick);border:1.5px solid var(--brick);">${d.mode === 'auto' ? '취소하고 환불받기' : '환불 신청하기'}</button></div>
              <div class="msg" id="refundMsg"></div>`}
       </div>`;
     const btn = document.getElementById('refundBtn'); if(!btn) return;
+    // 마침 쪽 사유는 자동 환불이 아니라 확인 후 처리(신청 접수)로 진행돼요. 방향서 발송 전 전액 환불은 사유와 상관없이 자동이에요.
+    const isMarkCause = v => String(v || '').indexOf('마침 쪽 사유') === 0;
+    const willBeRequest = v => isMarkCause(v) && !(d.mode === 'auto' && d.full);
+    const sel = document.getElementById('refundReason');
+    sel.addEventListener('change', () => {
+      const hint = document.getElementById('refundHint'), req = willBeRequest(sel.value);
+      if(req){ hint.style.display = 'block'; hint.innerHTML = '마침 쪽 사유는 바로 환불되지 않고 <b>신청으로 접수</b>돼요. 마침이 내용을 확인한 뒤, 맞다면 <b>전액 환불</b>로 처리해 안내드려요.'; }
+      else { hint.style.display = 'none'; }
+      btn.textContent = (d.mode === 'auto' && !req) ? '취소하고 환불받기' : '환불 신청하기';
+    });
     btn.addEventListener('click', async () => {
       const reason = document.getElementById('refundReason').value, msg = document.getElementById('refundMsg');
       if(!reason){ msg.textContent = '사유를 선택해주세요.'; return; }
-      if(!confirm(d.mode === 'auto' ? '정말 취소하시겠어요?\n' + (d.full ? '바로 전액' : money(d.amount)) + ' 환불 처리되며 되돌릴 수 없어요.' + (d.full ? '' : '\n(제작이 시작되어 결제 금액의 30%는 환불되지 않아요)') : '환불을 신청할까요?')) return;
+      if(willBeRequest(reason)){ if(!confirm('환불을 신청할까요?\n마침이 내용을 확인한 뒤 안내드려요.')) return; }
+      else if(!confirm(d.mode === 'auto' ? '정말 취소하시겠어요?\n' + (d.full ? '바로 전액' : money(d.amount)) + ' 환불 처리되며 되돌릴 수 없어요.' + (d.full ? '' : '\n(제작이 시작되어 결제 금액의 30%는 환불되지 않아요)') : '환불을 신청할까요?')) return;
       btn.disabled = true; msg.textContent = '처리 중…';
       try{
         const r = await sb.functions.invoke('machim-cancel-order', { body: { action: 'cancel', projectId: pid, reason } });
