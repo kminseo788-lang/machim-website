@@ -388,7 +388,7 @@ footer .foot-fine{font-size:11.5px;color:var(--muted);opacity:.8;}
       <span class="eyebrow">나도 작가도전 · 경험이 콘텐츠가 되는 순간</span>
       <h1>당신이 지나온 시간이,<br>누군가에겐 <em>돈을 내고서라도</em><br>알고 싶은 이야기일 수 있습니다.</h1>
       <p>며칠씩 검색하고, 돈을 쓰고, 실패하며 겨우 알아낸 것들. 당신에겐 지나간 일이지만, 누군가는 지금 그 문제 앞에서 헤매고 있어요.</p>
-      <a href="order-writer-campaign.html" class="btn">나도 작가도전하기 →</a>
+      <a href="order.html?p=writer_campaign" class="btn">나도 작가도전하기 →</a>
       <div class="caption">대단한 성공담이 아니어도 됩니다. 1,000원짜리 짧은 글부터 시작해요.</div>
     </div>
     <div class="hero-art">
@@ -743,7 +743,7 @@ footer .foot-fine{font-size:11.5px;color:var(--muted);opacity:.8;}
       <div class="price-box">
         <span class="tag">출시 기념 얼리버드</span>
         <div class="final">777,777원</div>
-        <div class="sub">선착순 50명 한정 · 이후 가격은 달라질 수 있어요</div>
+        <div class="sub" id="campSub">선착순 50명 한정 · 이후 가격은 달라질 수 있어요</div>
       </div>
     </div>
     <div class="price-plus" aria-hidden="true">+</div>
@@ -754,7 +754,7 @@ footer .foot-fine{font-size:11.5px;color:var(--muted);opacity:.8;}
       <div class="note">약 18만원 상당의 혜택이 포함돼요. 13개월째부터는 월 15,000원이며, 원치 않으면 그 전에 해지할 수 있어요.</div>
     </div>
     <div class="price-cta">
-      <a href="order-writer-campaign.html" class="btn">지금 신청하기 →</a>
+      <a href="order.html?p=writer_campaign" class="btn">지금 신청하기 →</a>
       <div class="form-note">유의사항 확인 및 동의 후, 날짜를 선택해 신청합니다.</div>
     </div>
   </div>
@@ -791,7 +791,7 @@ footer .foot-fine{font-size:11.5px;color:var(--muted);opacity:.8;}
 <section class="closing">
   <div class="wrap">
     <h2>팔릴지는 몰라도,<br>안 쓰면 팔 것도 없습니다.</h2>
-    <a href="order-writer-campaign.html" class="btn">나도 작가도전하기 →</a>
+    <a href="order.html?p=writer_campaign" class="btn">나도 작가도전하기 →</a>
   </div>
 </section>
 
@@ -808,5 +808,19 @@ footer .foot-fine{font-size:11.5px;color:var(--muted);opacity:.8;}
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script>
+  // 남은 자리 표시 (불러오지 못하면 기본 문구 그대로 둡니다)
+  (async function(){
+    try{
+      var r = await sb.rpc('machim_campaign_status', { p_key: 'writer_campaign' });
+      if(!r.data) return;
+      var el = document.getElementById('campSub'); if(!el) return;
+      el.textContent = r.data.open ? '선착순 ' + r.data.limit + '명 한정 · 현재 ' + r.data.remaining + '명 남았어요' : '선착순 ' + r.data.limit + '명이 마감되었어요';
+      if(!r.data.open){ document.querySelectorAll('a[href^="order.html?p=writer_campaign"]').forEach(function(a){ a.textContent = '마감되었어요'; a.style.pointerEvents = 'none'; a.style.opacity = '.55'; }); }
+    }catch(e){}
+  })();
+</script>
 </body>
 </html>

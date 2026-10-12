@@ -139,6 +139,7 @@
     <div class="stp" data-s="4"><span class="n">4</span>확인 · 결제</div>
   </div>
 
+  <div id="campBanner" style="display:none;margin:0 0 16px;padding:14px 18px;border-radius:12px;font-size:14px;font-weight:600;line-height:1.6;"></div>
   <div class="layout">
     <div>
       <!-- STEP 1 -->
@@ -235,6 +236,13 @@
     auto_price: { group:'auto', name:'경쟁사 가격·재고 모니터링', base:450000, desc:'등록한 상품의 가격·재고를 자동 확인하고 변경 시 알려드려요', dur:'제작기간 착수일로부터 7~10영업일', detail:'detail-price-monitoring.html', orderName:'경쟁사 가격·재고 모니터링', hoursKey:['hours_priceMonitoring'], hoursDefault:20, include:['표준 사양 기준 모니터링 프로그램','이메일 알림'], note:'스마트스토어 공개 상품 페이지 등 표준 사양 범위의 고정가 상품입니다.' },
     auto_ann:   { group:'auto', name:'공고·지원사업 모니터링', base:450000, desc:'업종·지역 조건에 맞는 공고만 매일 알려드려요', dur:'제작기간 착수일로부터 10~13영업일', detail:'detail-announcement.html', orderName:'공고·지원사업 모니터링', hoursKey:['hours_announcement'], hoursDefault:25, include:['조건 맞춤 공고 수집·필터','매일 알림'], note:'고정가 상품입니다.' },
     auto_excel: { group:'auto', name:'엑셀 반복업무 자동화', base:350000, desc:'수집·정리·파일 생성까지 버튼 하나로', dur:'제작기간 착수일로부터 6~9영업일', detail:'detail-excel.html', orderName:'엑셀 반복업무 자동화', hoursKey:['hours_excel'], hoursDefault:15, include:['규칙이 정해진 엑셀 업무 1종 자동화'], note:'고정가 상품입니다.' },
+    writer_campaign: { group:'web', hidden:true, campaign:true, name:'나도 작가도전', base:777777, desc:'글을 쓰고 가격을 붙이면 바로 판매할 수 있는 나만의 온라인 도서관 · 출시 기념 얼리버드', dur:'제작기간 착수일로부터 영업일 기준 7~10일', detail:'writer-campaign.html', orderName:'나도 작가도전', hoursKey:['hours_writerCampaign'], hoursDefault:20,
+      include:['개인 이북 도서관 사이트 1개(기본 템플릿)','결제 연동·관리자 페이지·열람 기능','칩북 12개월 무료 입점'],
+      note:'선착순 인원이 마감되면 신청이 닫혀요. 결제가 완료된 순서로 자리가 확정됩니다.',
+      extraItems:[
+        { title:'제작 범위와 수정 횟수', html:'<ul><li>글 작성·판매가 가능한 온라인 도서관(개인 출판 플랫폼) 사이트 1개를 기본 템플릿 안에서 제작합니다.</li><li>시안 확인 후 <strong>무상 수정은 2회까지</strong>이며, 그 이상의 수정이나 기본 템플릿을 벗어나는 큰 구조 변경은 별도 비용이 발생할 수 있습니다.</li><li>제작기간은 착수일로부터 <strong>영업일 기준 7~10일</strong>이 소요됩니다.</li></ul>' },
+        { title:'칩북 1년 무료 입점 혜택', html:'<ul><li>사이트 완성·납품 시점부터 칩북(chipbook.net) 작가 입점 구독료(월 15,000원 상당)가 <strong>12개월간 면제</strong>됩니다.</li><li>13개월째부터는 월 15,000원의 구독료가 적용되며, 원치 않으시면 그 전에 해지하실 수 있습니다.</li><li>칩북 입점이 노출이나 판매를 보장하는 것은 아닙니다.</li></ul>' }
+      ] },
     web_test:   { group:'web', adminOnly:true, name:'[관리자 전용] 결제 점검 1,000원', base:1000, desc:'결제·서버검증·프로젝트 자동생성 점검용 (고객에게는 보이지 않아요)', dur:'점검용', detail:null, orderName:'[관리자 테스트] 결제 점검', hoursKey:[], hoursDefault:0, include:['결제 점검 전용'], note:'관리자 계정에서만 보이는 점검용 상품입니다.' },
     auto_inq:   { group:'auto', name:'문의 분류 자동화', base:450000, desc:'구매 의사를 먼저 확인해 진짜 상담이 필요한 분만 연결', dur:'제작기간 착수일로부터 8~11영업일', detail:'detail-inquiry.html', orderName:'문의 분류 자동화', hoursKey:['hours_inquiry'], hoursDefault:22, include:['사전 질문 폼','조건별 분류'], note:'고정가 상품입니다.' }
   };
@@ -268,7 +276,7 @@
     ['web','auto'].forEach(function(g){
       var el = document.getElementById(g==='web'?'gridWeb':'gridAuto'); el.innerHTML = '';
       Object.keys(PRODUCTS).forEach(function(k){
-        var p = PRODUCTS[k]; if(p.group!==g) return; if(p.adminOnly && !isAdmin) return;
+        var p = PRODUCTS[k]; if(p.group!==g) return; if(p.adminOnly && !isAdmin) return; if(p.hidden) return;
         var b = document.createElement('div'); b.className = 'pc' + (state.key===k?' sel':''); b.dataset.k = k;
         b.innerHTML = '<div class="nm">'+p.name+'</div><div class="ds">'+p.desc+'</div><div class="pr">'+(p.addons||p.qty ? won(p.base)+'부터' : won(p.base))+'</div><div class="du">'+p.dur+'</div>'+(p.detail?'<a class="more" href="'+p.detail+'" target="_blank" onclick="event.stopPropagation()">자세히 보기</a>':'')+'';
         b.addEventListener('click', function(){
@@ -320,7 +328,7 @@
   function addBiz(d, n){ var x = nextBiz(d); for(var i=0;i<n;i++){ x.setDate(x.getDate()+1); x = nextBiz(x); } return x; }
   var STAGES = ['방향서','시안','개발','최종 확인','배포'], stageCache = {};
   // 관리자가 저장한 값이 없을 때 쓰는 기본값 (관리자 화면의 회색 추천값과 동일)
-  var STAGE_DEFAULTS = { web_test:[1,1,1,1,1], web_basic:[1,3,4,1,1], web_detail:[1,1,1,1,1], web_ecom:[2,5,12,3,3], web_writer:[1,1,1,1,1], auto_price:[1,2,4,2,1], auto_ann:[1,3,6,2,1], auto_excel:[1,2,4,1,1], auto_inq:[1,2,5,2,1] };
+  var STAGE_DEFAULTS = { web_test:[1,1,1,1,1], web_basic:[1,3,4,1,1], web_detail:[1,1,1,1,1], web_ecom:[2,5,12,3,3], web_writer:[1,1,1,1,1], writer_campaign:[1,2,3,2,1], auto_price:[1,2,4,2,1], auto_ann:[1,3,6,2,1], auto_excel:[1,2,4,1,1], auto_inq:[1,2,5,2,1] };
   async function loadStageDays(key){
     if(stageCache[key] !== undefined) return stageCache[key];
     var res = null;
@@ -392,10 +400,31 @@
     document.getElementById('n3').disabled = !state.date;
   }
 
+  // ----- 선착순 상품(나도 작가도전) 잔여 인원 -----
+  var campStatus = null;
+  async function loadCampaign(){
+    var p = PRODUCTS[state.key], bn = document.getElementById('campBanner');
+    campStatus = null; bn.style.display = 'none';
+    if(!p || !p.campaign) return;
+    try{ var r = await sb.rpc('machim_campaign_status', { p_key: state.key }); if(r.data) campStatus = r.data; }catch(e){ console.error(e); }
+    if(!campStatus) return;
+    bn.style.display = 'block';
+    if(campStatus.open){
+      bn.style.background = 'var(--green-soft, #E4EDE7)'; bn.style.color = '#1B4332';
+      bn.textContent = '선착순 ' + campStatus.limit + '명 중 ' + campStatus.remaining + '명 남았어요. 결제가 완료된 순서로 자리가 확정돼요.';
+    } else {
+      bn.style.background = '#F5E3DA'; bn.style.color = '#8A3F25';
+      bn.textContent = '선착순 ' + campStatus.limit + '명이 모두 마감되었어요. 다음 모집이 열리면 안내드릴게요.';
+    }
+  }
+  function campClosed(){ return !!(PRODUCTS[state.key] && PRODUCTS[state.key].campaign && campStatus && !campStatus.open); }
+
   // ----- 단계 이동 -----
   async function go(n){
     if(n>1 && !state.key) n = 1;
     if(n>3 && !state.date) n = 3;
+    await loadCampaign();
+    if(campClosed() && n>1) n = 1;
     state.step = n; save();
     document.querySelectorAll('.panel').forEach(function(x){ x.classList.toggle('on', x.dataset.p==n); });
     document.querySelectorAll('.stp').forEach(function(s){ var i = Number(s.dataset.s); s.classList.toggle('on', i===n); s.classList.toggle('done', i<n); });
@@ -424,7 +453,7 @@
           }
         }
       }catch(e){ console.error(e); }
-      renderConsent({ containerId:'consentBox', payBtnId:'payBtn', productName: PRODUCTS[state.key].name, productKey: state.key, approvedHost: approvedHost });
+      renderConsent({ containerId:'consentBox', payBtnId:'payBtn', productName: PRODUCTS[state.key].name, productKey: state.key, approvedHost: approvedHost, extraItems: PRODUCTS[state.key].extraItems || [] });
     }
   }
 
@@ -480,6 +509,8 @@
     if(!name || !phone){ alert('이름과 연락처를 입력해주세요.'); return; }
     if(!currentUser){ alert('로그인이 필요합니다.'); return; }
     if(!PAY_LIVE && !isAdmin){ alert('결제 기능을 준비 중입니다. 곧 열릴 예정이에요.'); return; }
+    await loadCampaign();
+    if(campClosed()){ alert('선착순 인원이 마감되었어요.'); return; }
     var p = PRODUCTS[state.key], total = calcTotal();
     var btn = document.getElementById('payBtn'); btn.disabled = true; btn.textContent = '처리 중…';
     var resetBtn = function(){ btn.disabled = false; btn.textContent = '결제하기'; };
@@ -501,7 +532,7 @@
       options: { product: state.key, pages: state.qty, addons: state.addons, picked_start_date: state.date, expected_schedule: state.sched || null, consent: consent }
     };
     var ins = await sb.from('machim_orders').insert(row);
-    if(ins.error){ console.error(ins.error); resetBtn(); alert('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'); return; }
+    if(ins.error){ console.error(ins.error); resetBtn(); alert(String(ins.error.message||'').indexOf('campaign_full')>=0 ? '선착순 인원이 마감되었어요.' : '접수 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'); return; }
 
     // (관리자 전용) 주소에 ?skipPay=1 을 붙이면 결제 없이 프로젝트만 만들어 흐름을 점검할 수 있습니다.
     if(isAdmin && new URLSearchParams(location.search).get('skipPay')==='1'){

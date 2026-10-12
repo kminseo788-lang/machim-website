@@ -221,6 +221,13 @@
           </table>
         </div>
       </div>
+
+      <div class="panel" style="margin-top:20px;">
+        <h3>선착순 현황 · 나도 작가도전</h3>
+        <div class="desc">결제가 <b>완료된</b> 신청만 센 인원이에요. 한도에 도달하면 신청 페이지와 서버에서 자동으로 마감돼요. 한도를 바꾸고 저장하면 바로 반영돼요.</div>
+        <div id="campBox" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;">불러오는 중…</div>
+        <div id="campList" style="font-size:13px;color:var(--ink-soft);"></div>
+      </div>
     </section>
 
     <!-- ORDERS -->
@@ -643,10 +650,32 @@
   // ===== 단계별 제작 일정(영업일) 설정 =====
   const STAGE_PRODUCTS = [
     ['web_basic','홈페이지 기본형',[1,3,4,1,1]], ['web_detail','상세페이지 제작',[1,1,1,1,1]],
-    ['web_ecom','쇼핑몰 풀커머스',[2,5,12,3,3]], ['web_writer','작가 프로필 페이지',[1,1,1,1,1]],
+    ['web_ecom','쇼핑몰 풀커머스',[2,5,12,3,3]], ['web_writer','작가 프로필 페이지',[1,1,1,1,1]], ['writer_campaign','나도 작가도전',[1,2,3,2,1]],
     ['auto_price','경쟁사 가격·재고 모니터링',[1,2,4,2,1]], ['auto_ann','공고·지원사업 모니터링',[1,3,6,2,1]],
     ['auto_excel','엑셀 반복업무 자동화',[1,2,4,1,1]], ['auto_inq','문의 분류 자동화',[1,2,5,2,1]]
   ];
+
+  async function loadCampaignAdmin(){
+    const box = document.getElementById('campBox'); if(!box) return;
+    const st = await sb.rpc('machim_campaign_status', { p_key: 'writer_campaign' });
+    if(st.error || !st.data){ box.textContent = '불러오지 못했어요: ' + (st.error ? st.error.message : '데이터 없음') + ' (add-campaign.sql을 실행했는지 확인하세요)'; return; }
+    const d = st.data;
+    box.innerHTML = '<div style="font-size:26px;font-weight:800;">' + d.taken + ' <span style="font-size:16px;font-weight:600;color:var(--ink-faint);">/ ' + d.limit + '명</span></div>'
+      + '<div style="font-size:13px;">남은 자리 <b>' + d.remaining + '</b>명 · ' + (d.open ? '<span style="color:var(--green);">모집 중</span>' : '<span style="color:var(--brick);">마감</span>') + '</div>'
+      + '<label style="font-size:13px;">한도 <input type="number" id="campLimit" min="1" max="1000" value="' + d.limit + '" style="width:80px;"></label>'
+      + '<button class="save-btn" id="campSave" style="padding:5px 12px;">저장</button><span id="campMsg" style="font-size:12px;"></span>';
+    document.getElementById('campSave').addEventListener('click', async () => {
+      const n = Math.max(1, Math.min(1000, parseInt(document.getElementById('campLimit').value, 10) || 0));
+      const r = await sb.from('machim_site_settings').upsert({ key: 'campaign_limit_writer_campaign', value: String(n) }, { onConflict: 'key' });
+      document.getElementById('campMsg').textContent = r.error ? '저장 실패: ' + r.error.message : '저장됨';
+      if(!r.error) loadCampaignAdmin();
+    });
+    const ol = await sb.from('machim_orders').select('created_at,customer_name,customer_email,status').like('product_name', '%작가도전%').order('created_at', { ascending: false }).limit(60);
+    const list = document.getElementById('campList');
+    if(ol.error){ list.textContent = ''; return; }
+    const paid = (ol.data || []).filter(x => x.status === '결제완료');
+    list.innerHTML = paid.length ? '<b>결제 완료</b><br>' + paid.map((x, i) => (paid.length - i) + '. ' + escapeHtmlA(x.customer_name || '-') + ' · ' + escapeHtmlA(x.customer_email || '') + ' · ' + fmtMD(String(x.created_at).slice(0, 10))).join('<br>') : '아직 결제 완료된 신청이 없어요.';
+  }
   async function loadStageDays(){
     const body = document.getElementById('stageBody'); if(!body) return;
     const keys = STAGE_PRODUCTS.map(p => 'stage_days_' + p[0]);
@@ -759,6 +788,7 @@
     loadInbox();
     loadHolidays();
     loadStageDays();
+    loadCampaignAdmin();
     setInterval(()=>{ if(!document.hidden){ loadInbox(true); } }, 60000);
   }
 
