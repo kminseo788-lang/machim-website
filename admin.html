@@ -234,7 +234,7 @@
     <section class="view" data-view="orders">
       <div class="panel" style="margin-bottom:20px;">
         <h3>환불 신청</h3>
-        <div class="desc">제작 착수 전 취소는 서버가 <b>자동으로 전액 환불</b>해요(여기엔 기록만 남아요). 착수 후(70% 기준)나 시안 이후 신청은 아래에서 확인하고 승인·거절하세요. 승인하면 포트원에 결제 취소가 요청돼요.</div>
+        <div class="desc">방향서 발송 전 취소(전액)와 시안 전 취소(70%)는 서버가 <b>자동으로 환불</b>해요(여기엔 기록만 남아요). 시안 이후 신청(마침 쪽 사유 등)만 아래에서 확인하고 승인·거절하세요. 승인하면 포트원에 결제 취소가 요청돼요.</div>
         <div id="refundList" style="font-size:13.5px;">불러오는 중…</div>
       </div>
       <div class="panel">
@@ -409,15 +409,15 @@
       const amountText = (o.amount || 0).toLocaleString('ko-KR') + '원';
       const startText = o.start_date || (o.options && o.options.picked_start_date_label) || '-';
       tr.innerHTML = `
-        <td>${o.customer_name || '-'}<div style="font-size:11.5px;color:var(--ink-faint);">${o.customer_email || ''}</div></td><td>${o.product_name}</td><td>${amountText}</td>
-        <td>${o.customer_phone || '-'}</td><td>${startText}</td>
+        <td>${escapeHtmlA(o.customer_name || '-')}<div style="font-size:11.5px;color:var(--ink-faint);">${escapeHtmlA(o.customer_email || '')}</div></td><td>${escapeHtmlA(o.product_name)}</td><td>${amountText}</td>
+        <td>${escapeHtmlA(o.customer_phone || '-')}</td><td>${escapeHtmlA(startText)}</td>
         <td>
           <select class="status-select" data-id="${o.id}">
             ${STATUS_OPTIONS.map(s=>`<option ${o.status===s?'selected':''}>${s}</option>`).join('')}
           </select>
           ${o.status==='결제확인중' ? `<button class="save-btn" style="margin-top:8px;font-size:12.5px;padding:6px 12px;" data-confirm-pay="${o.id}">결제 확인 → 자료제출 열기</button>` : ''}
           <div style="margin-top:8px;">
-            <textarea class="note-input" data-id="${o.id}" placeholder="고객에게 보여줄 메모 (예: 자재 발주 완료, 9/25 전달 예정)" style="width:100%;min-height:44px;font:inherit;font-size:12.5px;padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;">${o.admin_note || ''}</textarea>
+            <textarea class="note-input" data-id="${o.id}" placeholder="고객에게 보여줄 메모 (예: 자재 발주 완료, 9/25 전달 예정)" style="width:100%;min-height:44px;font:inherit;font-size:12.5px;padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;">${escapeHtmlA(o.admin_note || '')}</textarea>
             <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;" data-note-save="${o.id}">메모 저장</button>
           </div>
         </td>`;
@@ -464,7 +464,7 @@
     data.slice(0,3).forEach(o=>{
       const tr = document.createElement('tr');
       const amountText = (o.amount || 0).toLocaleString('ko-KR') + '원';
-      tr.innerHTML = `<td>${o.customer_name || '-'}</td><td>${o.product_name}</td><td>${amountText}</td><td>${o.status}</td>`;
+      tr.innerHTML = `<td>${escapeHtmlA(o.customer_name || '-')}</td><td>${escapeHtmlA(o.product_name)}</td><td>${amountText}</td><td>${escapeHtmlA(o.status)}</td>`;
       recentOrderTable.appendChild(tr);
     });
     if(!data.length) recentOrderTable.innerHTML = '<tr><td colspan="4">아직 주문이 없습니다.</td></tr>';
@@ -667,7 +667,7 @@
     if(error){ box.textContent = '불러오지 못했어요: ' + error.message + ' (add-refund.sql을 실행했는지 확인하세요)'; return; }
     if(!data || !data.length){ box.textContent = '환불 신청이 없어요.'; return; }
     const won = n => (n == null ? '-' : Number(n).toLocaleString() + '원');
-    const modeLbl = { auto: '자동(착수 전)', manual: '착수 후 · 70% 대상', blocked: '시안 이후' };
+    const modeLbl = { auto: '자동 환불', manual: '착수 후 · 70% 대상', blocked: '시안 이후' };
     box.innerHTML = data.map(r => {
       const open = r.status === '접수';
       return '<div style="border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:8px;' + (open ? 'background:#FFF8F0;' : '') + '">'
@@ -756,8 +756,8 @@
     data.forEach(q=>{
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${q.name || '-'}${q.customer_id ? '<br><span style="font-size:11px;color:var(--brick);">로그인 고객</span>' : ''}</td><td>${q.phone || '-'}${q.email ? '<br><span style="font-size:11px;">'+q.email+'</span>' : ''}</td><td>${q.task_type || '-'}${q.product_key ? '<br><span style="font-size:11px;">'+q.product_key+'</span>' : ''}</td>
-        <td>${q.frequency || '-'}</td><td style="max-width:260px;white-space:pre-wrap;">${(q.scope || '-').replace(/</g,'&lt;')}</td>
+        <td>${escapeHtmlA(q.name || '-')}${q.customer_id ? '<br><span style="font-size:11px;color:var(--brick);">로그인 고객</span>' : ''}</td><td>${escapeHtmlA(q.phone || '-')}${q.email ? '<br><span style="font-size:11px;">'+escapeHtmlA(q.email)+'</span>' : ''}</td><td>${escapeHtmlA(q.task_type || '-')}${q.product_key ? '<br><span style="font-size:11px;">'+escapeHtmlA(q.product_key)+'</span>' : ''}</td>
+        <td>${escapeHtmlA(q.frequency || '-')}</td><td style="max-width:260px;white-space:pre-wrap;">${escapeHtmlA(q.scope || '-')}</td>
         <td>
           <select class="status-select" data-id="${q.id}">
             <option ${q.status==='신규'?'selected':''}>신규</option>
@@ -765,10 +765,10 @@
             <option ${q.status==='답변완료'?'selected':''}>답변완료</option>
           </select>
           <div style="margin-top:8px;">
-            <textarea class="reply-input" data-id="${q.id}" placeholder="고객에게 보여줄 답변" style="width:100%;min-height:50px;font:inherit;font-size:12.5px;padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;">${q.admin_reply || ''}</textarea>
-            ${q.customer_id && q.product_key && q.host_service ? `<label style="display:block;font-size:12px;margin-top:4px;"><input type="checkbox" data-payable="${q.id}" ${q.payable?'checked':''}> 가능해요 → 고객 마이페이지에 "이 조건으로 결제하기" 표시 (${q.host_service})</label>` : ''}
+            <textarea class="reply-input" data-id="${q.id}" placeholder="고객에게 보여줄 답변" style="width:100%;min-height:50px;font:inherit;font-size:12.5px;padding:6px 8px;border:1.5px solid var(--line);border-radius:6px;">${escapeHtmlA(q.admin_reply || '')}</textarea>
+            ${q.customer_id && q.product_key && q.host_service ? `<label style="display:block;font-size:12px;margin-top:4px;"><input type="checkbox" data-payable="${q.id}" ${q.payable?'checked':''}> 가능해요 → 고객 마이페이지에 "이 조건으로 결제하기" 표시 (${escapeHtmlA(q.host_service)})</label>` : ''}
             <button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;" data-reply-save="${q.id}">답변 저장</button>
-            ${/작가/.test((q.task_type||'')+(q.scope||'')) ? `<button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;background:var(--gold);" data-add-order="${q.id}" data-name="${q.name || ''}">나도 작가도전 → 제작 일정에 추가</button>` : ''}
+            ${/작가/.test((q.task_type||'')+(q.scope||'')) ? `<button class="save-btn" style="margin-top:4px;font-size:12px;padding:4px 10px;background:var(--gold);" data-add-order="${q.id}" data-name="${escapeHtmlA(q.name || '')}">나도 작가도전 → 제작 일정에 추가</button>` : ''}
           </div>
         </td>`;
       inquiryTable.appendChild(tr);
@@ -927,7 +927,7 @@
     if(!capOrders.length){ capTable.innerHTML = '<tr><td colspan="4">진행 중인 주문이 없습니다.</td></tr>'; }
     capOrders.forEach(o=>{
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${o.customer_name || '-'}</td><td>${o.product_name}</td><td>${o.status}</td><td>${o.estimated_hours || 0}시간</td>`;
+      tr.innerHTML = `<td>${escapeHtmlA(o.customer_name || '-')}</td><td>${escapeHtmlA(o.product_name)}</td><td>${escapeHtmlA(o.status)}</td><td>${Number(o.estimated_hours) || 0}시간</td>`;
       capTable.appendChild(tr);
     });
 
@@ -1005,7 +1005,7 @@
     const out = [];
     for(const f of files){
       const { data } = await sb.storage.from('machim-materials').createSignedUrl(f.path, 3600);
-      const size = (f.size ? ' <span style="color:var(--ink-faint);">(' + (f.size/1024/1024).toFixed(1) + 'MB)</span>' : '') + (f.sha256 ? ' <span title="SHA-256 ' + f.sha256 + '" style="color:var(--ink-faint);font-size:11px;">#' + f.sha256.slice(0,8) + '</span>' : '');
+      const size = (Number(f.size) ? ' <span style="color:var(--ink-faint);">(' + (Number(f.size)/1024/1024).toFixed(1) + 'MB)</span>' : '') + (f.sha256 ? ' <span title="SHA-256 ' + escapeHtmlA(f.sha256) + '" style="color:var(--ink-faint);font-size:11px;">#' + escapeHtmlA(String(f.sha256).slice(0,8)) + '</span>' : '');
       out.push('<div style="padding:2px 0;">' + (data ? `<a href="${data.signedUrl}" target="_blank" rel="noopener" style="color:var(--brick);text-decoration:underline;">${escapeHtmlA(f.name)}</a>` : escapeHtmlA(f.name) + ' (열기 실패)') + size + '</div>');
     }
     return out.join('');
@@ -1187,6 +1187,61 @@
         </div>
       </details>`;
 
+    const SEC_ITEMS = [
+      ['keys','비밀키(서비스 키·결제 시크릿 등)가 코드·저장소에 노출되어 있지 않다',
+       '① VS Code에서 프로젝트 폴더를 열고 Ctrl+Shift+F(전체 검색)로 <b>service_role</b>, <b>sb_secret</b>, <b>secret</b>, <b>PORTONE</b>을 각각 검색해요. ② GitHub 저장소 화면 위쪽 검색창에서도 같은 단어를 검색해요. ③ 사이트를 열고 Ctrl+U(페이지 소스)에서도 검색해요. ▶ 통과 기준: 검색 결과가 없거나 <b>sb_publishable_</b>로 시작하는 공개 키만 나와야 해요. <b>sb_secret_</b>로 시작하거나 service_role이 보이면 즉시 키를 재발급해야 해요. (eyJ로 시작하는 긴 키는 jwt.io에 붙여서 role이 anon이면 공개용이라 괜찮고, service_role이면 위험해요.)'],
+      ['keyhandling','비밀키는 고객이 직접 입력했고 마침은 열람·보관하지 않았다 (부득이 보았다면 사용 후 고객이 키를 재발급했다)',
+       '진행 중에 비밀키를 채팅·메일·메모로 받은 적이 없는지 돌아보고, 있다면 고객이 새 키로 교체했는지 확인해요. 받은 적이 없다면 체크하고, 있다면 메모에 "언제 어디서 보았고 교체했다"를 적어요.'],
+      ['rls','모든 테이블에 RLS가 켜져 있고, 다른 계정으로 남의 데이터를 조회·수정해 봐도 막힌다',
+       'Supabase → Table Editor에서 각 테이블 이름 옆에 <b>RLS enabled</b>가 있는지 봐요(빨간 경고가 있으면 안 돼요). 그리고 Supabase → Advisors → <b>Security</b>에서 경고가 없는지 확인해요. 마지막으로 <b>test-rls.sql</b>을 SQL Editor에서 Run해서 결과표가 모두 PASS인지 봐요. (고객 사이트는 그 사이트의 테이블 이름에 맞게 고쳐서 실행해요.)'],
+      ['admin','일반 계정으로 관리자 기능·주소를 호출해도 실행되지 않는다',
+       '테스트용 일반 계정으로 로그인한 상태에서 admin.html 주소를 직접 열어 봐요. 주문·고객 데이터가 보이거나 버튼이 동작하면 안 돼요. 또 일반 계정으로 환불 승인 같은 관리자 기능을 눌러서 "권한이 없습니다"가 뜨는지 확인해요.'],
+      ['pay','결제 금액·상태를 서버에서 다시 확인한다 (브라우저가 보내는 값은 믿지 않음)',
+       '테스트 결제를 한 뒤 포트원 콘솔의 거래 금액과 주문 금액이 같은지 봐요. 결제창을 중간에 닫았을 때 "결제완료"로 바뀌지 않는지, 결제 없이 완료 화면 주소만 열었을 때 프로젝트가 생기지 않는지도 확인해요. 서버 함수(Edge Functions → Logs)에 금액 불일치 시 거절 기록이 남는지 봐요.'],
+      ['xss','고객이 입력한 값이 출력되는 곳에 악성 문자열을 넣어 봐도 실행되지 않는다',
+       '테스트 계정으로 이름·문의 칸에 <b>&lt;img src=x onerror=alert(1)&gt;</b> 를 그대로 입력해서 제출해요. 그 뒤 관리자 화면에서 그 주문·문의를 열었을 때 경고창이 뜨지 않고 <b>글자 그대로</b> 보이면 통과예요. 경고창이 뜨면 실패라서 수정이 필요해요.'],
+      ['upload','업로드 파일은 비공개 저장소에 두고 형식·크기를 제한한다',
+       'Supabase → Storage에서 버킷에 <b>Public</b> 표시가 없는지 봐요. 업로드된 파일의 주소를 로그아웃한 브라우저에 붙여서 열리지 않아야 해요. 허용 파일 형식과 최대 크기가 정해져 있는지도 확인해요.'],
+      ['privacy','수집하는 개인정보 항목이 개인정보처리방침과 일치한다',
+       '사이트의 가입·주문·문의 폼이 실제로 받는 항목(이름, 이메일, 전화번호 등)을 적어 보고, 개인정보처리방침 문서의 수집 항목과 하나씩 대조해요. 방침에 없는 항목을 받고 있으면 안 돼요.'],
+      ['https','HTTPS가 적용되어 있고 관리자 화면 접근이 제한된다',
+       '주소창에 http:// 로 입력해도 https:// 로 바뀌는지, 자물쇠 표시가 있는지 확인해요. 로그아웃 상태에서 관리자 화면이 열리지 않는지도 봐요.'],
+      ['deps','사용 중인 외부 라이브러리에 알려진 취약점이 없는지 확인했다',
+       'GitHub 저장소 → <b>Security</b> 탭 → Dependabot alerts에 열린 경고가 없는지 봐요. 코드에서 가져다 쓰는 외부 스크립트(CDN) 주소에 버전이 고정되어 있는지도 확인해요(버전 없이 latest로 가져오면 안 돼요).'],
+      ['backup','데이터 백업을 만들고, 실제로 복구되는지 확인했다 (원고·주문 데이터) · 백업 방법을 고객에게 안내했다',
+       'Supabase → Database → <b>Backups</b>에서 자동 백업이 켜져 있는지 봐요(플랜에 따라 다름). 그리고 중요한 테이블을 CSV로 내려받은 뒤, 새 테스트 프로젝트에 가져와 보면서 <b>실제로 복구되는지</b> 연습해요. 고객에게는 직접 내려받는 방법을 안내해요.'],
+      ['realdb','실제 운영 DB에서 권한 점검 스크립트(test-rls.sql)를 돌려 모두 PASS를 확인했다',
+       'Supabase → SQL Editor에 test-rls.sql 내용을 붙여 Run해요. 맨 아래 결과표의 "결과" 칸이 전부 PASS면 통과예요. FAIL이 있으면 그 줄 번호와 항목을 기록해서 고쳐요. (실행 후 임시 데이터는 자동으로 취소돼서 남지 않아요.)']
+    ];
+    const secChk = p.security_check || {};
+    const secItems = secChk.items || {};
+    const handoffOpen = (p.current_stage === '배포완료') ? ' open' : '';
+    const revReq = p.access_revoke_requested_at, revCust = p.access_revoke_customer_confirmed_at, revOk = p.access_revoke_verified_at;
+    const handoffSection = (p.current_stage === '배포완료' || p.deployed_at) ? `
+      <details style="${secStyle}"${handoffOpen}>
+        <summary style="${sumStyle}">납품 마무리 (보안 점검 · 접근권한 정리) ${revOk ? '<span style="font-weight:400;color:#3B6B45;">· ✓ 완전 종료</span>' : '<span style="font-weight:700;color:#B8452A;">· 마무리 필요</span>'}</summary>
+        <div style="${bodyStyle}">
+          <div style="font-weight:800;margin-top:4px;">1. 납품 전 보안 점검 ${secChk.done_at ? '<span style="font-weight:400;color:#3B6B45;">· ' + fmtDT(secChk.done_at) + ' 기록</span>' : '<span style="font-weight:400;color:var(--ink-faint);">· 아직 기록 없음</span>'}</div>
+          <div style="font-size:12px;color:var(--ink-faint);margin:2px 0 6px;">실제로 확인한 항목만 체크하고 저장하세요. 저장하면 날짜와 함께 진행 기록(증빙)에 남아요.</div>
+          ${SEC_ITEMS.map(it => `<div style="padding:3px 0;"><label style="display:flex;gap:8px;align-items:flex-start;"><input type="checkbox" data-sec="${it[0]}" ${secItems[it[0]] ? 'checked' : ''} style="margin-top:4px;"><span>${it[1]}</span></label><details style="margin-left:26px;"><summary style="cursor:pointer;font-size:12px;color:var(--brick);">확인 방법 보기</summary><div style="font-size:12.5px;line-height:1.7;color:var(--ink-soft);padding:4px 0 6px;">${it[2]}</div></details></div>`).join('')}
+          <textarea data-sec-note placeholder="점검 메모 (예: 확인한 방법, 해당 없는 항목과 이유)" style="width:100%;min-height:44px;margin-top:6px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;font-size:13px;">${escapeHtmlA(secChk.note || '')}</textarea>
+          <button type="button" class="save-btn" data-sec-save="${p.id}" style="margin-top:6px;font-size:12.5px;padding:6px 14px;">점검 기록 저장</button>
+          <div style="margin-top:6px;font-size:12.5px;">${secChk.done_at ? (p.security_ack_at && new Date(p.security_ack_at) >= new Date(secChk.done_at) ? '<span style="color:#3B6B45;font-weight:700;">✓ 고객이 점검 결과를 확인했어요: ' + fmtDT(p.security_ack_at) + '</span>' : '<span style="color:var(--ink-faint);">· 고객 확인 대기 중 (고객 마이페이지에 점검 결과가 표시돼요)</span>') : ''}</div>
+
+          <div style="font-weight:800;margin-top:16px;">2. 접근권한 정리 (고객이 마침 접근 권한을 해제)</div>
+          <div style="margin-top:4px;">
+            ${revReq ? '✓ 정리 요청: ' + fmtDT(revReq) : '<button type="button" class="save-btn" data-revoke-req="' + p.id + '" style="font-size:12.5px;padding:6px 14px;">고객에게 접근권한 정리 요청 (마이페이지에 안내 표시 · 기록)</button>'}
+          </div>
+          <div style="margin-top:6px;"><button type="button" class="save-btn" data-keyguide="${p.id}" style="font-size:12.5px;padding:6px 14px;background:#6b665c;">접근권한 해제·키 교체 안내를 마이페이지 대화로 보내기</button> <span style="font-size:12px;color:var(--ink-faint);">(고객이 대화에서 다시 볼 수 있어요 · 이메일 발송은 아직 연결 전)</span></div>
+          ${revReq ? '<div style="margin-top:4px;">' + (revCust ? '✓ 고객이 정리했다고 확인: ' + fmtDT(revCust) : '<span style="color:var(--ink-faint);">· 고객 확인 대기 중</span>') + '</div>' : ''}
+          ${revReq ? `<div style="margin-top:8px;">
+            ${revOk ? '✓ 마침 최종 확인: ' + fmtDT(revOk) + (p.access_revoke_note ? '<div style="white-space:pre-line;color:var(--ink-soft);">' + escapeHtmlA(p.access_revoke_note) + '</div>' : '')
+              : `<textarea data-revoke-note placeholder="직접 확인한 내용 (예: GitHub 저장소·Supabase·Cloudflare 멤버 목록에서 마침 계정이 없는 것을 확인)" style="width:100%;min-height:44px;padding:8px;border:1.5px solid var(--line);border-radius:6px;font:inherit;font-size:13px;"></textarea>
+                 <button type="button" class="save-btn" data-revoke-verify="${p.id}" style="margin-top:6px;font-size:12.5px;padding:6px 14px;">직접 확인 완료 → 완전 종료</button>`}
+          </div>` : ''}
+        </div>
+      </details>` : '';
+
     const ACT = { customer:'고객', admin:'마침', system:'시스템' };
     const timelineSection = `
       <details style="${secStyle}">
@@ -1210,6 +1265,7 @@
         ${prepSection}
         ${custSection}
         ${mineSection}
+        ${handoffSection}
         ${timelineSection}
         <div class="msg-area" data-msg="${p.id}" style="font-size:12.5px;margin-top:8px;display:none;"></div>
       </div>
@@ -1232,9 +1288,7 @@ function normUrl(u){
   return u;
 }
   function escapeHtmlA(s){
-    const d = document.createElement('div');
-    d.textContent = s || '';
-    return d.innerHTML;
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
   function bindProjectCard(p){
@@ -1282,6 +1336,58 @@ function normUrl(u){
       a.href = URL.createObjectURL(blob);
       a.download = '증빙_' + (p.product_name || 'project').replace(/[^\w가-힣]+/g,'_') + '_' + new Date().toISOString().slice(0,10) + '.json';
       a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
+    });
+
+    const secBtn = card.querySelector('[data-sec-save]');
+    if(secBtn) secBtn.addEventListener('click', async ()=>{
+      const items = {}; card.querySelectorAll('[data-sec]').forEach(c => { items[c.dataset.sec] = c.checked; });
+      const note = (card.querySelector('[data-sec-note]') || {}).value || '';
+      const total = Object.keys(items).length, ok = Object.values(items).filter(Boolean).length;
+      if(ok < total && !note.trim()){ alert('체크하지 않은 항목이 있어요. 해당 없음이거나 못 한 이유를 메모에 적어주세요.'); return; }
+      if(!confirm('점검 기록을 저장할까요? (' + ok + '/' + total + '개 확인) 날짜와 함께 증빙으로 남아요.')) return;
+      const { error } = await sb.from('machim_projects').update({ security_check: { items, note: note.trim(), done_at: new Date().toISOString(), by: 'admin' } }).eq('id', p.id);
+      if(error){ alert('실패: ' + error.message); return; }
+      loadProjects();
+    });
+    const revReqBtn = card.querySelector('[data-revoke-req]');
+    if(revReqBtn) revReqBtn.addEventListener('click', async ()=>{
+      if(!confirm('고객 마이페이지에 "마침 접근 권한을 해제해 주세요" 안내가 표시되고, 요청 일시가 기록돼요. 진행할까요?')) return;
+      const { error } = await sb.from('machim_projects').update({ access_revoke_requested_at: new Date().toISOString() }).eq('id', p.id);
+      if(error){ alert('실패: ' + error.message); return; }
+      loadProjects();
+    });
+    const kgBtn = card.querySelector('[data-keyguide]');
+    if(kgBtn) kgBtn.addEventListener('click', async ()=>{
+      if(!p.customer_id){ alert('이 프로젝트는 아직 고객 계정에 연결되지 않아 대화를 보낼 수 없어요.'); return; }
+      if(!confirm('고객 마이페이지 1:1 대화에 접근권한 해제와 키 교체 방법을 보낼까요?')) return;
+      const body = [
+        '[납품 마무리 안내] 마지막으로 두 가지만 부탁드려요.',
+        '',
+        '1) 마침 접근 권한 해제',
+        '· GitHub 저장소: Settings → Collaborators 에서 마침 계정을 제거해주세요.',
+        '· Cloudflare, Supabase 등: 멤버(초대) 목록에서 마침 계정을 제거해주세요.',
+        '',
+        '2) 비밀키 교체 (마침이 키가 보이는 화면에 접근한 적이 있을 때만 해주세요. 키를 직접 입력하셨고 마침이 본 적이 없다면 교체하지 않으셔도 돼요)',
+        '· 결제(포트원): 포트원 콘솔에서 새 API 시크릿을 발급받고, Supabase Edge Functions → Secrets 에 같은 이름으로 새 값을 저장해주세요. 결제 테스트가 정상인 것을 확인한 뒤 이전 시크릿을 폐기해주세요. (메뉴 이름은 화면에 따라 조금 다를 수 있어요)',
+        '· Supabase: 마침이 service_role/secret 키가 보이는 화면을 본 경우에만, Settings → API Keys 에서 새 secret key를 만들고 쓰는 곳을 바꾼 뒤 정상 동작을 확인하고 이전 키를 정리해주세요. 사이트가 정상인 것을 확인하기 전에는 이전 키를 지우거나 비활성화하지 마세요.',
+        '· 교체 후에는 로그인과 결제(또는 핵심 기능)가 정상인지 한 번 확인해주세요.',
+        '· 키는 이메일·메신저로 보내지 말고, 본인 계정 화면에서만 입력해주세요.',
+        '',
+        '끝나면 마이페이지 하단의 "정리했어요" 버튼을 눌러주세요. 마침이 확인하고 마무리할게요.'
+      ].join('\n');
+      const { error } = await sb.from('machim_messages').insert({ customer_id: p.customer_id, sender: 'admin', body, project_id: p.id });
+      if(error){ alert('실패: ' + error.message); return; }
+      alert('마이페이지 대화로 보냈어요.');
+    });
+    const revVerBtn = card.querySelector('[data-revoke-verify]');
+    if(revVerBtn) revVerBtn.addEventListener('click', async ()=>{
+      const note = ((card.querySelector('[data-revoke-note]') || {}).value || '').trim();
+      if(!note){ alert('직접 확인한 내용을 적어주세요. (어디에서 무엇을 확인했는지)'); return; }
+      if(!p.access_revoke_customer_confirmed_at && !confirm('고객이 아직 정리했다고 확인하지 않았어요. 그래도 직접 확인했다고 기록할까요?')) return;
+      if(!confirm('이 프로젝트를 "완전 종료"로 기록합니다. 마침의 접근 권한이 실제로 없는 것을 확인하셨나요?')) return;
+      const { error } = await sb.from('machim_projects').update({ access_revoke_verified_at: new Date().toISOString(), access_revoke_note: note }).eq('id', p.id);
+      if(error){ alert('실패: ' + error.message); return; }
+      loadProjects();
     });
 
     const remindBtn = card.querySelector('[data-remind]');

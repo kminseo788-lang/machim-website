@@ -480,6 +480,7 @@
         <div class="action-box" id="actionBox"></div>
       </div>
       <div id="refundBox"></div>
+      <div id="handoffBox"></div>
     `;
 
     el.querySelectorAll('[data-pid]').forEach(b => b.addEventListener('click', ()=>{
@@ -491,6 +492,83 @@
     renderPrepCard();
     renderAction();
     renderRefundCard();
+    renderHandoffCard();
+  }
+
+  // ===== 납품 점검 결과 확인 + 접근권한 정리 =====
+  const SEC_LABELS = {
+    keys:'비밀키가 코드·저장소에 노출되어 있지 않은지', keyhandling:'비밀키를 마침이 열람·보관하지 않았는지',
+    rls:'다른 사람의 데이터에 접근할 수 없도록 권한이 설정되어 있는지', admin:'일반 계정으로 관리자 기능을 쓸 수 없는지',
+    pay:'결제 금액·상태를 서버에서 다시 확인하는지', xss:'입력한 값이 악성 코드로 실행되지 않는지',
+    upload:'업로드 파일이 비공개로 보관되는지', privacy:'수집하는 개인정보가 개인정보처리방침과 일치하는지',
+    https:'HTTPS 적용과 관리자 화면 접근 제한', deps:'사용 중인 외부 라이브러리의 알려진 취약점', backup:'데이터 백업과 복구', realdb:'실제 운영 환경에서의 권한 점검'
+  };
+  const SEC_ACK_TEXT = '위 점검은 납품 시점을 기준으로 마침이 직접 확인한 결과이며, 이후 새로 발견되는 취약점, 외부 서비스·라이브러리의 변경, 고객 또는 제3자가 사이트를 수정하거나 계정 정보를 공유해 생기는 문제까지 보장하는 것은 아니라는 점을 이해했어요. 이후 점검·보안 업데이트는 유지관리로 진행된다는 점도 확인했어요.';
+  function renderHandoffCard(){
+    const box = document.getElementById('handoffBox'); if(!box) return;
+    box.innerHTML = '';
+    if(!project) return;
+    let html = '';
+    const sc = project.security_check;
+    if(sc && sc.done_at){
+      const acked = project.security_ack_at && new Date(project.security_ack_at) >= new Date(sc.done_at);
+      const items = sc.items || {};
+      html += '<div class="card"><h2>납품 전 보안 점검 결과</h2>' +
+        '<p class="desc" style="margin-bottom:8px;">' + fmtDateTime(sc.done_at) + ' 기준으로 마침이 직접 확인한 항목이에요.</p>' +
+        '<ul style="margin:0 0 10px 0;padding:0;list-style:none;font-size:13.8px;line-height:1.9;">' +
+        Object.keys(SEC_LABELS).filter(k => k in items).map(k => '<li>' + (items[k] ? '<span style="color:#3B6B45;font-weight:800;">✓</span> ' : '<span style="color:var(--ink-faint);">○</span> ') + escapeHtml(SEC_LABELS[k]) + (items[k] ? '' : ' <span style="color:var(--ink-faint);font-size:12px;">(해당 없음 또는 확인하지 않음 · 아래 메모 참고)</span>') + '</li>').join('') +
+        '</ul>' + (sc.note ? '<div style="padding:10px 12px;border-radius:10px;background:var(--paper);font-size:13px;white-space:pre-line;margin-bottom:10px;">' + escapeHtml(sc.note) + '</div>' : '') +
+        (acked
+          ? '<div style="font-size:13.5px;color:#3B6B45;font-weight:700;">✓ ' + fmtDateTime(project.security_ack_at) + ' 확인하셨어요.</div>'
+          : '<div style="padding:12px 14px;border-radius:10px;background:var(--paper);font-size:13px;line-height:1.7;color:var(--ink-soft);margin-bottom:10px;">' + escapeHtml(SEC_ACK_TEXT) + '</div><div class="btn-row"><button class="btn" id="secAckBtn">확인했어요</button></div><div class="msg" id="secAckMsg"></div>') +
+        '</div>';
+    }
+    if(project.access_revoke_requested_at){
+      if(project.access_revoke_verified_at){
+        html += '<div class="card"><h2>마무리 완료</h2><p class="desc">마침의 접근 권한 정리까지 모두 확인되어 이 프로젝트가 완전히 종료되었어요. 이후 수정이나 점검이 필요하면 유지관리로 문의해주세요.</p></div>';
+      } else if(project.access_revoke_customer_confirmed_at){
+        html += '<div class="card"><h2>접근권한 정리</h2><p class="desc">정리 완료를 알려주셨어요. 마침이 확인하면 마무리돼요.</p></div>';
+      } else {
+        html += `
+      <div class="card" style="border:1.5px solid var(--brick);">
+        <h2>마지막 단계 · 마침 접근 권한 해제</h2>
+        <p class="desc" style="margin-bottom:10px;">사이트 제작을 위해 마침이 초대받았던 권한을 정리하면 모든 과정이 끝나요. 고객님의 계정과 사이트를 고객님만 관리할 수 있게 하는 단계예요.</p>
+        <ul style="margin:0 0 12px 18px;font-size:13.8px;line-height:1.8;color:var(--ink-soft);">
+          <li>GitHub 저장소: Settings → Collaborators 에서 마침 계정을 제거해요.</li>
+          <li>Cloudflare, Supabase 등: 멤버(초대) 목록에서 마침 계정을 제거해요.</li>
+          <li>비밀키 교체 (마침이 키가 보이는 화면에 접근한 적이 있을 때만 해주세요. 직접 입력하셨고 마침이 본 적이 없다면 교체하지 않으셔도 돼요):
+            <ul style="margin:4px 0 0 18px;">
+              <li>결제(포트원): 콘솔에서 새 API 시크릿을 발급받아 Supabase Secrets에 같은 이름으로 저장하고, 결제 테스트가 정상인지 확인한 뒤 이전 시크릿을 폐기해요.</li>
+              <li>Supabase: Settings → API Keys 에서 새 secret key를 만들고 쓰는 곳을 바꾼 뒤, 사이트가 정상인 것을 확인하고 이전 키를 정리해요. 확인 전에는 이전 키를 지우거나 비활성화하지 마세요.</li>
+              <li>교체 후 로그인과 결제(핵심 기능)가 정상인지 한 번 확인해 주세요. 키는 이메일·메신저로 보내지 마세요.</li>
+            </ul></li>
+        </ul>
+        <div class="btn-row"><button class="btn" id="handoffBtn">정리했어요</button></div>
+        <div class="msg" id="handoffMsg"></div>
+      </div>`;
+      }
+    }
+    box.innerHTML = html;
+    const refresh = async () => {
+      const { data } = await sb.from('machim_projects').select('*').eq('id', project.id).maybeSingle();
+      if(data){ const i = allProjects.findIndex(y => y.id === data.id); if(i >= 0) allProjects[i] = data; project = data; }
+      renderHandoffCard();
+    };
+    const ackBtn = document.getElementById('secAckBtn');
+    if(ackBtn) ackBtn.addEventListener('click', async () => {
+      const m = document.getElementById('secAckMsg'); ackBtn.disabled = true;
+      const { error } = await sb.from('machim_projects').update({ security_ack_at: new Date().toISOString(), security_ack_text: SEC_ACK_TEXT }).eq('id', project.id);
+      if(error){ m.textContent = '저장하지 못했어요. 잠시 후 다시 시도해주세요.'; ackBtn.disabled = false; return; }
+      refresh();
+    });
+    const hb = document.getElementById('handoffBtn');
+    if(hb) hb.addEventListener('click', async () => {
+      if(!confirm('마침의 접근 권한을 모두 해제하셨나요?')) return;
+      const m = document.getElementById('handoffMsg'); hb.disabled = true;
+      const { error } = await sb.from('machim_projects').update({ access_revoke_customer_confirmed_at: new Date().toISOString() }).eq('id', project.id);
+      if(error){ m.textContent = '저장하지 못했어요. 잠시 후 다시 시도해주세요.'; hb.disabled = false; return; }
+      refresh();
+    });
   }
 
   // ===== 취소·환불 =====
@@ -525,7 +603,7 @@
     btn.addEventListener('click', async () => {
       const reason = document.getElementById('refundReason').value, msg = document.getElementById('refundMsg');
       if(!reason){ msg.textContent = '사유를 선택해주세요.'; return; }
-      if(!confirm(d.mode === 'auto' ? '정말 취소하시겠어요?\n바로 전액 환불 처리되며 되돌릴 수 없어요.' : '환불을 신청할까요?')) return;
+      if(!confirm(d.mode === 'auto' ? '정말 취소하시겠어요?\n' + (d.full ? '바로 전액' : money(d.amount)) + ' 환불 처리되며 되돌릴 수 없어요.' + (d.full ? '' : '\n(제작이 시작되어 결제 금액의 30%는 환불되지 않아요)') : '환불을 신청할까요?')) return;
       btn.disabled = true; msg.textContent = '처리 중…';
       try{
         const r = await sb.functions.invoke('machim-cancel-order', { body: { action: 'cancel', projectId: pid, reason } });

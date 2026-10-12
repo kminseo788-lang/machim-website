@@ -21,7 +21,7 @@
        // orders.insert(...) 의 options 필드 등에 consent 를 같이 저장
    ========================================================= */
 
-const CONSENT_VERSION = '2026-10-08f';
+const CONSENT_VERSION = '2026-10-12c';
 
 // 1마침이 기본으로 안내하는 배포(호스팅) 서비스. 서비스를 바꾸고 싶으면 이 한 줄만 고치면
 // 동의 문구에 반영됩니다. (terms.html, guide-hosting-domain.html 의 문구도 같이 확인하세요)
@@ -43,6 +43,7 @@ const COMMON_CONSENT_ITEMS = [
         <li>호스팅·도메인의 <strong>요금제, 사용량 한도, 갱신 비용</strong>은 고객님이 해당 회사와 직접 맺는 계약이라 그 회사의 약관과 요금표가 적용돼요. 제가 대신 정하거나 바꿀 수 없는 부분이라, 가입하실 때 요금제를 꼭 확인해주세요. 나중에 예상치 못한 요금으로 서로 곤란해지는 일을 막기 위해 미리 분명히 해두는 내용이에요.</li>
         <li>상품·서비스 판매나 광고 수익처럼 <strong>영리 목적으로 운영</strong>하신다면, 선택한 요금제가 영리 이용을 허용하는지 가입할 때 함께 확인해주세요. 서비스 회사의 정책은 바뀔 수 있고, 바뀐 뒤의 요금이나 제한은 그 회사의 기준이 적용돼요.</li>
         <li>호스팅 회사의 장애·정책 변경·계정 정지 등으로 사이트가 멈추거나 옮겨야 할 때는, 복구·이전 작업을 별도 유지보수로 도와드려요. 비용과 일정은 건별로 협의해요.</li>
+        <li><strong>결제 연동 비밀키 같은 중요한 키는 고객님이 직접 입력해요.</strong> 마침은 비밀키를 요구하거나 열람·보관하지 않고, 입력 방법만 안내해드려요. 키는 이메일·메신저로 주고받지 마세요. 작업이 끝나면 마침의 접근 권한을 해제하고 키를 새로 발급받아 교체하는 마무리 단계가 있어요.</li>
         <li><strong>배포 준비는 시안 승인 이후에 부탁드려요.</strong> 시안을 승인하시면 마이페이지에 호스팅 가입, 협업자 초대, 도메인 준비 안내가 열려요. 보통 20~30분이면 끝나고, 개발이 진행되는 동안 해주시면 일정이 늦어지지 않아요. 준비가 지연되면 배포도 그만큼 미뤄지고, <strong>준비 요청 후 14일이 지나도 완료되지 않으면 다른 고객님 작업을 먼저 진행</strong>할 수 있어요. 준비가 끝나면 가장 빠른 일정으로 이어서 배포해드려요. (약관 제4조 4-7)</li>
         <li>가입과 구매 방법은 <a href="guide-hosting-domain.html" target="_blank" style="color:var(--brick);text-decoration:underline;">이 안내 페이지</a>에 순서대로 정리해두었어요. 막히는 부분은 문의하기에 글이나 캡처로 남겨주세요. (비밀번호 등 개인정보가 보이는 부분은 가리고 보내주세요.) 어디를 눌러야 하는지 글로 안내해드려요.</li>
       </ul>
@@ -52,11 +53,13 @@ const COMMON_CONSENT_ITEMS = [
     title: '결제 · 환불 · 청약철회 안내',
     html: `
       <ul>
-        <li>이 서비스는 결제 직후부터 <strong>고객님만을 위해 개별 제작에 들어가는 주문제작</strong>이에요. 그래서 진행 단계별 환불 기준을 미리 분명하게 정해두었어요. 서로 오해가 생기지 않도록 하기 위한 기준이에요.</li>
-        <li><strong>제작 착수 전</strong>: 결제 후 시간이 얼마나 지났는지와 관계없이, 사유와 관계없이(단순 변심 포함) <strong>전액 환불</strong>해드려요. 마이페이지에서 취소하시면 바로 자동으로 처리돼요. ‘착수 전’은 선택하신 <strong>착수일이 되기 전</strong>이면서 마침이 <strong>방향서를 보내드리기 전</strong>인 상태를 말해요. (자료를 미리 제출하셨더라도 위 조건이면 착수 전이에요)</li>
-        <li><strong>제작 착수 후 ~ 시안 전달 전</strong>: 이미 진행된 작업 비용(결제 금액의 30%)을 제외하고 70%를 환불해드려요. 신청하시면 확인 후 처리돼요.</li>
-        <li><strong>시안 전달 이후</strong>: 전자상거래법상 청약철회가 제한되는 단계라 원칙적으로 환불이 어려워요. 다만 마침 쪽 사유(약속한 납품일의 큰 지연, 계약과 다른 결과물, 명백한 하자·오류 등)가 있다면 개별적으로 검토해서 환불 여부와 금액을 안내드려요. 단순 변심이나 시안에 대한 취향상의 불만은 환불 사유로 보기 어려워요.</li>
-        <li>취소는 마이페이지에서 직접 신청하실 수 있고, 현재 단계에 따라 환불 가능 여부와 금액이 바로 안내돼요. 착수 후 신청이나 마침 쪽 사유를 주장하시는 경우는 신청 내용으로 접수되고, 확인 후 개별 안내해드려요.</li>
+        <li>이 서비스는 <strong>고객님만을 위해 개별 제작하는 주문제작 용역</strong>이에요. 그래서 진행 단계별 환불 기준을 미리 분명하게 정해두었어요. 서로 오해가 생기지 않도록 하기 위한 기준이에요.</li>
+        <li><strong>용역 제공 개시 시점</strong>: 마침이 고객님께 <strong>방향서를 보내드린 때</strong>부터 용역 제공이 시작된 것으로 봐요. 방향서에는 상담과 자료 검토를 거쳐 정리한 제작 방향이 담겨요.</li>
+        <li><strong>방향서 발송 전</strong>: 결제 후 시간이 얼마나 지났는지와 관계없이, 사유와 관계없이(단순 변심 포함) <strong>전액 환불</strong>해드려요. 마이페이지에서 취소하시면 바로 자동으로 처리돼요.</li>
+        <li><strong>방향서 발송 후 ~ 시안 전달 전</strong>: 이미 진행된 기획·준비 작업 비용(결제 금액의 30%)을 제외하고 <strong>70%를 환불</strong>해드려요. 이 경우에도 마이페이지에서 취소하시면 바로 자동으로 처리돼요.</li>
+        <li><strong>시안 전달 이후</strong>: 이미 용역이 상당 부분 제공된 단계라 전자상거래법상 청약철회가 제한되고, 원칙적으로 환불이 어려워요. 다만 마침 쪽 사유(약속한 납품일의 큰 지연, 계약과 다른 결과물, 명백한 하자·오류 등)가 있다면 개별적으로 검토해서 환불 여부와 금액을 안내드려요. 단순 변심이나 시안에 대한 취향상의 불만은 환불 사유로 보기 어려워요.</li>
+        <li><strong>계약과 다르게 진행된 경우</strong>: 결과물이 고객님이 승인하신 방향서와 안내된 제작 범위(페이지 수·기능·수정 횟수 등)와 현저히 다르면, 먼저 마이페이지로 <strong>시정을 요청</strong>해주세요. 마침이 합리적인 기간 안에 바로잡아 드리고, 그래도 해결되지 않으면 환불을 안내드려요. 법에서 정한 고객님의 권리는 이 안내로 제한되지 않아요.</li>
+        <li>취소는 마이페이지에서 직접 하시고, 현재 단계에 따라 환불 금액이 바로 안내돼요. 시안 이후 신청이나 마침 쪽 사유를 주장하시는 경우는 신청 내용으로 접수되고, 확인 후 개별 안내해드려요.</li>
         <li>환불은 결제 취소 신청 후 영업일 기준 3~5일 안에 처리돼요. 카드사 사정에 따라 다소 달라질 수 있고, 평일 오후 5시 이후 접수는 다음 영업일에 처리돼요. (주말·공휴일 제외)</li>
       </ul>
     `
@@ -67,6 +70,7 @@ const COMMON_CONSENT_ITEMS = [
       <ul>
         <li>안내된 제작 기간은 필요한 자료를 모두 받은 <strong>착수일부터 세는 예상 일정</strong>이에요.</li>
         <li>자료 제출이나 확인·승인, 배포 준비가 늦어지거나, 기본 범위를 넘는 수정을 요청하시면 <strong>그만큼 일정이 뒤로 밀려요.</strong> 서로 일정을 정확히 맞추기 위해 미리 안내드리는 내용이에요.</li>
+        <li><strong>보안 점검은 납품 시점을 기준으로 해요.</strong> 마침은 납품 전에 접근 권한, 결제 확인, 비밀키 노출 같은 주요 보안 항목을 직접 점검하고, 그 결과를 마이페이지로 보여드려 확인받아요. 다만 이후에 새로 발견되는 취약점이나 외부 서비스의 변경, 고객님 또는 제3자가 사이트를 수정하거나 계정 정보를 공유해 생기는 문제까지 보장하는 것은 아니에요. 납품 후 점검과 보안 업데이트는 유지관리로 진행돼요. 마침의 책임 범위는 이용약관 제8조에 따라요.</li>
         <li>마침 쪽 사정으로 안내한 기간보다 늦어질 것 같으면 <strong>먼저 알려드리고</strong>, 새 일정으로 계속 진행할지 계약을 끝낼지 고객님이 선택하실 수 있어요. 마침 쪽 사유로 늦어진 경우의 환불은 위 환불 기준의 '마침 쪽 사유' 검토 절차로 안내해드려요.</li>
         <li>디자인 시안은 <strong>방향을 확인하고 승인받기 위한 자료</strong>예요. 상품 규모에 맞게 이미지·PDF·미리보기 링크 등 알맞은 형태로 보내드리고, 시안을 만드는 데 쓴 <strong>원본 작업 파일은 제공하지 않아요.</strong> 최종 결과물로는 완성된 사이트와 소스코드를 드려요. 특정 형태의 시안이 꼭 필요하시면 결제 전에 문의해주세요.</li>
         <li>마침이 책임을 져야 하는 경우, 그 범위는 <strong>결제하신 금액을 한도</strong>로 해요. 사이트가 늦어지거나 오류가 난 것 때문에 생기는 매출 감소 같은 간접적인 손해까지는 책임지기 어려운 점을 미리 말씀드려요. 다만 마침의 고의 또는 중대한 과실로 생긴 손해에는 이 한도가 적용되지 않고, 법에서 정한 고객님의 권리도 이 내용으로 제한되지 않아요.</li>
@@ -135,6 +139,13 @@ function renderConsent({ containerId, payBtnId, productName, productKey, approve
           </label>
         </div>
       </div>` : ''}
+      <div class="cc-agree-row" style="margin-bottom:10px;">
+        <input type="checkbox" id="cc-wd-${containerId}">
+        <label for="cc-wd-${containerId}">
+          <strong>주문제작 용역이며, 마침이 방향서를 보내 제작이 시작된 뒤에는 전자상거래법상 7일 이내 단순 변심 청약철회가 제한</strong>되고, 시안 전까지는 결제 금액의 70%만 환불된다는 점을 확인했어요.
+          <span class="cc-fine">방향서를 보내기 전에는 언제든 사유와 관계없이 전액 환불돼요.</span>
+        </label>
+      </div>
       <div class="cc-agree-row">
         <input type="checkbox" id="cc-agree-${containerId}">
         <label for="cc-agree-${containerId}">
@@ -198,6 +209,8 @@ function renderConsent({ containerId, payBtnId, productName, productKey, approve
   });
 
   const checkbox = document.getElementById('cc-agree-' + containerId);
+  const wdBox = document.getElementById('cc-wd-' + containerId);
+  let wdAckAt = null;
   const hostBox = document.getElementById('cc-host-' + containerId);
   const hostChoiceBox = document.getElementById('cc-hostchoice-' + containerId);
   const hostLabel = document.getElementById('cc-hostlabel-' + containerId);
@@ -217,7 +230,7 @@ function renderConsent({ containerId, payBtnId, productName, productKey, approve
   function refresh() {
     const modeOk = hostChoice.mode === 'default' || hostChoice.screened === 'pass' || hostChoice.screened === 'approved';
     const hostOk = !hostBox || (hostBox.checked && modeOk);
-    const ok = checkbox.checked && hostOk;
+    const ok = checkbox.checked && wdBox.checked && hostOk;
     if (payBtn) payBtn.disabled = !ok;
     _lastConsentPayload = {
       agreed: ok,
@@ -226,6 +239,7 @@ function renderConsent({ containerId, payBtnId, productName, productKey, approve
       product_name: productName || null,
       items_shown: items.map((it) => it.title),
       text_snapshot: textSnapshot,
+      withdrawal_ack: { agreed: wdBox.checked, at: wdAckAt, text: wdBox.parentElement.querySelector('label').textContent.replace(/\s+/g, ' ').trim() },
       hosting_ack: hostBox ? { agreed: hostBox.checked, at: hostAckAt, hosting_service: hostChoice.mode === 'other' ? (hostChoice.service || '') : DEFAULT_HOSTING_NAME } : null,
       hosting_choice: hostBox ? hostChoice : null,
       page_url: location.href,
@@ -233,6 +247,7 @@ function renderConsent({ containerId, payBtnId, productName, productKey, approve
     };
   }
   checkbox.addEventListener('change', refresh);
+  wdBox.addEventListener('change', () => { wdAckAt = wdBox.checked ? new Date().toISOString() : null; refresh(); });
   if (hostBox) hostBox.addEventListener('change', () => {
     hostAckAt = hostBox.checked ? new Date().toISOString() : null;
     refresh();
