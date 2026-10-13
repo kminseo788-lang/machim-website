@@ -418,6 +418,39 @@
   }
   function fmtDate(iso){ return fmtDateTime(iso); }
 
+  // 진행 기록(방향서·시안·최종 결과물을 받은 시각 등)은 서버가 기록한 시각을 그대로 보여줍니다.
+  const evCache = {};
+  const RECV = { '방향승인': ['방향서 받음', '방향서 발송', '방향서 승인', '고객 방향서 승인'], '시안승인': ['시안 받음', '시안 발송', '시안 승인', '고객 시안 승인'], '개발중': null, '최종확인': ['최종 결과물 받음', '최종 결과물 발송', '최종 승인', '고객 최종 승인'] };
+  const STAGE_RECV = { '방향서승인대기': ['방향서 받은 시각', '방향서 발송'], '프로토타입승인대기': ['시안 받은 시각', '시안 발송'], '최종확인대기': ['최종 결과물 받은 시각', '최종 결과물 발송'] };
+  function lastEv(list, type){ const m = (list || []).filter(e => e.event_type === type); return m.length ? m[m.length - 1].occurred_at : null; }
+  function applyEvents(){
+    if(!project) return;
+    const list = evCache[project.id]; if(!list) return;
+    document.querySelectorAll('.timeline li[data-step]').forEach(li => {
+      const cfg = RECV[li.dataset.step]; if(!cfg) return;
+      const a = lastEv(list, cfg[1]), b = lastEv(list, cfg[3]);
+      const parts = [];
+      if(a) parts.push(cfg[0] + ' ' + fmtDateTime(a));
+      if(b) parts.push(cfg[2] + ' ' + fmtDateTime(b));
+      const ln = li.querySelector('.evline'); if(ln) ln.textContent = parts.join(' · ');
+    });
+    const sr = STAGE_RECV[project.current_stage], box = document.getElementById('actionBox');
+    if(sr && box && !box.querySelector('.recv-time')){
+      const t = lastEv(list, sr[1]);
+      if(t){ const d = document.createElement('div'); d.className = 'recv-time'; d.style.cssText = 'font-size:12.5px;color:var(--ink-faint);margin-bottom:8px;'; d.textContent = sr[0] + ': ' + fmtDateTime(t); box.insertBefore(d, box.firstChild); }
+    }
+  }
+  async function loadEvents(){
+    if(!project) return;
+    const pid = project.id;
+    if(evCache[pid]){ applyEvents(); return; }
+    try{
+      const { data } = await sb.from('machim_project_events').select('event_type,occurred_at').eq('project_id', pid).order('occurred_at', { ascending: true });
+      evCache[pid] = data || [];
+    }catch(e){ console.error(e); return; }
+    if(project && project.id === pid) applyEvents();
+  }
+
   function render(){
     const el = document.getElementById('content');
     const idx = STAGE_ORDER.indexOf(project.current_stage);
@@ -437,7 +470,7 @@
       let cls = 'pending', mark = '○';
       if(s.doneIf || s.doneAt){ cls='done'; mark='✓'; }
       else if(s.currentIf){ cls='current'; mark='●'; }
-      timelineHtml += `<li class="${cls}"><span class="mark">${mark}</span><span>${s.date && (cls==='done') ? `<span class="date">${fmtDate(s.date)}</span>`:''}${s.label}</span></li>`;
+      timelineHtml += `<li class="${cls}" data-step="${s.key}"><span class="mark">${mark}</span><span>${s.date && (cls==='done') ? `<span class="date">${fmtDate(s.date)}</span>`:''}${s.label}<span class="evline" style="display:block;font-size:12px;color:var(--ink-faint);margin-top:2px;"></span></span></li>`;
     });
 
     let switcherHtml = '';
@@ -488,6 +521,7 @@
     renderPrepCard();
     renderAction();
     renderRefundCard();
+    loadEvents();
     renderHandoffCard();
   }
 
