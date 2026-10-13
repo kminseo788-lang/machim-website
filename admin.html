@@ -366,6 +366,12 @@
 </div>
 
 <script>
+  // 모든 시각은 한국시간(KST)으로 날짜+시:분까지 표기
+  function kstDT(iso){
+    if(!iso) return '';
+    const f = new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Seoul', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23' }).formatToParts(new Date(iso)), g = t => (f.find(x => x.type === t) || {}).value;
+    return g('year') + '-' + g('month') + '-' + g('day') + ' ' + g('hour') + ':' + g('minute');
+  }
   // menu nav
   document.querySelectorAll('.menu button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -409,7 +415,7 @@
       const amountText = (o.amount || 0).toLocaleString('ko-KR') + '원';
       const startText = o.start_date || (o.options && o.options.picked_start_date_label) || '-';
       tr.innerHTML = `
-        <td>${escapeHtmlA(o.customer_name || '-')}<div style="font-size:11.5px;color:var(--ink-faint);">${escapeHtmlA(o.customer_email || '')}</div></td><td>${escapeHtmlA(o.product_name)}</td><td>${amountText}</td>
+        <td>${escapeHtmlA(o.customer_name || '-')}<div style="font-size:11.5px;color:var(--ink-faint);">${escapeHtmlA(o.customer_email || '')}</div><div style="font-size:11.5px;color:var(--ink-faint);">접수 ${kstDT(o.created_at)}</div></td><td>${escapeHtmlA(o.product_name)}</td><td>${amountText}</td>
         <td>${escapeHtmlA(o.customer_phone || '-')}</td><td>${escapeHtmlA(startText)}</td>
         <td>
           <select class="status-select" data-id="${o.id}">
@@ -503,10 +509,7 @@
     if(h < 24) return h + '시간 ' + (m % 60) + '분';
     return Math.floor(h / 24) + '일 ' + (h % 24) + '시간';
   }
-  function fmtMD(iso){
-    const d = new Date(iso), p = n => String(n).padStart(2,'0');
-    return (d.getMonth()+1) + '.' + d.getDate() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
-  }
+  function fmtMD(iso){ return kstDT(iso); }
 
   async function loadInbox(quiet){
     const list = document.getElementById('inboxList');
@@ -668,7 +671,7 @@
     if(!data || !data.length){ box.textContent = '환불 신청이 없어요.'; return; }
     const won = n => (n == null ? '-' : Number(n).toLocaleString() + '원');
     // 시각은 한국 시간으로 표시 (DB 값은 세계 표준시)
-    const kstShort = iso => iso ? new Date(iso).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\. /g, '-').replace(/-(\d{2}):/, ' $1:').replace(/\.$/, '') : '-';
+    const kstShort = iso => iso ? kstDT(iso) : '-';
     // 결제 금액을 알아야 퍼센트 버튼으로 금액을 계산할 수 있어요
     const orderAmt = {};
     const oids = [...new Set(data.map(r => r.order_id).filter(Boolean))];
@@ -678,7 +681,7 @@
       const open = r.status === '접수';
       return '<div style="border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:8px;' + (open ? 'background:#FFF8F0;' : '') + '">'
         + '<div><b>' + escapeHtmlA(r.customer_email || '-') + '</b> · ' + (modeLbl[r.mode] || r.mode) + ' · <b style="color:' + (open ? 'var(--brick)' : 'var(--ink-faint)') + ';">' + r.status + '</b> <span style="color:var(--ink-faint);font-size:12px;">' + escapeHtmlA(kstShort(r.created_at)) + '</span></div>'
-        + '<div style="margin-top:4px;color:var(--ink-soft);">사유: ' + escapeHtmlA(r.reason || '-') + ' · 기준 금액 ' + won(r.suggested_amount) + (r.refund_amount != null ? ' · 환불 ' + won(r.refund_amount) : '') + (r.admin_note ? ' · ' + escapeHtmlA(r.admin_note) : '') + '</div>'
+        + '<div style="margin-top:4px;color:var(--ink-soft);">사유: ' + escapeHtmlA(r.reason || '-') + ' · 기준 금액 ' + won(r.suggested_amount) + (r.refund_amount != null ? ' · 환불 ' + won(r.refund_amount) : '') + (r.processed_at ? ' · 처리 ' + escapeHtmlA(kstDT(r.processed_at)) : '') + (r.admin_note ? ' · ' + escapeHtmlA(r.admin_note) : '') + '</div>'
         + (open ? (orderAmt[r.order_id] ? '<div style="margin-top:6px;font-size:12.5px;color:var(--ink-soft);">결제 금액 <b>' + won(orderAmt[r.order_id]) + '</b> · 퍼센트 버튼을 누르면 금액이 자동으로 채워져요(원 단위 버림).</div><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">' + [100, 70, 50, 30].map(pc => '<button type="button" class="save-btn" data-rpct="' + pc + '" data-rfor="' + r.id + '" data-rtotal="' + orderAmt[r.order_id] + '" style="padding:4px 10px;background:#fff;color:var(--ink);border:1.5px solid var(--line);">' + pc + '% · ' + Math.floor(orderAmt[r.order_id] * pc / 100).toLocaleString() + '원</button>').join('') + '</div>' : '') + '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;"><label style="font-size:12.5px;">환불 금액 <input type="number" min="1" value="' + (r.suggested_amount || '') + '" data-ramt="' + r.id + '" style="width:120px;"></label>'
           + '<button class="save-btn" data-rok="' + r.id + '" style="padding:5px 12px;">승인 · 환불 실행</button><button class="save-btn" data-rno="' + r.id + '" style="padding:5px 12px;background:#888;">거절</button></div>' : '')
         + '</div>';
@@ -725,7 +728,7 @@
     const list = document.getElementById('campList');
     if(ol.error){ list.textContent = ''; return; }
     const paid = (ol.data || []).filter(x => x.status === '결제완료' && x.options && x.options.payment && x.options.payment.channelType === 'LIVE');
-    list.innerHTML = paid.length ? '<b>결제 완료</b><br>' + paid.map((x, i) => (paid.length - i) + '. ' + escapeHtmlA(x.customer_name || '-') + ' · ' + escapeHtmlA(x.customer_email || '') + ' · ' + fmtMD(String(x.created_at).slice(0, 10))).join('<br>') : '아직 실결제로 완료된 신청이 없어요. (테스트 결제는 인원에 세지 않아요)';
+    list.innerHTML = paid.length ? '<b>결제 완료</b><br>' + paid.map((x, i) => (paid.length - i) + '. ' + escapeHtmlA(x.customer_name || '-') + ' · ' + escapeHtmlA(x.customer_email || '') + ' · ' + kstDT(x.created_at)).join('<br>') : '아직 실결제로 완료된 신청이 없어요. (테스트 결제는 인원에 세지 않아요)';
   }
   async function loadStageDays(){
     const body = document.getElementById('stageBody'); if(!body) return;
@@ -1095,7 +1098,7 @@
     const evs = projectEvents[p.id] || [];
     const evAt = (type)=>{ const m = evs.filter(e => e.event_type === type); return m.length ? m[m.length-1].occurred_at : null; };
     const sentBrief = evAt('방향서 발송'), sentProto = evAt('시안 발송'), sentFinal = evAt('최종 결과물 발송');
-    const fd = (iso)=> iso ? new Date(iso).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'}) : '';
+    const fd = (iso)=> kstDT(iso);
     const idx = ['자료제출대기','방향서대기','방향서승인대기','프로토타입대기','프로토타입승인대기','개발중','최종확인대기','배포완료'].indexOf(p.current_stage);
     const steps = [
       { label:'결제',     done:true },
